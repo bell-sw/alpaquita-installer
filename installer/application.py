@@ -1,3 +1,5 @@
+import asyncio
+
 import urwid
 
 from subiquitycore.ui.anchors import HeaderColumns
@@ -38,7 +40,7 @@ class ApplicationUI(urwid.WidgetWrap):
 class Application:
     make_ui = ApplicationUI
 
-    def __init__(self):
+    def __init__(self, header: str, palette=()):
         self._controllers = []
         self._controllers.extend([
             UserController(self),
@@ -49,9 +51,17 @@ class Application:
         self._ctrl_idx = 0
 
         self.ui = self.make_ui()
-        self.ui.set_header('Alpaca Linux Installation')
+        self.ui.set_header(header)
+        self._palette = palette
 
+        self.aio_loop = asyncio.get_event_loop()
+        self._urwid_loop = urwid.MainLoop(widget=self.ui, palette=self._palette,
+                                          handle_mouse=False, pop_ups=True,
+                                          event_loop=urwid.AsyncioEventLoop(loop=self.aio_loop))
+
+    def run(self):
         self._display_screen()
+        self._urwid_loop.run()
 
     def _move_screen(self, increment):
         if increment > 0:
