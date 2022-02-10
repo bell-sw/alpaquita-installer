@@ -18,9 +18,10 @@ class ApplicationUI(urwid.WidgetWrap):
                                     Color.frame_header_fringe(urwid.Text(''))])
         self._pile = urwid.Pile([('pack', self._header),
                                  ('pack', title_cols),
+                                 ('pack', urwid.Text('')),
                                  urwid.ListBox([urwid.Text('Body')])
                                  ])
-        self._pile.focus_position = 2
+        self._pile.focus_position = 3
 
         super().__init__(Color.body(self._pile))
 
@@ -31,7 +32,7 @@ class ApplicationUI(urwid.WidgetWrap):
         self._title.set_text(title)
 
     def set_body(self, body):
-        self._pile.contents[2] = (body, self._pile.contents[2][1])
+        self._pile.contents[3] = (body, self._pile.contents[3][1])
 
 
 class Application:
