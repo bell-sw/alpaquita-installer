@@ -9,6 +9,7 @@ from controllers.timezone import TimezoneController
 from controllers.root_password import RootPasswordController
 from controllers.proxy import ProxyController
 from controllers.user import UserController
+from .error import ErrorMsgStretchy
 
 class ApplicationUI(urwid.WidgetWrap):
     def __init__(self):
@@ -35,6 +36,10 @@ class ApplicationUI(urwid.WidgetWrap):
 
     def set_body(self, body):
         self._pile.contents[3] = (body, self._pile.contents[3][1])
+
+    @property
+    def body(self):
+        return self._pile.contents[3][0]
 
 
 class Application:
@@ -81,3 +86,6 @@ class Application:
         view = self._controllers[self._ctrl_idx].make_ui()
         self.ui.set_title(view.title)
         self.ui.set_body(view)
+
+    def show_error_message(self, msg: str):
+        self.ui.body.show_stretchy_overlay(ErrorMsgStretchy(self, msg))
