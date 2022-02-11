@@ -3,7 +3,7 @@ import asyncio
 import urwid
 
 from subiquitycore.ui.anchors import HeaderColumns
-from subiquitycore.ui.utils import Color
+from subiquitycore.ui.utils import Color, LoadingDialog
 
 from controllers.timezone import TimezoneController
 from controllers.root_password import RootPasswordController
@@ -11,7 +11,17 @@ from controllers.proxy import ProxyController
 from controllers.user import UserController
 from .error import ErrorMsgStretchy
 
+# From Ubuntu
+# When waiting for something of unknown duration, block the UI for at
+# most this long before showing an indication of progress.
+MAX_BLOCK_TIME = 0.1
+# If an indication of progress is shown, show it for at least this
+# long to avoid excessive flicker in the UI.
+MIN_SHOW_PROGRESS_TIME = 1.0
+
 class ApplicationUI(urwid.WidgetWrap):
+    block_input = False
+
     def __init__(self):
         self._header = urwid.Text('Header', align='center')
         self._title = urwid.Text('Title', align='left')
@@ -40,6 +50,10 @@ class ApplicationUI(urwid.WidgetWrap):
     @property
     def body(self):
         return self._pile.contents[3][0]
+
+    def keypress(self, size, key: str):
+        if not self.block_input:
+            return super().keypress(size, key)
 
 
 class Application:
@@ -89,3 +103,65 @@ class Application:
 
     def show_error_message(self, msg: str):
         self.ui.body.show_stretchy_overlay(ErrorMsgStretchy(self, msg))
+
+    # From Ubuntu TuiApplication
+    async def _wait_with_indication(self, awaitable, show, hide=None):
+        """Wait for something but tell the user if it takes a while.
+
+        When waiting for something that can take an unknown length of
+        time, we want to tell the user if it takes more than a moment
+        (defined as MAX_BLOCK_TIME) but make sure that we display any
+        indication for long enough that the UI is not flickering
+        incomprehensibly (MIN_SHOW_PROGRESS_TIME).
+        """
+        min_show_task = None
+
+        def _show():
+            self.ui.block_input = False
+            nonlocal min_show_task
+            min_show_task = self.aio_loop.create_task(
+                asyncio.sleep(MIN_SHOW_PROGRESS_TIME))
+            show()
+
+        self.ui.block_input = True
+        show_handle = self.aio_loop.call_later(MAX_BLOCK_TIME, _show)
+        try:
+            result = await awaitable
+        finally:
+            if min_show_task:
+                await min_show_task
+                if hide is not None:
+                    hide()
+            else:
+                self.ui.block_input = False
+                show_handle.cancel()
+
+        return result
+
+    # From Ubuntu TuiApplication
+    async def wait_with_text_dialog(self, awaitable, message,
+                                    *, can_cancel=False):
+        ld = None
+
+        task_to_cancel = None
+        if can_cancel:
+            if not isinstance(awaitable, asyncio.Task):
+                orig = awaitable
+
+                async def w():
+                    return await orig
+                awaitable = task_to_cancel = self.aio_loop.create_task(w())
+            else:
+                task_to_cancel = None
+
+        def show_load():
+            nonlocal ld
+            ld = LoadingDialog(
+                self.ui.body, self.aio_loop, message, task_to_cancel)
+            self.ui.body.show_overlay(ld, width=ld.width)
+
+        def hide_load():
+            ld.close()
+
+        return await self._wait_with_indication(
+            awaitable, show_load, hide_load)
