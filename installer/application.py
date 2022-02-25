@@ -9,7 +9,9 @@ from controllers.timezone import TimezoneController
 from controllers.root_password import RootPasswordController
 from controllers.proxy import ProxyController
 from controllers.user import UserController
+from controllers.network import NetworkController
 from .error import ErrorMsgStretchy
+from nmanager.manager import NetworkManager
 
 # From Ubuntu
 # When waiting for something of unknown duration, block the UI for at
@@ -60,8 +62,13 @@ class Application:
     make_ui = ApplicationUI
 
     def __init__(self, header: str, palette=()):
+        # TODO: maybe move this into NetworkController
+        self.nmanager = NetworkManager()
+        self.nmanager.add_host_ifaces()
+
         self._controllers = []
         self._controllers.extend([
+            NetworkController(self),
             UserController(self),
             TimezoneController(self),
             RootPasswordController(self),
