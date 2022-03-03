@@ -2,10 +2,10 @@ import re
 import time
 import subprocess
 
-
-def run_cmd(args, timeout: float = None, ignore_status: bool = False) -> subprocess.CompletedProcess:
+# TODO: add a type to input
+def run_cmd(args, input=None, timeout: float = None, ignore_status: bool = False) -> subprocess.CompletedProcess:
     try:
-        res = subprocess.run(args,
+        res = subprocess.run(args, input=input,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              timeout=timeout, check=False)
     except subprocess.TimeoutExpired:
