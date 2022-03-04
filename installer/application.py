@@ -8,6 +8,7 @@ from subiquitycore.ui.utils import Color, LoadingDialog
 from controllers.timezone import TimezoneController
 from controllers.root_password import RootPasswordController
 from controllers.proxy import ProxyController
+from controllers.repo import RepoController
 from controllers.user import UserController
 from controllers.network import NetworkController
 from .error import ErrorMsgStretchy
@@ -73,6 +74,7 @@ class Application:
             TimezoneController(self),
             RootPasswordController(self),
             ProxyController(self),
+            RepoController(self),
         ])
         self._ctrl_idx = 0
 
