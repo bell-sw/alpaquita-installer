@@ -1,21 +1,26 @@
 import urwid
 
 from subiquitycore.view import BaseView
-from subiquitycore.ui.form import Form, URLField, StringField, ReadOnlyField
+from subiquitycore.ui.form import (
+    Form,
+    URLField,
+    ReadOnlyField,
+    NO_HELP
+)
 
 class RepoForm(Form):
     cancel_label = 'Back'
-    repo_base_url = URLField('Repository server:')
-    repo_field0 = ReadOnlyField('Repositories:')
-    repo_field1 = ReadOnlyField('')
+    repo_base_url = URLField('Base URL:')
+    repo_field0 = ReadOnlyField('Repositories:', help=NO_HELP)
+    repo_field1 = ReadOnlyField('', help=NO_HELP)
 
     def __init__(self):
         super().__init__()
         self.repo_fields = [self.repo_field0, self.repo_field1]
 
 class RepoView(BaseView):
-    title = 'Repository URL'
-    excerpt = ('Setup package repository URLs')
+    title = 'Installation Source'
+    excerpt = ('Specify the URL of the repository server that will be used to install the packages')
 
     def __init__(self, controller, repo_base_url: str):
         self._controller = controller
