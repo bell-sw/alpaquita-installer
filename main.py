@@ -1,7 +1,7 @@
 import logging
 
-from installer.application import Application
-from installer.palette import PALETTE
+from app.application import Application
+from app.palette import PALETTE
 
 logging.basicConfig(filename='installer.log', filemode='w')
 

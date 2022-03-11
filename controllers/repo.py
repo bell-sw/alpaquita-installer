@@ -1,7 +1,7 @@
-import os
 import urllib
 import yaml
 import logging
+from controllers.controller import Controller
 from views.repo import RepoView
 
 log = logging.getLogger('controllers.repo')
@@ -9,32 +9,11 @@ log = logging.getLogger('controllers.repo')
 class RepoException(Exception):
     pass
 
-class RepoInstaller:
-    def apply(self, data):
-        try:
-            repos = yaml.safe_load(data).get('repositories',[])
-        except yaml.YAMLError as err:
-            log.error(f"Error: {err}")
-            raise RepoException(f'Error in loading yaml: {err}')
-        except:
-            raise RepoException('Error in parsing repositories')
-
-        log.info(f"Installing repos: {repos}")
-
-        with open('/etc/apk/repositories', 'a') as apk_repo_file:
-            for r in repos:
-                apk_repo_file.write('\n' + r)
-            apk_repo_file.write('\n')
-            return
-
-        raise RepoException("Failed to add repositories")
-
-class RepoController:
+class RepoController(Controller):
     def __init__(self, app):
-        self._app = app
+        super().__init__(app)
         self._repo_base_url = 'https://packages.bell-sw.com'
         self._repos = []
-        self._installer = RepoInstaller()
         self._release = self.get_os_release().get('VERSION_ID', '').split('.')[0]
         self._release = 'v' + self._release if self._release else 'stream'
 
@@ -67,6 +46,3 @@ class RepoController:
 
         log.debug(f"export to yaml: {yaml_data}")
         return yaml_data
-
-    def installer(self):
-        return self._installer

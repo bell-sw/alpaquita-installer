@@ -11,6 +11,7 @@ from controllers.proxy import ProxyController
 from controllers.repo import RepoController
 from controllers.user import UserController
 from controllers.network import NetworkController
+from controllers.installer import InstallerController
 from .error import ErrorMsgStretchy
 from nmanager.manager import NetworkManager
 
@@ -75,6 +76,7 @@ class Application:
             RootPasswordController(self),
             ProxyController(self),
             RepoController(self),
+            InstallerController(self, create_config=True)
         ])
         self._ctrl_idx = 0
 
@@ -86,6 +88,9 @@ class Application:
         self._urwid_loop = urwid.MainLoop(widget=self.ui, palette=self._palette,
                                           handle_mouse=False, pop_ups=True,
                                           event_loop=urwid.AsyncioEventLoop(loop=self.aio_loop))
+
+    def controllers(self):
+        return self._controllers
 
     def run(self):
         self._display_screen()
