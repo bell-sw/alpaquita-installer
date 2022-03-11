@@ -1,11 +1,12 @@
 import logging
+import abc
 
 log = logging.getLogger('installer')
 
 class InstallerException(Exception):
     pass
 
-class Installer:
+class Installer(abc.ABC):
     def __init__(self, name, config):
         self._name = name
         if name not in config:
@@ -13,6 +14,7 @@ class Installer:
 
         self._data = config.get(name)
 
+    @abc.abstractmethod
     def apply(self):
         pass
 
