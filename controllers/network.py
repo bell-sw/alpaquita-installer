@@ -9,7 +9,7 @@ from nmanager.ip_config import IPConfig4, IPConfig6
 from nmanager.wifi_config import WIFIConfig
 
 if TYPE_CHECKING:
-    from installer.application import Application
+    from app.application import Application
 
 
 class NetworkController:
