@@ -9,9 +9,9 @@ from controllers.controller import Controller
 log = logging.getLogger('controllers.installer')
 
 class InstallerController(Controller):
-    def __init__(self, app, create_config):
+    def __init__(self, app, create_config=True, config_file='setup.yaml'):
         super().__init__(app)
-        self._config_name = "install.yaml"
+        self._config_file = config_file
         self._create_config = create_config
 
     def make_ui(self):
@@ -26,15 +26,21 @@ class InstallerController(Controller):
         self.install_config()
 
     def create_config(self):
-        with open(self._config_name, 'w') as f:
+        with open(self._config_file, 'w') as f:
             for c in self._app.controllers():
                 yaml_str = c.to_yaml();
                 if yaml_str:
                     f.write(yaml_str + '\n')
 
     def install_config(self):
-        with open(self._config_name) as f:
-            config_str = f.read()
+        try:
+            with open(self._config_file) as f:
+                config_str = f.read()
+        except IOError as err:
+            raise InstallerException(f'Failed to open/read config file: {err}')
+
+        if not config_str:
+            raise InstallerException(f'Config is empty')
 
         try:
             config = yaml.safe_load(config_str)

@@ -1,6 +1,8 @@
 import asyncio
 
 import urwid
+import sys
+import getopt
 
 from subiquitycore.ui.anchors import HeaderColumns
 from subiquitycore.ui.utils import Color, LoadingDialog
@@ -64,20 +66,43 @@ class Application:
     make_ui = ApplicationUI
 
     def __init__(self, header: str, palette=()):
+
+        try:
+            opts, args = getopt.getopt(sys.argv[1:], 'hf:',
+                ['help', 'config-file'])
+        except getopt.GetoptError as err:
+            print(f'Options parsing error: {err}')
+            self.usage()
+            sys.exit(1)
+
+        self._config_file = ''
+        for opt, arg in opts:
+            if opt in ("-h", "--help"):
+                self.usage()
+                sys.exit(0)
+            elif opt in ("-f", "--config-file"):
+                self._config_file = arg
+
         # TODO: maybe move this into NetworkController
         self.nmanager = NetworkManager()
         self.nmanager.add_host_ifaces()
 
         self._controllers = []
-        self._controllers.extend([
-            NetworkController(self),
-            UserController(self),
-            TimezoneController(self),
-            RootPasswordController(self),
-            ProxyController(self),
-            RepoController(self),
-            InstallerController(self, create_config=True)
-        ])
+
+        if self._config_file:
+            self._controllers.append(InstallerController(
+                app=self, create_config=False, config_file=self._config_file))
+        else:
+            self._controllers.extend([
+                NetworkController(self),
+                UserController(self),
+                TimezoneController(self),
+                RootPasswordController(self),
+                ProxyController(self),
+                RepoController(self),
+                InstallerController(self)
+            ])
+
         self._ctrl_idx = 0
 
         self.ui = self.make_ui()
@@ -88,6 +113,12 @@ class Application:
         self._urwid_loop = urwid.MainLoop(widget=self.ui, palette=self._palette,
                                           handle_mouse=False, pop_ups=True,
                                           event_loop=urwid.AsyncioEventLoop(loop=self.aio_loop))
+
+    def usage(self):
+        print(f'''Usage: setup-alpaca [OPTIONS]
+        OPTIONS:
+            -f --config-file file.yaml Get setup configuration from .yaml file
+        ''')
 
     def controllers(self):
         return self._controllers
