@@ -8,10 +8,10 @@ from subiquitycore.ui.form import Form, SubForm, StringField, SubFormField, Choi
 from subiquitycore.ui.container import Pile
 from subiquitycore.ui.stretchy import Stretchy
 
-from nmanager.ip_config import is_valid_domain
+from alpaca_installer.nmanager.ip_config import is_valid_domain
 
 if TYPE_CHECKING:
-    from views.network_vlan import NetworkView
+    from .network_vlan import NetworkView
 
 IP_INTERFACE_CLS = {4: ipaddress.IPv4Interface,
                     6: ipaddress.IPv6Interface}

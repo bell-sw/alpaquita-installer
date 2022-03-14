@@ -3,13 +3,13 @@ from typing import Optional, TYPE_CHECKING
 
 import attrs
 
-from views.network import NetworkView
-from nmanager.interface import InterfaceInfo
-from nmanager.ip_config import IPConfig4, IPConfig6
-from nmanager.wifi_config import WIFIConfig
+from alpaca_installer.views.network import NetworkView
+from alpaca_installer.nmanager.interface import InterfaceInfo
+from alpaca_installer.nmanager.ip_config import IPConfig4, IPConfig6
+from alpaca_installer.nmanager.wifi_config import WIFIConfig
 
 if TYPE_CHECKING:
-    from app.application import Application
+    from alpaca_installer.app.application import Application
 
 
 class NetworkController:

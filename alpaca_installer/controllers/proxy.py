@@ -1,4 +1,4 @@
-from views.proxy import ProxyView
+from alpaca_installer.views.proxy import ProxyView
 
 class ProxyController:
     def __init__(self, app):

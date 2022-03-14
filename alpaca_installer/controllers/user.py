@@ -2,8 +2,8 @@ from typing import Optional
 
 from attrs import define
 
-from models.user import UserModel
-from views.user import UserView, UserViewData
+from alpaca_installer.models.user import UserModel
+from alpaca_installer.views.user import UserView, UserViewData
 
 class UserController:
     def __init__(self, app):

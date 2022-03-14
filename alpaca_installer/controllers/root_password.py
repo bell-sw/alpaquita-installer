@@ -1,4 +1,4 @@
-from views.root_password import RootPasswordView
+from alpaca_installer.views.root_password import RootPasswordView
 
 class RootPasswordController:
     def __init__(self, app):

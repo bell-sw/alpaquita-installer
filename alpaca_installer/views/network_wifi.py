@@ -7,10 +7,10 @@ from subiquitycore.ui.form import Form, StringField, PasswordField
 from subiquitycore.ui.container import Pile
 from subiquitycore.ui.stretchy import Stretchy
 
-from nmanager.wifi_config import validate_wifi_ssid, validate_wifi_psk
+from alpaca_installer.nmanager.wifi_config import validate_wifi_ssid, validate_wifi_psk
 
 if TYPE_CHECKING:
-    from views.network import NetworkView
+    from .network import NetworkView
 
 class WIFIForm(Form):
     ok_label = 'Save'

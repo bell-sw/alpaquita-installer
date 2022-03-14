@@ -1,8 +1,8 @@
 import urllib
 import yaml
 import logging
-from controllers.controller import Controller
-from views.repo import RepoView
+from .controller import Controller
+from alpaca_installer.views.repo import RepoView
 
 log = logging.getLogger('controllers.repo')
 

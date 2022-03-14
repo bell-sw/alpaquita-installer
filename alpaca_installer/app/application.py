@@ -7,15 +7,15 @@ import getopt
 from subiquitycore.ui.anchors import HeaderColumns
 from subiquitycore.ui.utils import Color, LoadingDialog
 
-from controllers.timezone import TimezoneController
-from controllers.root_password import RootPasswordController
-from controllers.proxy import ProxyController
-from controllers.repo import RepoController
-from controllers.user import UserController
-from controllers.network import NetworkController
-from controllers.installer import InstallerController
+from alpaca_installer.controllers.timezone import TimezoneController
+from alpaca_installer.controllers.root_password import RootPasswordController
+from alpaca_installer.controllers.proxy import ProxyController
+from alpaca_installer.controllers.repo import RepoController
+from alpaca_installer.controllers.user import UserController
+from alpaca_installer.controllers.network import NetworkController
+from alpaca_installer.controllers.installer import InstallerController
 from .error import ErrorMsgStretchy
-from nmanager.manager import NetworkManager
+from alpaca_installer.nmanager.manager import NetworkManager
 
 # From Ubuntu
 # When waiting for something of unknown duration, block the UI for at

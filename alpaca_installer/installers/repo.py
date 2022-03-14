@@ -2,8 +2,8 @@ import os
 import urllib
 import yaml
 import logging
-from views.repo import RepoView
-from installers.installer import Installer
+from alpaca_installer.views.repo import RepoView
+from .installer import Installer
 
 log = logging.getLogger('installer.repo')
 

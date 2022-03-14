@@ -11,11 +11,11 @@ from subiquitycore.ui.stretchy import Stretchy
 from subiquitycore.ui.views.network_configure_manual_interface import MultiNetdevField
 from subiquitycore.ui.selector import Option
 
-from nmanager.bond_config import BOND_MODES, hash_policies_for_bond_mode
-from nmanager.manager import NetworkManager
+from alpaca_installer.nmanager.bond_config import BOND_MODES, hash_policies_for_bond_mode
+from alpaca_installer.nmanager.manager import NetworkManager
 
 if TYPE_CHECKING:
-    from views.network import NetworkView
+    from .network import NetworkView
 
 log = logging.getLogger('views.network_bond')
 

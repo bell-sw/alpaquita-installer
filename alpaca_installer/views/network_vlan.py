@@ -8,7 +8,7 @@ from subiquitycore.ui.container import Pile
 from subiquitycore.ui.stretchy import Stretchy
 
 if TYPE_CHECKING:
-    from views.network import NetworkView
+    from .network import NetworkView
 
 class VlanForm(Form):
     ok_label = 'Add'

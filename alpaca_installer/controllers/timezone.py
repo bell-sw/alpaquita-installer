@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
-from models.timezone import read_regions
-from views.timezone import TimezoneView
+from alpaca_installer.models.timezone import read_regions
+from alpaca_installer.views.timezone import TimezoneView
 
 class TimezoneController:
     def __init__(self, app):

@@ -10,13 +10,13 @@ from subiquitycore.ui.selector import Selector, Option
 from subiquitycore.ui.table import ColSpec, TablePile, TableRow
 from subiquitycore.view import BaseView
 
-from views.network_vlan import AddVlanStretchy
-from views.network_edit import EditIPStretchy
-from views.network_wifi import EditWIFIStretchy
-from views.network_bond import CreateBondStretchy
+from .network_vlan import AddVlanStretchy
+from .network_edit import EditIPStretchy
+from .network_wifi import EditWIFIStretchy
+from .network_bond import CreateBondStretchy
 
 if TYPE_CHECKING:
-    from controllers.network import NetworkController
+    from alpaca_installer.controllers.network import NetworkController
 
 
 class NetworkView(BaseView):

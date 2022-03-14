@@ -16,7 +16,7 @@ from subiquitycore.ui.form import (
     BooleanField,
 )
 
-from models.user import USERNAME_REGEX, USERNAME_MAX_LEN
+from alpaca_installer.models.user import USERNAME_REGEX, USERNAME_MAX_LEN
 
 @define
 class UserViewData:

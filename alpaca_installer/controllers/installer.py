@@ -1,10 +1,10 @@
 from gettext import install
 import yaml
 import logging
-from views.installer import InstallerView
-from installers.repo import RepoInstaller
-from installers.installer import InstallerException
-from controllers.controller import Controller
+from alpaca_installer.views.installer import InstallerView
+from alpaca_installer.installers.repo import RepoInstaller
+from alpaca_installer.installers.installer import InstallerException
+from .controller import Controller
 
 log = logging.getLogger('controllers.installer')
 
