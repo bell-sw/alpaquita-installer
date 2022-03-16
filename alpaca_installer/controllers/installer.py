@@ -6,8 +6,11 @@ from alpaca_installer.views.installer import InstallerView
 from alpaca_installer.installers.repo import RepoInstaller
 from alpaca_installer.installers.installer import InstallerException
 from .controller import Controller
+# TODO: do something with this run_cmd
+from alpaca_installer.nmanager.utils import run_cmd
 
 log = logging.getLogger('controllers.installer')
+
 
 class InstallerController(Controller):
     def __init__(self, app, create_config=True, config_file='setup.yaml'):
@@ -48,15 +51,22 @@ class InstallerController(Controller):
 
         try:
             config = yaml.safe_load(config_str)
+            target_root = '/mnt/target_root'
 
             installers = [
-                RepoInstaller(config)
+                RepoInstaller(target_root=target_root, config=config),
             ]
         except yaml.YAMLError as err:
             log.error(f"Error: {err}")
             raise InstallerException(f'Error in loading yaml: {err}')
         except InstallerException as err:
             raise InstallerException(f'Error in parsing config: {err}')
+
+        # TODO: in the future this will be handled by an installer, which
+        # will mount all necessary file systems to target_root
+        # Now these commands are just for testing purposes
+        run_cmd(args=['rm', '-rf', target_root])
+        run_cmd(args=['mkdir', '-p', target_root])
 
         for i in installers:
             i.apply()
