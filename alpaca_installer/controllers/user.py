@@ -13,8 +13,8 @@ class UserController:
     def make_ui(self):
         data = None
         if self._model is not None:
-            data = UserViewData(full_name=self._model.full_name,
-                                user_name=self._model.user_name,
+            data = UserViewData(full_name=self._model.gecos,
+                                user_name=self._model.name,
                                 is_admin=self._model.is_admin,
                                 password=self._model.password)
 
@@ -25,8 +25,8 @@ class UserController:
         # ValueError, TypeError errors from model validation
         new_model = None
         if data is not None:
-           new_model = UserModel(full_name=data.full_name,
-                                 user_name=data.user_name,
+           new_model = UserModel(gecos=data.full_name,
+                                 name=data.user_name,
                                  is_admin=data.is_admin,
                                  password=data.password)
 

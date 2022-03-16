@@ -11,10 +11,10 @@ def _password_not_empty(instance, attribute, value):
 
 @define
 class UserModel:
-    full_name: str = field(validator=validators.instance_of(str))
-    user_name: str = field(validator=[validators.instance_of(str),
-                                      validators.max_len(USERNAME_MAX_LEN),
-                                      validators.matches_re(USERNAME_REGEX)])
+    gecos: str = field(validator=validators.optional(validators.instance_of(str)))
+    name: str = field(validator=[validators.instance_of(str),
+                                 validators.max_len(USERNAME_MAX_LEN),
+                                 validators.matches_re(USERNAME_REGEX)])
     is_admin: bool = field(validator=validators.instance_of(bool))
     password: str = field(validator=[validators.instance_of(str),
                                      _password_not_empty])
