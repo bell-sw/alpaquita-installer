@@ -1,6 +1,7 @@
 from gettext import install
 import yaml
 import logging
+import urwid
 from alpaca_installer.views.installer import InstallerView
 from alpaca_installer.installers.repo import RepoInstaller
 from alpaca_installer.installers.installer import InstallerException
@@ -24,6 +25,9 @@ class InstallerController(Controller):
         if self._create_config:
             self.create_config()
         self.install_config()
+
+        # TODO: this is temporary
+        raise urwid.ExitMainLoop
 
     def create_config(self):
         with open(self._config_file, 'w') as f:
