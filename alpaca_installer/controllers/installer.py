@@ -4,6 +4,7 @@ import logging
 import urwid
 from alpaca_installer.views.installer import InstallerView
 from alpaca_installer.installers.repo import RepoInstaller
+from alpaca_installer.installers.packages import PackagesInstaller
 from alpaca_installer.installers.installer import InstallerException
 from .controller import Controller
 # TODO: do something with this run_cmd
@@ -52,15 +53,21 @@ class InstallerController(Controller):
         try:
             config = yaml.safe_load(config_str)
             target_root = '/mnt/target_root'
+            pkgs_installer = PackagesInstaller(target_root=target_root,
+                                              config=config)
 
             installers = [
                 RepoInstaller(target_root=target_root, config=config),
+                pkgs_installer,
             ]
         except yaml.YAMLError as err:
             log.error(f"Error: {err}")
             raise InstallerException(f'Error in loading yaml: {err}')
         except InstallerException as err:
             raise InstallerException(f'Error in parsing config: {err}')
+
+        for i in installers:
+            pkgs_installer.add_package(*i.packages)
 
         # TODO: in the future this will be handled by an installer, which
         # will mount all necessary file systems to target_root
