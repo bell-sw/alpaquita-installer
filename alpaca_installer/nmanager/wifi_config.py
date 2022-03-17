@@ -19,8 +19,8 @@ def validate_wifi_psk(psk: str):
 
 @attrs.define
 class WIFIConfig:
-    ssid: str = attrs.field()
-    psk: str = attrs.field()
+    ssid: str = attrs.field(validator=attrs.validators.instance_of(str))
+    psk: str = attrs.field(validator=attrs.validators.instance_of(str))
 
     @ssid.validator
     def check_ssid(self, attribute, value):
