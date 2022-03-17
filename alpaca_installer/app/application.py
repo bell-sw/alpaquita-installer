@@ -13,7 +13,10 @@ from alpaca_installer.controllers.proxy import ProxyController
 from alpaca_installer.controllers.repo import RepoController
 from alpaca_installer.controllers.user import UserController
 from alpaca_installer.controllers.network import NetworkController
-from alpaca_installer.controllers.installer import InstallerController
+from alpaca_installer.controllers.installer import (
+    InstallerController,
+    ConsoleInstallerController,
+)
 from .error import ErrorMsgStretchy
 from alpaca_installer.nmanager.manager import NetworkManager
 
@@ -67,9 +70,11 @@ class Application:
 
     def __init__(self, header: str, palette=()):
 
+        self._no_ui = False
+
         try:
-            opts, args = getopt.getopt(sys.argv[1:], 'hf:',
-                ['help', 'config-file'])
+            opts, args = getopt.getopt(sys.argv[1:], 'hf:n',
+                ['help', 'config-file', 'no-ui'])
         except getopt.GetoptError as err:
             print(f'Options parsing error: {err}')
             self.usage()
@@ -85,6 +90,12 @@ class Application:
                     print(f'Failed to find config file {arg}')
                     sys.exit(1)
                 self._config_file = arg
+            elif opt in ("-n", "--no-ui"):
+                self._no_ui = True
+
+        if self._no_ui and not self._config_file:
+            self.usage()
+            sys.exit(1)
 
         # TODO: maybe move this into NetworkController
         self.nmanager = NetworkManager()
@@ -93,8 +104,10 @@ class Application:
         self._controllers = []
 
         if self._config_file:
-            self._controllers.append(InstallerController(
-                app=self, create_config=False, config_file=self._config_file))
+            if self._no_ui:
+                self._console_installer = ConsoleInstallerController(self, self._config_file)
+                return
+            self._controllers.append(InstallerController(self, False, self._config_file))
         else:
             self._controllers.extend([
                 NetworkController(self),
@@ -119,13 +132,17 @@ class Application:
     def usage(self):
         print(f'''Usage: setup-alpaca [OPTIONS]
         OPTIONS:
-            -f --config-file file.yaml Get setup configuration from .yaml file
+            -f --config-file x Get setup configuration from yaml file x
+            -n --no-ui         Run the installation without a text-based UI. Requires config-file option
         ''')
 
     def controllers(self):
         return self._controllers
 
     def run(self):
+        if self._no_ui:
+            sys.exit(self._console_installer.run())
+
         self._display_screen()
         self._urwid_loop.run()
 

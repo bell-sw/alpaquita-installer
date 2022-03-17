@@ -8,14 +8,30 @@ log = logging.getLogger('installer')
 class InstallerException(Exception):
     pass
 
+class EventReceiver(abc.ABC):
+
+  @abc.abstractmethod
+  def start_event(self, msg):
+     pass
+
+  @abc.abstractmethod
+  def stop_event(self):
+     pass
+
+  @abc.abstractmethod
+  def add_log_line(self, msg):
+     pass
 
 class Installer(abc.ABC):
     def __init__(self, name: str, config: dict,
                  target_root: str,
-                 data_is_optional: bool = False):
+                 event_receiver: EventReceiver,
+                 data_is_optional: bool = False,
+                 ):
         self._name = name
         self._packages = set()
         self._target_root = target_root
+        self._event_receiver = event_receiver
 
         if (not data_is_optional) and (name not in config):
             raise InstallerException(f'Not found {name} in config')
