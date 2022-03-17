@@ -99,6 +99,9 @@ class VLANInterface(BaseInterface):
                              base_iface=self.base_iface.name,
                              vlan_id=self.vlan_id)
 
+    def get_interface_lines(self) -> list[str]:
+        return self.base_iface.get_interface_lines()
+
 
 # We keep SSID and PSK attributes as interface properties
 # for simplicity as in the installer we don't need to connect
