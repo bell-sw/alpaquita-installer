@@ -17,10 +17,12 @@ class IPConfig:
     method: str
 
     # for mode == 'static'
-    address: str = ''
-    gateway: str = ''
-    name_servers: list[str] = attrs.field(default=attrs.Factory(list))
-    search_domains: list[str] = attrs.field(default=attrs.Factory(list))
+    address: str = attrs.field(default='', validator=attrs.validators.instance_of(str))
+    gateway: str = attrs.field(default='', validator=attrs.validators.instance_of(str))
+    name_servers: list[str] = attrs.field(default=attrs.Factory(list),
+                                          validator=attrs.validators.instance_of(list))
+    search_domains: list[str] = attrs.field(default=attrs.Factory(list),
+                                            validator=attrs.validators.instance_of(list))
 
     @staticmethod
     def supported_modes() -> list[str]:
