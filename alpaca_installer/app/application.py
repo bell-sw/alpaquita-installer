@@ -3,6 +3,7 @@ import asyncio
 import urwid
 import sys
 import getopt
+import os
 
 from subiquitycore.ui.anchors import HeaderColumns
 from subiquitycore.ui.utils import Color, LoadingDialog
@@ -80,6 +81,9 @@ class Application:
                 self.usage()
                 sys.exit(0)
             elif opt in ("-f", "--config-file"):
+                if not os.path.exists(arg):
+                    print(f'Failed to find config file {arg}')
+                    sys.exit(1)
                 self._config_file = arg
 
         # TODO: maybe move this into NetworkController
