@@ -212,3 +212,6 @@ class Application:
 
         return await self._wait_with_indication(
             awaitable, show_load, hide_load)
+
+    def exit(self):
+        self.aio_loop.stop()
