@@ -6,6 +6,7 @@ from alpaca_installer.views.installer import InstallerView
 from alpaca_installer.installers.repo import RepoInstaller
 from alpaca_installer.installers.packages import PackagesInstaller
 from alpaca_installer.installers.users import UsersInstaller
+from alpaca_installer.installers.network import NetworkInstaller
 from alpaca_installer.installers.installer import InstallerException
 from .controller import Controller
 # TODO: do something with this run_cmd
@@ -61,6 +62,7 @@ class InstallerController(Controller):
                 RepoInstaller(target_root=target_root, config=config),
                 pkgs_installer,
                 UsersInstaller(target_root=target_root, config=config),
+                NetworkInstaller(target_root=target_root, config=config),
             ]
         except yaml.YAMLError as err:
             log.error(f"Error: {err}")
