@@ -8,7 +8,6 @@ from subiquitycore.ui.anchors import HeaderColumns
 from subiquitycore.ui.utils import Color, LoadingDialog
 
 from alpaca_installer.controllers.timezone import TimezoneController
-from alpaca_installer.controllers.root_password import RootPasswordController
 from alpaca_installer.controllers.proxy import ProxyController
 from alpaca_installer.controllers.repo import RepoController
 from alpaca_installer.controllers.user import UserController
@@ -97,7 +96,6 @@ class Application:
                 NetworkController(self),
                 UserController(self),
                 TimezoneController(self),
-                RootPasswordController(self),
                 ProxyController(self),
                 RepoController(self),
                 InstallerController(self)
