@@ -22,14 +22,13 @@ class PackagesInstaller(Installer):
         self._event_receiver.start_event('Initializing new root')
 
         common = ['apk', 'add', '--root', self.target_root,
+                  '--keys', '/etc/apk/keys', # install using keys from the host system
                   '--no-progress']
 
         res = run_cmd(args=(common + ['--initdb']))
         self._event_receiver.add_log_line('{}'.format(res.stdout.decode()))
 
-        args = common + ['--keys',
-                         '/etc/apk/keys',  # install using keys from the host system
-                         '--update-cache', '--clean-protected']
+        args = common + ['--update-cache', '--clean-protected']
         args.extend(self.packages)
 
         self._event_receiver.start_event(f'Installing packages: {self.packages}')
