@@ -65,13 +65,13 @@ class BaseInstallerController(Controller, EventReceiver):
         target_root = '/mnt/target_root'
         self.add_log_line(f'Using new root {target_root}')
         pkgs_installer = PackagesInstaller(target_root=target_root,
-                                           config=config)
+                                           config=config, event_receiver=self)
 
         installers = [
-            RepoInstaller(target_root=target_root, config=config),
+            RepoInstaller(target_root=target_root, config=config, event_receiver=self),
             pkgs_installer,
-            UsersInstaller(target_root=target_root, config=config),
-            NetworkInstaller(target_root=target_root, config=config),
+            UsersInstaller(target_root=target_root, config=config, event_receiver=self),
+            NetworkInstaller(target_root=target_root, config=config, event_receiver=self),
         ]
 
         for i in installers:

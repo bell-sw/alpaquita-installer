@@ -49,11 +49,12 @@ def update_user_hash(etc_shadow: str, user: str, password_hash: str):
 
 
 class UsersInstaller(Installer):
-    def __init__(self, target_root: str, config: dict):
+    def __init__(self, target_root: str, config: dict, event_receiver):
         yaml_key = 'users'
 
         super().__init__(name=yaml_key, target_root=target_root,
-                         config=config)
+                         config=config, event_receiver=event_receiver,
+                         data_is_optional=True)
 
         self._users: list[UserModel] = []
         if not isinstance(self._data, list):
@@ -74,6 +75,7 @@ class UsersInstaller(Installer):
             raise InstallerException('At least one admin user must be defined')
 
     def apply(self):
+        self._event_receiver.start_event('Setup users')
         wheel_sudoers_needed = False
         etc_shadow = os.path.join(self.target_root, 'etc/shadow')
 
