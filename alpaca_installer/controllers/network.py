@@ -105,7 +105,7 @@ class NetworkController:
 
             if 'name_servers' in data:
                 data['name_servers'] = data['name_servers'].split(',')
-            if ('search_domains' in data) and (data['search_domains']):
+            if 'search_domains' in data:
                 data['search_domains'] = data['search_domains'].split(',')
 
             if ip_ver == 4:

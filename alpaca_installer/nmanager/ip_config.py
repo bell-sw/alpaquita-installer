@@ -86,6 +86,8 @@ class IPConfig:
         for domain in self.search_domains:
             if not isinstance(domain, str):
                 raise ValueError('Non-str domain value: {}'.format(domain))
+            if not domain:
+                continue
             if not re.match(DOMAIN_REGEX, domain):
                 raise ValueError('Invalid domain: {}'.format(domain))
             search_domains.append(domain)
