@@ -4,9 +4,15 @@ import ipaddress
 import attrs
 
 DOMAIN_REGEX=r'^((?!-)[A-Za-z0-9-]{1,63}(?<!-).)*(?!-)[A-Za-z0-9-]{1,63}(?<!-)$'
+HOSTNAME_REGEX = r'^(?!-)[A-Za-z0-9-]{1,63}(?<!-)$'
+
 
 def is_valid_domain(domain: str) -> bool:
     return bool(re.match(DOMAIN_REGEX, domain))
+
+
+def is_valid_hostname(hostname: str) -> bool:
+    return bool(re.match(HOSTNAME_REGEX, hostname))
 
 
 @attrs.define
