@@ -22,7 +22,6 @@ def read_user_from_dict(data: dict) -> UserModel:
     return user
 
 
-# TODO: this will probably be used by the root password installer
 def update_user_hash(etc_shadow: str, user: str, password_hash: str):
     with open(etc_shadow, 'r') as file:
         lines = file.readlines()
@@ -54,27 +53,33 @@ class UsersInstaller(Installer):
         yaml_key = 'users'
 
         super().__init__(name=yaml_key, target_root=target_root,
-                         config=config, data_is_optional=True)
+                         config=config)
 
         self._users: list[UserModel] = []
-
-        if not self._data:
-            return
         if not isinstance(self._data, list):
-            raise InstallerException("'{}' must be a YAML array".format(yaml_key))
+            raise InstallerException("'{}' must be an array".format(yaml_key))
 
+        admin_defined = False
         for item in self._data:
             try:
                 user = read_user_from_dict(item)
             except (TypeError, ValueError) as exc:
                 raise InstallerException(str(exc)) from None
             if user.is_admin:
+                admin_defined = True
                 self.add_package('sudo')
             self._users.append(user)
+
+        if not admin_defined:
+            raise InstallerException('At least one admin user must be defined')
 
     def apply(self):
         wheel_sudoers_needed = False
         etc_shadow = os.path.join(self.target_root, 'etc/shadow')
+
+        # Disable the root user
+        update_user_hash(etc_shadow=etc_shadow, user='root',
+                         password_hash='!')
 
         for user in self._users:
             args = ['chroot', self.target_root, 'adduser', '-D']
