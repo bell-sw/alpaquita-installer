@@ -1,9 +1,9 @@
 from typing import Optional
 
-from attrs import define
 
 from alpaca_installer.models.user import UserModel
 from alpaca_installer.views.user import UserView, UserViewData
+
 
 class UserController:
     def __init__(self, app):
@@ -15,7 +15,6 @@ class UserController:
         if self._model is not None:
             data = UserViewData(full_name=self._model.gecos,
                                 user_name=self._model.name,
-                                is_admin=self._model.is_admin,
                                 password=self._model.password)
 
         return UserView(self, data)
@@ -27,7 +26,7 @@ class UserController:
         if data is not None:
            new_model = UserModel(gecos=data.full_name,
                                  name=data.user_name,
-                                 is_admin=data.is_admin,
+                                 is_admin=True,
                                  password=data.password)
 
         self._model = new_model
