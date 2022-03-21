@@ -33,9 +33,9 @@ class Installer(abc.ABC):
         self._target_root = target_root
         self._event_receiver = event_receiver
 
-        if (not data_is_optional) and (name not in config):
-            raise InstallerException(f'Not found {name} in config')
         self._data = config.get(name, None)
+        if (not data_is_optional) and (self._data is None):
+            raise InstallerException("'{}' is not set".format(name))
         if (self._data is not None) and (not isinstance(self._data, data_type)):
             raise InstallerException("'{}' is of type '{}', expected '{}'".format(
                 name, type(self._data), data_type))
