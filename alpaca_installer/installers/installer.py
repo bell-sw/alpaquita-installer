@@ -26,8 +26,8 @@ class Installer(abc.ABC):
     def __init__(self, name: str, config: dict,
                  target_root: str,
                  event_receiver: EventReceiver,
-                 data_is_optional: bool = False,
-                 ):
+                 data_type,
+                 data_is_optional: bool = False):
         self._name = name
         self._packages = set()
         self._target_root = target_root
@@ -36,6 +36,9 @@ class Installer(abc.ABC):
         if (not data_is_optional) and (name not in config):
             raise InstallerException(f'Not found {name} in config')
         self._data = config.get(name, None)
+        if (self._data is not None) and (not isinstance(self._data, data_type)):
+            raise InstallerException("'{}' is of type '{}', expected '{}'".format(
+                name, type(self._data), data_type))
 
     @abc.abstractmethod
     def apply(self):

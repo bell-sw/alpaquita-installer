@@ -50,15 +50,11 @@ def update_user_hash(etc_shadow: str, user: str, password_hash: str):
 
 class UsersInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
-        yaml_key = 'users'
-
-        super().__init__(name=yaml_key, target_root=target_root,
-                         config=config, event_receiver=event_receiver,
-                         data_is_optional=True)
+        super().__init__(name='users', target_root=target_root,
+                         event_receiver=event_receiver,
+                         data_type=list, config=config)
 
         self._users: list[UserModel] = []
-        if not isinstance(self._data, list):
-            raise InstallerException("'{}' must be an array".format(yaml_key))
 
         admin_defined = False
         for item in self._data:

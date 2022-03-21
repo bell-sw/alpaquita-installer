@@ -5,14 +5,12 @@ from .installer import Installer, InstallerException
 
 class PackagesInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
-        yaml_key = 'extra_packages'
-        super().__init__(name=yaml_key, config=config,
+        super().__init__(name='extra_packages', config=config,
                          event_receiver=event_receiver,
                          target_root=target_root,
+                         data_type=list,
                          data_is_optional=True)
         if self._data:
-            if not isinstance(self._data, list):
-                raise InstallerException("'{}' must be a YAML array".format(yaml_key))
             for pkg in self._data:
                 self.add_package(pkg)
 

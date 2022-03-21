@@ -9,7 +9,8 @@ log = logging.getLogger('installer.repo')
 class RepoInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
         super().__init__(name='repositories', target_root=target_root,
-                         config=config, event_receiver=event_receiver)
+                         event_receiver=event_receiver,
+                         data_type=list, config=config)
 
     def apply(self):
         self._event_receiver.start_event('Saving repositories')
