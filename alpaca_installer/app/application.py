@@ -143,16 +143,23 @@ class Application:
         if self._no_ui:
             sys.exit(self._console_installer.run())
 
-        self._display_screen()
+        if not self._display_screen():
+            self.next_screen()
         self._urwid_loop.run()
 
     def _move_screen(self, increment):
+        prev_idx = self._ctrl_idx
+
         if increment > 0:
             self._ctrl_idx = min(self._ctrl_idx + 1, len(self._controllers) - 1)
         else:
             self._ctrl_idx = max(self._ctrl_idx - 1, 0)
 
-        self._display_screen()
+        if prev_idx == self._ctrl_idx:
+            return
+
+        if not self._display_screen():
+            self._move_screen(increment)
 
     def next_screen(self):
         self._move_screen(1)
@@ -162,8 +169,12 @@ class Application:
 
     def _display_screen(self):
         view = self._controllers[self._ctrl_idx].make_ui()
+        if view is None:
+            return False
+
         self.ui.set_title(view.title)
         self.ui.set_body(view)
+        return True
 
     def show_error_message(self, msg: str):
         self.ui.body.show_stretchy_overlay(ErrorMsgStretchy(self, msg))
