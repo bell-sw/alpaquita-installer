@@ -12,6 +12,7 @@ from alpaca_installer.installers.packages import PackagesInstaller
 from alpaca_installer.installers.timezone import TimezoneInstaller
 from alpaca_installer.installers.users import UsersInstaller
 from alpaca_installer.installers.network import NetworkInstaller
+from alpaca_installer.installers.secureboot import SecureBootInstaller
 from alpaca_installer.installers.installer import (
     InstallerException,
     EventReceiver
@@ -74,6 +75,7 @@ class BaseInstallerController(Controller, EventReceiver):
             TimezoneInstaller(target_root=target_root, config=config, event_receiver=self),
             UsersInstaller(target_root=target_root, config=config, event_receiver=self),
             NetworkInstaller(target_root=target_root, config=config, event_receiver=self),
+            SecureBootInstaller(target_root=target_root, config=config, event_receiver=self),
         ]
 
         for i in installers:
