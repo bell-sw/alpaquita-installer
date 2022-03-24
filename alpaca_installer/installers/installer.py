@@ -1,6 +1,11 @@
 import logging
 import abc
+import os
+import subprocess
 from typing import Collection
+
+# TODO: remove this nmanager reference
+from alpaca_installer.nmanager.utils import run_cmd
 
 log = logging.getLogger('installer')
 
@@ -57,3 +62,14 @@ class Installer(abc.ABC):
 
     def add_package(self, *names: Collection[str]):
         self._packages.update(names)
+
+    def abs_target_path(self, rel_target_path: str) -> str:
+        return os.path.join(self.target_root,
+                            rel_target_path.lstrip('/'))
+
+    def run_in_chroot(self, args: list[str]) -> subprocess.CompletedProcess:
+        new_args = ['chroot', self.target_root] + args
+        return run_cmd(args=new_args)
+
+    def enable_service(self, service: str, runlevel: str):
+        self.run_in_chroot(args=['rc-update', 'add', service, runlevel])

@@ -1,7 +1,5 @@
-import os
 import datetime
 
-from alpaca_installer.nmanager.utils import run_cmd
 from alpaca_installer.models.user import UserModel
 from .installer import Installer, InstallerException
 
@@ -73,27 +71,26 @@ class UsersInstaller(Installer):
     def apply(self):
         self._event_receiver.start_event('Setup users')
         wheel_sudoers_needed = False
-        etc_shadow = os.path.join(self.target_root, 'etc/shadow')
+        etc_shadow = self.abs_target_path('/etc/shadow')
 
         # Disable the root user
         update_user_hash(etc_shadow=etc_shadow, user='root',
                          password_hash='!')
 
         for user in self._users:
-            args = ['chroot', self.target_root, 'adduser', '-D']
+            args = ['adduser', '-D']
             if user.gecos:
                 args.extend(['-g', user.gecos])
             args.append(user.name)
-            run_cmd(args=args)
+            self.run_in_chroot(args=args)
 
             update_user_hash(etc_shadow=etc_shadow, user=user.name,
                              password_hash=user.password)
 
             if user.is_admin:
-                run_cmd(args=['chroot', self.target_root, 'addgroup',
-                              user.name, 'wheel'])
+                self.run_in_chroot(args=['addgroup', user.name, 'wheel'])
                 wheel_sudoers_needed = True
 
         if wheel_sudoers_needed:
-            with open(os.path.join(self.target_root, 'etc/sudoers.d/wheel'), 'w') as file:
+            with open(self.abs_target_path('/etc/sudoers.d/wheel'), 'w') as file:
                 file.write('%wheel ALL=(ALL) ALL\n')

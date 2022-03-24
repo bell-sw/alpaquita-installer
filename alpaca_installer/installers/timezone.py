@@ -20,7 +20,7 @@ class TimezoneInstaller(Installer):
     def apply(self):
         self._event_receiver.start_event('Configuring time zone')
         zone_path_rel = os.path.join(ZONEINFO_DIR, self._timezone)
-        zone_path_abs = os.path.join(self.target_root, zone_path_rel.lstrip('/'))
+        zone_path_abs = self.abs_target_path(zone_path_rel)
 
         if not os.path.exists(zone_path_abs):
             raise InstallerException("Zone file does not exist: {}".format(zone_path_abs))

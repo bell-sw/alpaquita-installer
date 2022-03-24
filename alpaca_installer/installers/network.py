@@ -1,5 +1,3 @@
-import os
-
 from alpaca_installer.nmanager.manager import NetworkManager
 from alpaca_installer.nmanager.ip_config import IPConfig4, IPConfig6, is_valid_hostname
 from alpaca_installer.nmanager.wifi_config import WIFIConfig
@@ -125,8 +123,6 @@ class NetworkInstaller(Installer):
             file.write('{}\n'.format(self._hostname))
 
     def apply(self):
-        self.write_hostname(os.path.join(self.target_root, 'etc/hostname'))
-        self._nmanager.write_resolvconf_file(os.path.join(self.target_root,
-                                                          'etc/resolv.conf'))
-        self._nmanager.write_interfaces_file(os.path.join(self.target_root,
-                                                          'etc/network/interfaces'))
+        self.write_hostname(self.abs_target_path('/etc/hostname'))
+        self._nmanager.write_resolvconf_file(self.abs_target_path('/etc/resolv.conf'))
+        self._nmanager.write_interfaces_file(self.abs_target_path('/etc/network/interfaces'))

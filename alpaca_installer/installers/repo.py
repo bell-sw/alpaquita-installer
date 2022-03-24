@@ -16,7 +16,7 @@ class RepoInstaller(Installer):
         self._event_receiver.start_event('Saving repositories')
         self._event_receiver.add_log_line(f'{self._data}')
 
-        apk_dir = os.path.join(self.target_root, 'etc/apk')
+        apk_dir = self.abs_target_path('/etc/apk')
         os.makedirs(apk_dir, exist_ok=True)
         repo_file = os.path.join(apk_dir, 'repositories')
         with open(repo_file, 'a') as apk_repo_file:
