@@ -15,6 +15,7 @@ from alpaca_installer.controllers.repo import RepoController
 from alpaca_installer.controllers.user import UserController
 from alpaca_installer.controllers.network import NetworkController
 from alpaca_installer.controllers.secureboot import SecureBootController
+from alpaca_installer.controllers.packages import PackagesController
 from alpaca_installer.controllers.installer import (
     InstallerController,
     ConsoleInstallerController,
@@ -118,8 +119,9 @@ class Application:
                 UserController(self),
                 TimezoneController(self),
                 ProxyController(self),
-                SecureBootController(self),
                 RepoController(self),
+                PackagesController(self),
+                SecureBootController(self),
                 InstallerController(self)
             ])
 
