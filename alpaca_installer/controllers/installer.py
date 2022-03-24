@@ -13,6 +13,7 @@ from alpaca_installer.installers.packages import PackagesInstaller
 from alpaca_installer.installers.timezone import TimezoneInstaller
 from alpaca_installer.installers.users import UsersInstaller
 from alpaca_installer.installers.network import NetworkInstaller
+from alpaca_installer.installers.kernel import KernelInstaller
 from alpaca_installer.installers.secureboot import SecureBootInstaller
 from alpaca_installer.installers.installer import (
     InstallerException,
@@ -68,6 +69,7 @@ class BaseInstallerController(Controller, EventReceiver):
         self.add_log_line(f'Using new root {target_root}')
         storage_installer = StorageInstaller(target_root=target_root,
                                              config=config, event_receiver=self)
+        efi_mount = storage_installer.efi_mount_point
         pkgs_installer = PackagesInstaller(target_root=target_root,
                                            config=config, event_receiver=self)
 
@@ -78,6 +80,8 @@ class BaseInstallerController(Controller, EventReceiver):
             TimezoneInstaller(target_root=target_root, config=config, event_receiver=self),
             UsersInstaller(target_root=target_root, config=config, event_receiver=self),
             NetworkInstaller(target_root=target_root, config=config, event_receiver=self),
+            KernelInstaller(target_root=target_root, config=config, event_receiver=self,
+                            efi_boot=bool(efi_mount)),
             SecureBootInstaller(target_root=target_root, config=config, event_receiver=self),
         ]
 
