@@ -14,6 +14,13 @@ if TYPE_CHECKING:
 class StorageUnitFlag(enum.Enum):
     ESP = 1
 
+    @classmethod
+    def from_str(cls, value) -> StorageUnitFlag:
+        ret = getattr(cls, value.strip().upper(), None)
+        if ret is None:
+            raise ValueError('Unknown unit flag: {}'.format(value))
+        return ret
+
 
 @attrs.define
 class StorageUnit:
