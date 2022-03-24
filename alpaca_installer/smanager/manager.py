@@ -81,6 +81,12 @@ class StorageManager:
     def cryptsetup(self) -> Cryptsetup:
         return self._cryptsetup
 
+    def get_unit_by_mount_point(self, mount_point: str) -> Optional[StorageUnit]:
+        for mnt, unit in self.mount_points:
+            if mount_point == mnt:
+                return unit
+        return None
+
     def get_device_by_id(self, id: str) -> Optional[StorageDevice]:
         return self._devices.get(id, None)
 
