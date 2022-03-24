@@ -15,6 +15,7 @@ from alpaca_installer.installers.users import UsersInstaller
 from alpaca_installer.installers.network import NetworkInstaller
 from alpaca_installer.installers.kernel import KernelInstaller
 from alpaca_installer.installers.secureboot import SecureBootInstaller
+from alpaca_installer.installers.bootloader import BootloaderInstaller
 from alpaca_installer.installers.installer import (
     InstallerException,
     EventReceiver
@@ -83,6 +84,8 @@ class BaseInstallerController(Controller, EventReceiver):
             KernelInstaller(target_root=target_root, config=config, event_receiver=self,
                             efi_boot=bool(efi_mount)),
             SecureBootInstaller(target_root=target_root, config=config, event_receiver=self),
+            BootloaderInstaller(target_root=target_root, config=config, event_receiver=self,
+                                efi_mount=efi_mount),
         ]
 
         for i in installers:
