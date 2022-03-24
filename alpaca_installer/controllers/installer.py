@@ -7,6 +7,7 @@ import abc
 
 from subiquitycore.async_helpers import run_in_thread
 from alpaca_installer.views.installer import InstallerView
+from alpaca_installer.installers.storage import StorageInstaller
 from alpaca_installer.installers.repo import RepoInstaller
 from alpaca_installer.installers.packages import PackagesInstaller
 from alpaca_installer.installers.timezone import TimezoneInstaller
@@ -65,10 +66,13 @@ class BaseInstallerController(Controller, EventReceiver):
         config = yaml.safe_load(config_str)
         target_root = '/mnt/target_root'
         self.add_log_line(f'Using new root {target_root}')
+        storage_installer = StorageInstaller(target_root=target_root,
+                                             config=config, event_receiver=self)
         pkgs_installer = PackagesInstaller(target_root=target_root,
                                            config=config, event_receiver=self)
 
         installers = [
+            storage_installer,
             RepoInstaller(target_root=target_root, config=config, event_receiver=self),
             pkgs_installer,
             TimezoneInstaller(target_root=target_root, config=config, event_receiver=self),
