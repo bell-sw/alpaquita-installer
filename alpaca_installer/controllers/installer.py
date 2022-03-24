@@ -17,7 +17,6 @@ from alpaca_installer.installers.installer import (
     InstallerException,
     EventReceiver
 )
-from alpaca_installer.nmanager.utils import run_cmd
 from .controller import Controller
 
 # TODO: do something with this run_cmd
@@ -81,14 +80,14 @@ class BaseInstallerController(Controller, EventReceiver):
         for i in installers:
             pkgs_installer.add_package(*i.packages)
 
-        # TODO: in the future this will be handled by an installer, which
-        # will mount all necessary file systems to target_root
-        # Now these commands are just for testing purposes
-        run_cmd(args=['rm', '-rf', target_root])
-        run_cmd(args=['mkdir', '-p', target_root])
-
         for i in installers:
             i.apply()
+
+        for i in installers:
+            i.post_apply()
+
+        for i in reversed(installers):
+            i.cleanup()
 
 
 class ConsoleInstallerController(BaseInstallerController):

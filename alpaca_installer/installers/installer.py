@@ -49,6 +49,12 @@ class Installer(abc.ABC):
     def apply(self):
         pass
 
+    def post_apply(self):
+        pass
+
+    def cleanup(self):
+        pass
+
     @property
     def target_root(self) -> str:
         return self._target_root
