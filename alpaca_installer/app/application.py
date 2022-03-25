@@ -123,6 +123,10 @@ class Application:
                 InstallerController(self)
             ])
 
+        self._type_to_controller = {}
+        for c in self._controllers:
+            self._type_to_controller[type(c).__name__] = c
+
         self._ctrl_idx = 0
 
         self.ui = self.make_ui()
@@ -144,6 +148,9 @@ class Application:
 
     def controllers(self):
         return self._controllers
+
+    def controller(self, type_name):
+        return self._type_to_controller.get(type_name)
 
     def run(self):
         if self._no_ui:
