@@ -4,6 +4,7 @@ import urwid
 import sys
 import getopt
 import os
+import logging
 
 from subiquitycore.ui.anchors import HeaderColumns
 from subiquitycore.ui.utils import Color, LoadingDialog
@@ -74,8 +75,8 @@ class Application:
         self._no_ui = False
 
         try:
-            opts, args = getopt.getopt(sys.argv[1:], 'hf:n',
-                ['help', 'config-file', 'no-ui'])
+            opts, args = getopt.getopt(sys.argv[1:], 'hf:nd',
+                ['help', 'config-file', 'no-ui', 'debug'])
         except getopt.GetoptError as err:
             print(f'Options parsing error: {err}')
             self.usage()
@@ -93,6 +94,8 @@ class Application:
                 self._config_file = arg
             elif opt in ("-n", "--no-ui"):
                 self._no_ui = True
+            elif opt in ("-d", "--debug"):
+                logging.getLogger().setLevel(logging.DEBUG)
 
         if self._no_ui and not self._config_file:
             self.usage()
@@ -136,6 +139,7 @@ class Application:
         OPTIONS:
             -f --config-file x Get setup configuration from yaml file x
             -n --no-ui         Run the installation without a text-based UI. Requires config-file option
+            -d --debug         Enable debug-level log
         ''')
 
     def controllers(self):
