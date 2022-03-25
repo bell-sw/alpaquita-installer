@@ -15,6 +15,7 @@ class RepoController(Controller):
         self._release = self.get_os_release().get('VERSION_ID', '').split('.')[0]
         self._release = self._release if self._release else 'stream'
         self._libc_type = 'musl' if os.path.exists('/lib/ld-musl-x86_64.so.1') else 'glibc'
+        self._host_libc_type = self._libc_type
 
     def get_os_release(self):
         res = {}
@@ -23,6 +24,9 @@ class RepoController(Controller):
                 k,v = line.rstrip().split('=')
                 res[k] = v
         return res
+
+    def get_libc_type(self) -> str:
+        return self._libc_type
 
     def make_ui(self):
         return RepoView(self, self._repo_base_url, self._libc_type)
@@ -44,7 +48,13 @@ class RepoController(Controller):
         return self._repos
 
     def to_yaml(self):
-        yaml_data = yaml.dump({ "repositories" : self._repos })
+        res = []
+
+        if self._host_libc_type == self._libc_type:
+            res.append('/media/disk/apks')
+        res.extend(self._repos)
+
+        yaml_data = yaml.dump({ "repositories" : res })
 
         log.debug(f"export to yaml: {yaml_data}")
         return yaml_data
