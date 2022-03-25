@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 class StorageUnitFlag(enum.Enum):
     ESP = 1
+    BIOS_BOOT = 2
 
     @classmethod
     def from_str(cls, value) -> StorageUnitFlag:
@@ -80,6 +81,8 @@ class Partition(StorageUnit):
     def gpt_type_guid(self) -> str:
         if self.is_flag_set(StorageUnitFlag.ESP):
             res = 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B'
+        elif self.is_flag_set(StorageUnitFlag.BIOS_BOOT):
+            res = '21686148-6449-6E6F-744E-656564454649'
         elif self.fs_type == FSType.RAID_MEMBER:
             res = 'A19D880F-05FC-4D3B-A006-743F0F84911E'
         elif self.fs_type == FSType.PHYSICAL_VOLUME:
