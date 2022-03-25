@@ -19,15 +19,15 @@ class BootloaderInstaller(Installer):
         else:
             if (not self._data) or (not isinstance(self._data, str)):
                 raise ValueError("There must be an '{}' entry of type string".format(yaml_key))
-            raise NotImplemented('Implement non-EFI booting')
+            self.add_package('grub', 'grub-bios')
 
     def apply(self):
         pass
 
     def post_apply(self):
         self._event_receiver.start_event('Installing bootloader')
+        self.run_in_chroot(args=['grub-mkconfig', '-o', '/boot/grub/grub.cfg'])
         if self._efi_mount:
-            self.run_in_chroot(args=['grub-mkconfig', '-o', '/boot/grub/grub.cfg'])
             self.run_in_chroot(args=['grub-install', '--target=x86_64-efi',
                                      '--efi-directory={}'.format(self._efi_mount),
                                      '--boot-directory=/boot', '--bootloader-id=alpaca',
@@ -36,5 +36,5 @@ class BootloaderInstaller(Installer):
                                      os.path.join(self._efi_mount, 'EFI/alpaca/grubx64.efi'),
                                      os.path.join(self._efi_mount, 'EFI/boot/bootx64.efi')])
         else:
-            # TODO: implement non-EFI installations
-            raise NotImplemented('Implement a non-EFI bootloader installation')
+            self.run_in_chroot(args=['grub-install', '--target=i386-pc',
+                                     '--boot-directory=/boot', self._data])

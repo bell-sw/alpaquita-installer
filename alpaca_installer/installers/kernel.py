@@ -9,14 +9,11 @@ from .utils import read_key_or_fail
 
 
 class KernelInstaller(Installer):
-    def __init__(self, target_root: str, config: dict, event_receiver,
-                 efi_boot: bool):
+    def __init__(self, target_root: str, config: dict, event_receiver):
         super().__init__(name='kernel', config=config,
                          event_receiver=event_receiver,
                          data_type=dict, data_is_optional=True,
                          target_root=target_root)
-
-        self._efi_boot = efi_boot
 
         self._cmdline: list[str] = []
         if self._data is not None:
@@ -35,14 +32,11 @@ class KernelInstaller(Installer):
         self._event_receiver.start_event('Regenerating initrd')
         self.run_in_chroot(args=['dracut', '-f', '/boot/initramfs-lts'])
 
-        if self._efi_boot:
-            data = """GRUB_DISTRIBUTOR="Alpaca"
+        data = """GRUB_DISTRIBUTOR="Alpaca"
 GRUB_TIMEOUT=2
 GRUB_DISABLE_SUBMENU=y
 GRUB_DISABLE_RECOVERY=true
 GRUB_CMDLINE_LINUX_DEFAULT="{}"
 """.format(' '.join(self._cmdline))
-            with open(self.abs_target_path('/etc/default/grub'), 'w') as file:
-                file.write(data)
-        else:
-            raise NotImplemented('update syslinux config')
+        with open(self.abs_target_path('/etc/default/grub'), 'w') as file:
+            file.write(data)
