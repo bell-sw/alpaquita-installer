@@ -1,18 +1,23 @@
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
+import logging
 
 import attrs
+import yaml
 
 from alpaca_installer.views.network import NetworkView
 from alpaca_installer.nmanager.interface import InterfaceInfo
 from alpaca_installer.nmanager.ip_config import IPConfig4, IPConfig6
 from alpaca_installer.nmanager.wifi_config import WIFIConfig
+from .controller import Controller
 
 if TYPE_CHECKING:
     from alpaca_installer.app.application import Application
 
+log = logging.getLogger('controllers.network')
 
-class NetworkController():
+
+class NetworkController(Controller):
     def __init__(self, app: Application):
         super().__init__(app)
         self._iface_name = self._app.nmanager.get_selected_iface()
@@ -126,7 +131,7 @@ class NetworkController():
         except (KeyError, ValueError) as exc:
             self._app.show_error_message(str(exc))
 
-    def get_ip_config(self, ip_ver: int) -> dict[str,str]:
+    def get_ip_config(self, ip_ver: int) -> dict:
         if ip_ver not in (4, 6):
             raise ValueError(f'Unknown IP version {ip_ver}')
         return attrs.asdict(self._ip_config[ip_ver])
@@ -145,3 +150,32 @@ class NetworkController():
             return attrs.asdict(self._wifi_config)
         else:
             return None
+
+    def to_yaml(self) -> str:
+        data = {'hostname': self._hostname}
+        for ip_ver in (4, 6):
+            tag = 'ipv{}'.format(ip_ver)
+            cfg = self.get_ip_config(ip_ver)
+            if cfg['method'] == 'static':
+                data[tag] = cfg
+            else:
+                data[tag] = {'method': cfg['method']}
+
+        iface_info = self.get_iface_info(self.get_selected_iface())
+        interface = {'name': iface_info.name}
+        if iface_info.type == 'bond':
+            interface['type'] = iface_info.type
+            interface['bond_members'] = iface_info.bond_members
+            interface['bond_mode'] = iface_info.bond_mode
+            if iface_info.bond_hash_policy:
+                interface['bond_hash_policy'] = iface_info.bond_hash_policy
+        elif iface_info.type == 'wifi':
+            interface['type'] = iface_info.type
+            wifi_cfg = self.get_wifi_config()
+            interface['wifi_ssid'] = wifi_cfg['ssid']
+            interface['wifi_psk'] = wifi_cfg['psk']
+        data['interface'] = interface
+
+        yaml_data = yaml.dump({'network': data})
+        log.debug('export to yaml: {}'.format(yaml_data))
+        return yaml_data
