@@ -3,5 +3,5 @@ class Controller:
     def __init__(self, app):
         self._app = app
 
-    def to_yaml(self):
+    def to_yaml(self) -> str:
         return ''
