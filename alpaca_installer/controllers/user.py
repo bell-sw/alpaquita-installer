@@ -1,13 +1,19 @@
 from typing import Optional
+import crypt
+import logging
 
+import yaml
 
 from alpaca_installer.models.user import UserModel
 from alpaca_installer.views.user import UserView, UserViewData
+from .controller import Controller
+
+log = logging.getLogger('controllers.users')
 
 
-class UserController:
+class UserController(Controller):
     def __init__(self, app):
-        self._app = app
+        super().__init__(app)
         self._model = None
 
     def make_ui(self):
@@ -34,3 +40,12 @@ class UserController:
 
     def cancel(self):
         self._app.prev_screen()
+
+    def to_yaml(self) -> str:
+        user_data = {'name': self._model.name,
+                     'password': crypt.crypt(self._model.password),
+                     'gecos': self._model.gecos,
+                     'is_admin': self._model.is_admin}
+        yaml_data = yaml.dump({'users': [user_data]})
+        log.debug('export to yaml: {}'.format(yaml_data))
+        return yaml_data
