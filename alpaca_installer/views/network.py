@@ -5,6 +5,7 @@ import urwid
 
 from subiquitycore.ui.buttons import cancel_btn, done_btn
 from subiquitycore.ui.container import ListBox, Pile
+from subiquitycore.ui.form import Form, StringField
 from subiquitycore.ui.utils import screen
 from subiquitycore.ui.selector import Selector, Option
 from subiquitycore.ui.table import ColSpec, TablePile, TableRow
@@ -14,20 +15,33 @@ from .network_vlan import AddVlanStretchy
 from .network_edit import EditIPStretchy
 from .network_wifi import EditWIFIStretchy
 from .network_bond import CreateBondStretchy
+from alpaca_installer.nmanager.ip_config import is_valid_hostname
 
 if TYPE_CHECKING:
     from alpaca_installer.controllers.network import NetworkController
 
 
-class NetworkView(BaseView):
-    title = 'Network configuration'
-
+class HostnameForm(Form):
     ok_label = 'Done'
     cancel_label = 'Back'
+
+    hostname = StringField('')
+
+    def clean_hostname(self, value):
+        if not is_valid_hostname(value):
+            raise ValueError("Invalid hostname: '{}'".format(value))
+        return value
+
+
+class NetworkView(BaseView):
+    title = 'Network configuration'
 
     def __init__(self, controller: NetworkController):
         self.controller = controller
         self._selected_iface = self.controller.get_selected_iface()
+
+        self._hostname_form = HostnameForm()
+        self._hostname_form.hostname.value = self.controller.get_hostname()
 
         self._bond_btn = done_btn('Create bond interface', on_press=self._add_bond)
         self._vlan_btn = done_btn('Add VLAN', on_press=self._add_vlan)
@@ -63,7 +77,9 @@ class NetworkView(BaseView):
             2: ColSpec()
         })
 
-        self._pile = Pile([urwid.Text('Network interface'),
+        hostname_rows = [urwid.Padding(r, width=79) for r in self._hostname_form.as_rows()]
+        self._pile = Pile([urwid.Text('Hostname'), urwid.Text('')] + hostname_rows +
+                          [urwid.Text('Network interface'),
                            urwid.Text(''),
                            self._iface_selector,
                            urwid.Text(''),
@@ -80,14 +96,14 @@ class NetworkView(BaseView):
         self.update_interfaces_list(iface_to_select=self._selected_iface)
         self.update_wifi_status()
 
-        _done_btn = done_btn(self.ok_label, on_press=self.done)
-        _cancel_btn = cancel_btn(self.cancel_label, on_press=self.cancel)
+        urwid.connect_signal(self._hostname_form, 'submit', self.done)
+        urwid.connect_signal(self._hostname_form, 'cancel', self.cancel)
 
-        super().__init__(screen(ListBox([self._pile]), buttons=[_done_btn, _cancel_btn],
+        super().__init__(screen(ListBox([self._pile]), buttons=self._hostname_form.buttons,
                                 focus_buttons=False))
 
     def _reset_focus(self):
-        # Reset the pile focus to the iface selector
+        # Reset the pile focus to the hostname field
         self._pile.focus_position = 2
 
     def _iface_selected(self, sender, value):
@@ -190,6 +206,7 @@ class NetworkView(BaseView):
         self._wifi_status.set_text(text)
 
     def done(self, sender):
+        self.controller.set_hostname(self._hostname_form.hostname.value)
         self.controller.select_iface(self._selected_iface)
         self.controller.done()
 

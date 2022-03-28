@@ -12,10 +12,11 @@ if TYPE_CHECKING:
     from alpaca_installer.app.application import Application
 
 
-class NetworkController:
+class NetworkController():
     def __init__(self, app: Application):
-        self._app = app
+        super().__init__(app)
         self._iface_name = self._app.nmanager.get_selected_iface()
+        self._hostname = 'localhost'
 
         self._ip_config = {
             4: IPConfig4(method='dhcp'),
@@ -57,6 +58,12 @@ class NetworkController:
 
     def cancel(self):
         self._app.prev_screen()
+
+    def get_hostname(self) -> str:
+        return self._hostname
+
+    def set_hostname(self, hostname: str):
+        self._hostname = hostname
 
     def select_iface(self, iface_name: str):
         self._iface_name = iface_name
@@ -119,7 +126,7 @@ class NetworkController:
         except (KeyError, ValueError) as exc:
             self._app.show_error_message(str(exc))
 
-    def get_ip_config(self, ip_ver: int) -> dict[str, str]:
+    def get_ip_config(self, ip_ver: int) -> dict[str,str]:
         if ip_ver not in (4, 6):
             raise ValueError(f'Unknown IP version {ip_ver}')
         return attrs.asdict(self._ip_config[ip_ver])
