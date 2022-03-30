@@ -150,6 +150,9 @@ class Application:
             -d --debug         Enable debug-level log
         ''')
 
+    def is_efi(self) -> bool:
+        return os.path.exists('/sys/firmware/efi')
+
     def controllers(self):
         return self._controllers
 

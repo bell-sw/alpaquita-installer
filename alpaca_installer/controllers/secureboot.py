@@ -8,7 +8,7 @@ class SecureBootController(Controller):
         super().__init__(app)
 
         self._install_shim = False
-        self._is_efi = os.path.exists('/sys/firmware/efi')
+        self._is_efi = self._app.is_efi()
 
     def make_ui(self):
         return SecureBootView(self, self._install_shim) if self._is_efi else None
