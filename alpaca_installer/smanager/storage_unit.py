@@ -22,6 +22,9 @@ class StorageUnitFlag(enum.Enum):
             raise ValueError('Unknown unit flag: {}'.format(value))
         return ret
 
+    def __str__(self) -> str:
+        return self.name.lower()
+
 
 @attrs.define
 class StorageUnit:
