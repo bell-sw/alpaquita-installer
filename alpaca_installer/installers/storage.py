@@ -1,5 +1,4 @@
 from __future__ import annotations
-import re
 import os
 from typing import Optional
 
@@ -9,7 +8,7 @@ from alpaca_installer.smanager.manager import StorageManager
 from alpaca_installer.smanager.storage_unit import StorageUnit, StorageUnitFlag
 from alpaca_installer.smanager.file_system import FSType
 from .installer import Installer
-from .utils import read_key_or_fail
+from .utils import read_key_or_fail, str_size_to_bytes
 # TODO: do something with this run_cmd
 from alpaca_installer.nmanager.utils import run_cmd
 
@@ -114,25 +113,6 @@ class UnitParams:
         return UnitParams(id=id, size=size, fs_type=fs_type, fs_opts=fs_opts,
                           mount_point=mount_point, flags=flags,
                           crypto_passphrase=crypto_passphrase)
-
-
-def str_size_to_bytes(size: str) -> int:
-    m = re.match(r'^([0-9]+)([KMG])?$', size)
-    if not m:
-        raise ValueError('Invalid size format: {}'.format(size))
-
-    nbytes = int(m.group(1))
-    suffixes = {'K': 1024,
-                'M': 1024 * 1024,
-                'G': 1024 * 1024 * 1024}
-    suffix = m.group(2)
-    if suffix:
-        mult = suffixes.get(suffix, None)
-        if not mult:
-            raise ValueError("Invalid suffix '{}' in size {}".format(suffix, size))
-        nbytes *= mult
-
-    return nbytes
 
 
 class StorageInstaller(Installer):
