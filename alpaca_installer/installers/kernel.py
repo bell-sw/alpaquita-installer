@@ -1,3 +1,6 @@
+import os
+import re
+
 from .installer import Installer
 from .utils import read_key_or_fail
 
@@ -30,7 +33,16 @@ class KernelInstaller(Installer):
 
     def post_apply(self):
         self._event_receiver.start_event('Regenerating initrd')
-        self.run_in_chroot(args=['dracut', '-f', '/boot/initramfs-lts'])
+
+        kver = None
+        for name in os.listdir(self.abs_target_path('/boot')):
+            m = re.match(r'^config-(\d+.*)$', name)
+            if m:
+                kver = m.group(1)
+                break
+        if not kver:
+            raise RuntimeError('Unable to determine the installed kernel version')
+        self.run_in_chroot(args=['dracut', '-f', '/boot/initramfs-lts', kver])
 
         data = """GRUB_DISTRIBUTOR="Alpaca"
 GRUB_TIMEOUT=2
