@@ -40,8 +40,7 @@ class NetworkView(BaseView):
         self.controller = controller
         self._selected_iface = self.controller.get_selected_iface()
 
-        self._hostname_form = HostnameForm()
-        self._hostname_form.hostname.value = self.controller.get_hostname()
+        self._hostname_form = HostnameForm(initial={'hostname': self.controller.get_hostname()})
 
         self._bond_btn = done_btn('Create bond interface', on_press=self._add_bond)
         self._vlan_btn = done_btn('Add VLAN', on_press=self._add_vlan)
@@ -92,6 +91,8 @@ class NetworkView(BaseView):
                            urwid.Text('IP address configuration'),
                            urwid.Text(''),
                            table])
+        # Adjust it if any widgets above the self._iface_selector are added/removed
+        self._iface_selector_pos = 2 + len(hostname_rows) + 2
 
         self.update_interfaces_list(iface_to_select=self._selected_iface)
         self.update_wifi_status()
@@ -100,11 +101,10 @@ class NetworkView(BaseView):
         urwid.connect_signal(self._hostname_form, 'cancel', self.cancel)
 
         super().__init__(screen(ListBox([self._pile]), buttons=self._hostname_form.buttons,
-                                focus_buttons=False))
+                                focus_buttons=True))
 
     def _reset_focus(self):
-        # Reset the pile focus to the hostname field
-        self._pile.focus_position = 2
+        self._pile.focus_position = self._iface_selector_pos
 
     def _iface_selected(self, sender, value):
         self._selected_iface = value
