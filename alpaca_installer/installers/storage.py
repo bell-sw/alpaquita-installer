@@ -91,7 +91,7 @@ class UnitParams:
         if size is None:
             size = 0
         else:
-            size = str_size_to_bytes(size)
+            size = str_size_to_bytes(str(size))
 
         fs_type = data.get('fs_type', None)
         if fs_type is not None:
