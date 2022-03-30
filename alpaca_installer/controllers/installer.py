@@ -10,6 +10,7 @@ from alpaca_installer.views.installer import InstallerView
 from alpaca_installer.installers.storage import StorageInstaller
 from alpaca_installer.installers.repo import RepoInstaller
 from alpaca_installer.installers.packages import PackagesInstaller
+from alpaca_installer.installers.swapfile import SwapfileInstaller
 from alpaca_installer.installers.timezone import TimezoneInstaller
 from alpaca_installer.installers.users import UsersInstaller
 from alpaca_installer.installers.network import NetworkInstaller
@@ -78,6 +79,7 @@ class BaseInstallerController(Controller, EventReceiver):
             storage_installer,
             RepoInstaller(target_root=target_root, config=config, event_receiver=self),
             pkgs_installer,
+            SwapfileInstaller(target_root=target_root, config=config, event_receiver=self),
             TimezoneInstaller(target_root=target_root, config=config, event_receiver=self),
             UsersInstaller(target_root=target_root, config=config, event_receiver=self),
             NetworkInstaller(target_root=target_root, config=config, event_receiver=self),
