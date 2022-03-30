@@ -28,7 +28,7 @@ class TimezoneView(BaseView):
         urwid.connect_signal(self._form, 'cancel', self.cancel)
 
         super().__init__(self._form.as_screen(excerpt=self.excerpt,
-                                              focus_buttons=False))
+                                              focus_buttons=True))
 
     def _init_regions(self):
         reg_opts = []
