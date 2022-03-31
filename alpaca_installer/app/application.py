@@ -9,6 +9,7 @@ import logging
 from subiquitycore.ui.anchors import HeaderColumns
 from subiquitycore.ui.utils import Color, LoadingDialog
 
+from alpaca_installer.controllers.eula import EULAController
 from alpaca_installer.controllers.timezone import TimezoneController
 from alpaca_installer.controllers.proxy import ProxyController
 from alpaca_installer.controllers.repo import RepoController
@@ -115,6 +116,7 @@ class Application:
             self._controllers.append(InstallerController(self, False, self._config_file))
         else:
             self._controllers.extend([
+                EULAController(self),
                 NetworkController(self),
                 UserController(self),
                 TimezoneController(self),
