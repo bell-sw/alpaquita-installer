@@ -1,6 +1,6 @@
-# SPDX-License-Identifier: AGPL-3.0-or-later
-# Copyright (c) 2022, BELLSOFT. All rights reserved.
-# Copyright 2015 Canonical, Ltd.
+#  SPDX-FileCopyrightText: 2015 Canonical, Ltd
+#  SPDX-FileCopyrightText: 2022 BellSoft
+#  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 import logging
 

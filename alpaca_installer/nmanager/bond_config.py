@@ -1,3 +1,6 @@
+#  SPDX-FileCopyrightText: 2022 BellSoft
+#  SPDX-License-Identifier:  AGPL-3.0-or-later
+
 from typing import Optional
 
 BOND_MODES = ('balance-rr', 'active-backup', 'balance-xor', 'broadcast',

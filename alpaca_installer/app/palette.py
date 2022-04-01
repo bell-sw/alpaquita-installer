@@ -1,3 +1,6 @@
+#  SPDX-FileCopyrightText: 2022 BellSoft
+#  SPDX-License-Identifier:  AGPL-3.0-or-later
+
 PALETTE = [
     #    ('frame_header_fringe', 'white',   'black'),
     ('frame_header_fringe', 'black',   'light cyan'),

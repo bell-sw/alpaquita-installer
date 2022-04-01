@@ -1,3 +1,6 @@
+#  SPDX-FileCopyrightText: 2022 BellSoft
+#  SPDX-License-Identifier:  AGPL-3.0-or-later
+
 from alpaca_installer.nmanager.manager import NetworkManager
 from alpaca_installer.nmanager.ip_config import IPConfig4, IPConfig6, is_valid_hostname
 from alpaca_installer.nmanager.wifi_config import WIFIConfig

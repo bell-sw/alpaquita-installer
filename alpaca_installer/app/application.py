@@ -1,3 +1,7 @@
+#  SPDX-FileCopyrightText: 2020 Canonical, Ltd
+#  SPDX-FileCopyrightText: 2022 BellSoft
+#  SPDX-License-Identifier:  AGPL-3.0-or-later
+
 import asyncio
 
 import urwid

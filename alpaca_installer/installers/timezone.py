@@ -1,3 +1,6 @@
+#  SPDX-FileCopyrightText: 2022 BellSoft
+#  SPDX-License-Identifier:  AGPL-3.0-or-later
+
 import os
 
 from alpaca_installer.models.timezone import REGIONS, ZONEINFO_DIR

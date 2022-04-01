@@ -1,3 +1,6 @@
+#  SPDX-FileCopyrightText: 2022 BellSoft
+#  SPDX-License-Identifier:  AGPL-3.0-or-later
+
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 import json

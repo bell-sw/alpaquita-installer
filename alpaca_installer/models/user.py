@@ -1,3 +1,6 @@
+#  SPDX-FileCopyrightText: 2022 BellSoft
+#  SPDX-License-Identifier:  AGPL-3.0-or-later
+
 from attrs import define, field, validators
 
 # From 'man 8 useradd' in Ubuntu
