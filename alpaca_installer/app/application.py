@@ -119,11 +119,11 @@ class Application:
             self._controllers.extend([
                 EULAController(self),
                 NetworkController(self),
-                UserController(self),
-                TimezoneController(self),
                 ProxyController(self),
                 RepoController(self),
                 PackagesController(self),
+                TimezoneController(self),
+                UserController(self),
                 StorageController(self),
                 SecureBootController(self),
                 InstallerController(self)
