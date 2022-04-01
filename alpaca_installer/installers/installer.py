@@ -79,3 +79,10 @@ class Installer(abc.ABC):
 
     def enable_service(self, service: str, runlevel: str):
         self.run_in_chroot(args=['rc-update', 'add', service, runlevel])
+
+    def disable_service(self, service: str, runlevel: str):
+        # As disabling an already disabled service will exit with an error
+        is_enabled = os.path.exists(os.path.join(self.abs_target_path('/etc/runlevels/'),
+                                                 runlevel, service))
+        if is_enabled:
+            self.run_in_chroot(args=['rc-update', 'del', service, runlevel])
