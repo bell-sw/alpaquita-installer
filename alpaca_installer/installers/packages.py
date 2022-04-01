@@ -14,7 +14,7 @@ class PackagesInstaller(Installer):
             for pkg in self._data:
                 self.add_package(pkg)
 
-        self.add_package('alpaca-base')
+        self.add_package('acct', 'alpaca-base')
 
     def apply(self):
         self._event_receiver.start_event('Initializing new root')
