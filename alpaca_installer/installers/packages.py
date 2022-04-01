@@ -29,7 +29,7 @@ class PackagesInstaller(Installer):
         args = common + ['--update-cache', '--clean-protected']
         args.extend(self.packages)
 
-        self._event_receiver.start_event(f'Installing packages: {self.packages}')
+        self._event_receiver.start_event(f'Installing packages: {sorted(self.packages)}')
         res = run_cmd(args=args)
         self._event_receiver.add_log_line('{}'.format(res.stdout.decode()))
 

@@ -44,7 +44,7 @@ class StorageForm(Form):
 
 
 class StorageView(BaseView):
-    title = 'Storage configuration'
+    title = 'Installation Destination'
     excerpt = 'Select a disk for installation. All existing data on this disk will be destroyed.'
 
     def __init__(self, controller: StorageController,

@@ -11,8 +11,8 @@ class TimezoneForm(Form):
     city = ChoiceField('City:', choices=['dummy'])
 
 class TimezoneView(BaseView):
-    title = 'Time zone'
-    excerpt = 'Select time zone.'
+    title = 'Time Zone'
+    excerpt = 'Select a time zone.'
 
     def __init__(self, controller, region: str, city: str):
         self._controller = controller

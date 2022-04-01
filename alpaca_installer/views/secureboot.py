@@ -11,7 +11,7 @@ class SecureBootForm(Form):
     info_text = ReadOnlyField('', (
         'Alpaca Linux provides pre-bootloader "shim" with a built-in certificate, '
         'signed MOKManager utility, grub and kernel (automatically locked down if '
-        'SB is enabled).\n\n'
+        'Secure Boot (SB) is enabled).\n\n'
         'The currently provided shim efi image is not yet signed by Microsoft, so '
         'it cannot be loaded with SB enabled using Microsoft certificates. For it '
         'to work, the shim must be signed with your own trusted SB key from UEFI '
@@ -22,8 +22,7 @@ class SecureBootForm(Form):
     install_shim = BooleanField('Install "shim" and signed "grub" bootloaders for SB')
 
 class SecureBootView(BaseView):
-    title = 'Secure Boot (SB) setup'
-    excerpt = '"shim" and signed "grub" bootloaders'
+    title = 'Secure Boot'
 
     def __init__(self, controller, install_shim):
         self._controller = controller
@@ -32,8 +31,7 @@ class SecureBootView(BaseView):
 
         urwid.connect_signal(self._form, 'submit', self.done)
         urwid.connect_signal(self._form, 'cancel', self.cancel)
-        super().__init__(self._form.as_screen(excerpt=self.excerpt,
-                                              focus_buttons=True))
+        super().__init__(self._form.as_screen(focus_buttons=True))
 
     def done(self, sender):
         self._controller.done(self._form.install_shim.widget.value)

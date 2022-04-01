@@ -16,7 +16,7 @@ class EULAView(BaseView):
     title = 'End User License Agreement'
     excerpt = (
         'To install and use Alpaca Linux you must read and accept '
-        'the terms of the End User License Agreement (EULA)'
+        'the terms of the End User License Agreement (EULA).'
     )
 
     def __init__(self, controller: EULAController, content: str):

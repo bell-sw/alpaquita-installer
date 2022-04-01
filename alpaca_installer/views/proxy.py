@@ -11,8 +11,8 @@ class ProxyForm(Form):
 
 class ProxyView(BaseView):
     title = 'Proxy'
-    excerpt = ('If your system needs a HTTP proxy to connect to the Internet,'
-              ' set it here.')
+    excerpt = ('If your system needs an HTTP proxy to connect to the Internet,'
+               ' set it here.')
 
     def __init__(self, controller, proxy: str):
         self._controller = controller

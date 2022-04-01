@@ -34,7 +34,7 @@ class HostnameForm(Form):
 
 
 class NetworkView(BaseView):
-    title = 'Network configuration'
+    title = 'Network'
 
     def __init__(self, controller: NetworkController):
         self.controller = controller

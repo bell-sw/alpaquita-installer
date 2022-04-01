@@ -69,7 +69,7 @@ class UsersInstaller(Installer):
             raise InstallerException('At least one admin user must be defined')
 
     def apply(self):
-        self._event_receiver.start_event('Setup users')
+        self._event_receiver.start_event('Adding users')
         wheel_sudoers_needed = False
         etc_shadow = self.abs_target_path('/etc/shadow')
 

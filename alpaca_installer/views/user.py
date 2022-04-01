@@ -58,7 +58,7 @@ class UserForm(Form):
 
 
 class UserView(BaseView):
-    title = 'Create user'
+    title = 'User'
     excerpt = "This account will have admin privileges."
 
     def __init__(self, controller, data: Optional[UserViewData]):
