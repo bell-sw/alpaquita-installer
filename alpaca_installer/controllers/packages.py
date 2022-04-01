@@ -13,7 +13,8 @@ class PackagesController(Controller):
         super().__init__(app)
 
         is_virt = len(glob.glob('/dev/disk/by-label/alpaca-virt-*')) > 0
-        self._data = {'kernel': {'extramods': not is_virt}}
+        self._data = {'kernel': {'extramods': not is_virt},
+                      'other': {'ssh_server': True}}
 
         log.debug(f'init: {self._data}')
 
@@ -30,14 +31,18 @@ class PackagesController(Controller):
     def cancel(self):
         self._app.prev_screen()
 
+    def _is_group_item(self, group: str, item: str):
+        return self._data.get(group).get(item)
+
     def _add_pkg(self, pkgs, group, name, pkg_name):
         if (group not in self._data) or (name not in self._data.get(group)):
             return
-        if self._data.get(group).get(name):
+        if self._is_group_item(group=group, item=name):
             pkgs.append(pkg_name)
 
     def to_yaml(self):
         epkgs = []
+        enable_services = []
 
         self._add_pkg(epkgs, 'kernel', 'extramods', 'linux-lts-extra-modules')
 
@@ -52,4 +57,12 @@ class PackagesController(Controller):
 
         self._add_pkg(epkgs, 'libc', 'perf', 'musl-perf')
 
-        return yaml.dump({'extra_packages': epkgs})
+        self._add_pkg(epkgs, 'other', 'ssh_server', 'openssh-server')
+        if self._is_group_item(group='other', item='ssh_server'):
+            enable_services.append('sshd')
+
+        data = {'extra_packages': epkgs}
+        if enable_services:
+            data['services'] = {'enabled': enable_services}
+
+        return yaml.dump(data)

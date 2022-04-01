@@ -26,12 +26,19 @@ class NIKForm(SubForm):
 class LibcForm(SubForm):
     perf = BooleanField('Install musl-perf with CPU features detection and optimized asm functions')
 
+
+class OtherForm(SubForm):
+    ssh_server = BooleanField('OpenSSH server', help=NO_HELP)
+
+
 class PackagesForm(Form):
     cancel_label = 'Back'
     kernel = SubFormField(KernelForm, 'Linux kernel')
     jdk = SubFormField(JDKForm, 'Liberica JDK')
     nik = SubFormField(NIKForm, 'Liberica Native Image Kit')
     libc = SubFormField(LibcForm, 'libc')
+    other = SubFormField(OtherForm, 'Other components')
+
 
 class PackagesView(BaseView):
     title = 'Packages'
@@ -45,7 +52,8 @@ class PackagesView(BaseView):
         for k, f  in [('kernel', self._form.kernel),
                       ('jdk', self._form.jdk),
                       ('nik', self._form.nik),
-                      ('libc', self._form.libc)]:
+                      ('libc', self._form.libc),
+                      ('other', self._form.other)]:
             if k in data:
                 f.widget.value = data.get(k)
 
@@ -63,6 +71,7 @@ class PackagesView(BaseView):
             'jdk': self._form.jdk.widget.value,
             'nik': self._form.nik.widget.value,
             'libc': self._form.libc.widget.value,
+            'other': self._form.other.widget.value,
             })
 
     def cancel(self, sender=None):
