@@ -19,7 +19,7 @@ class PackagesInstaller(Installer):
         self.add_package('acct', 'alpaca-base')
 
     def apply(self):
-        self._event_receiver.start_event('Initializing new root')
+        self._event_receiver.start_event('Initializing APK database')
 
         common = ['apk', 'add', '--root', self.target_root,
                   '--keys', '/etc/apk/keys', # install using keys from the host system
