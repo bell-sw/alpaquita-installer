@@ -4,12 +4,20 @@
 import urwid
 
 from subiquitycore.view import BaseView
-from subiquitycore.ui.form import Form, URLField
+from subiquitycore.ui.form import Form, StringField
+
+from alpaca_installer.common.utils import validate_proxy_url, VALID_PROXY_URL_TEMPLATE
+
 
 class ProxyForm(Form):
     cancel_label = 'Back'
 
-    proxy_url = URLField('Proxy:')
+    proxy_url = StringField('Proxy:',
+                         help=VALID_PROXY_URL_TEMPLATE)
+
+    def clean_proxy_url(self, value):
+        if value:
+            validate_proxy_url(value)
 
 
 class ProxyView(BaseView):
