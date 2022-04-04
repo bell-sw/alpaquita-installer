@@ -12,6 +12,7 @@ from subiquitycore.async_helpers import run_in_thread
 from alpaca_installer.views.installer import InstallerView
 from alpaca_installer.installers.storage import StorageInstaller
 from alpaca_installer.installers.repo import RepoInstaller
+from alpaca_installer.installers.proxy import ProxyInstaller
 from alpaca_installer.installers.packages import PackagesInstaller
 from alpaca_installer.installers.services import ServicesInstaller
 from alpaca_installer.installers.swapfile import SwapfileInstaller
@@ -81,6 +82,7 @@ class BaseInstallerController(Controller, EventReceiver):
         installers = [
             storage_installer,
             RepoInstaller(target_root=target_root, config=config, event_receiver=self),
+            ProxyInstaller(target_root=target_root, config=config, event_receiver=self),
             pkgs_installer,
             ServicesInstaller(target_root=target_root, config=config, event_receiver=self),
             SwapfileInstaller(target_root=target_root, config=config, event_receiver=self),
