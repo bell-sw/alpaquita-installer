@@ -7,8 +7,7 @@ import os
 import subprocess
 from typing import Collection
 
-# TODO: remove this nmanager reference
-from alpaca_installer.nmanager.utils import run_cmd
+from alpaca_installer.common.utils import run_cmd
 
 log = logging.getLogger('installer')
 

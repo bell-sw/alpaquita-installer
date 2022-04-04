@@ -1,8 +1,7 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
-# TODO: importing from nmanager here looks odd
-from alpaca_installer.nmanager.utils import run_cmd
+from alpaca_installer.common.utils import run_cmd
 from .installer import Installer, InstallerException
 
 

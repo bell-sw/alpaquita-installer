@@ -13,7 +13,8 @@ from .ip_config import IPConfig4, IPConfig6
 from .wifi_config import WIFIConfig
 from .bond_config import validate_bond_mode_and_policy
 from .identification import identify_device, find_match_in_file, read_one_line
-from .utils import run_cmd, get_active_iface_names, wait_iface_gets_ip
+from .utils import get_active_iface_names, wait_iface_gets_ip
+from alpaca_installer.common.utils import run_cmd
 
 _InterfaceType = TypeVar('_InterfaceType')
 

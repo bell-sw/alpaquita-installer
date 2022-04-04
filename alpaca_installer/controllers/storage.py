@@ -15,7 +15,7 @@ from alpaca_installer.smanager.storage_unit import Partition, StorageUnit, Stora
 from alpaca_installer.smanager.disk import Disk as SM_Disk
 from alpaca_installer.smanager.raid import RAID
 from alpaca_installer.smanager.lvm import VolumeGroup
-from alpaca_installer.smanager.utils import run_cmd
+from alpaca_installer.common.utils import run_cmd
 from alpaca_installer.views.storage import StorageView, StorageViewData
 from .controller import Controller
 

@@ -10,10 +10,9 @@ import attrs
 from alpaca_installer.smanager.manager import StorageManager
 from alpaca_installer.smanager.storage_unit import StorageUnit, StorageUnitFlag
 from alpaca_installer.smanager.file_system import FSType
+from alpaca_installer.common.utils import run_cmd
 from .installer import Installer
 from .utils import read_key_or_fail, str_size_to_bytes
-# TODO: do something with this run_cmd
-from alpaca_installer.nmanager.utils import run_cmd
 
 # Each unit id is unique in the file
 #

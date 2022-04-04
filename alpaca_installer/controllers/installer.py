@@ -27,8 +27,7 @@ from alpaca_installer.installers.installer import (
 )
 from .controller import Controller
 
-# TODO: do something with this run_cmd
-from alpaca_installer.nmanager.utils import run_cmd
+from alpaca_installer.common.utils import run_cmd
 from alpaca_installer.common.types import ApplicationState
 
 log = logging.getLogger('controllers.installer')

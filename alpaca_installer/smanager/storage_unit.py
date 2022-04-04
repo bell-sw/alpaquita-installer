@@ -8,7 +8,8 @@ import enum
 import attrs
 
 from .file_system import FSType
-from .utils import run_cmd, get_block_device_uuid, get_block_device_size
+from .utils import get_block_device_uuid, get_block_device_size
+from alpaca_installer.common.utils import run_cmd
 
 if TYPE_CHECKING:
     from .storage_device import StorageDevice

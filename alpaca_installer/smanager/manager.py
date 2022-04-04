@@ -13,7 +13,7 @@ from .raid import RAID
 from .cryptsetup import Cryptsetup
 from .storage_unit import Partition
 from .file_system import FSType
-from .utils import run_cmd
+from alpaca_installer.common.utils import run_cmd
 
 if TYPE_CHECKING:
     from .storage_device import StorageDevice
