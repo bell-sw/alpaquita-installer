@@ -14,7 +14,7 @@ from subiquitycore.ui.form import (
     PasswordField,
 )
 
-from alpaca_installer.models.user import USERNAME_REGEX, USERNAME_MAX_LEN
+from alpaca_installer.models.user import USERNAME_REGEX, USERNAME_MAX_LEN, GECOS_INVALID_CHARACTERS
 
 
 @define
@@ -40,6 +40,13 @@ class UserForm(Form):
             self.user_name.value = data.user_name
             self.password.value = data.password
             self.confirm.value = data.password
+
+    def clean_full_name(self, value):
+        if value:
+            if set(value).intersection(set(GECOS_INVALID_CHARACTERS)):
+                raise ValueError('Full name must not contain characters from {}'.format(
+                    list(GECOS_INVALID_CHARACTERS)))
+        return value
 
     def validate_user_name(self):
         user_name = self.user_name.value
