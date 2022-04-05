@@ -2,11 +2,18 @@
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 from typing import Optional
+import re
 
 import attrs
 
 from .wifi_config import validate_wifi_ssid, validate_wifi_psk
 from .bond_config import validate_bond_mode_and_policy
+
+
+def validate_mac_address(mac_address: str):
+    if not re.match(r'^[0-9a-zA-Z]{2}(:[0-9a-zA-Z]{2}){5}$', mac_address):
+        raise ValueError("'{}' is an invalid MAC address".format(mac_address))
+
 
 @attrs.define
 class InterfaceInfo:
@@ -52,7 +59,7 @@ class EthernetInterface(BaseInterface):
     def __init__(self, name: str, mac_address: str,
                  vendor: str, model: str):
         super().__init__(name)
-        #TODO: validate mac_address
+        validate_mac_address(mac_address)
         self._mac_address = mac_address
         self._vendor = vendor
         self._model = model
@@ -113,7 +120,7 @@ class WIFIInterface(BaseInterface):
     def __init__(self, name: str, mac_address: str,
                  vendor: str, model: str):
         super().__init__(name)
-        # TODO: validate mac_address
+        validate_mac_address(mac_address)
         self._mac_address = mac_address
         self._vendor = vendor
         self._model = model
