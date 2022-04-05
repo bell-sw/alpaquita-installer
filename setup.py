@@ -17,6 +17,9 @@ setuptools.setup(
     url='https://bell-sw.com',
     license="AGPLv3+",
     packages=setuptools.find_packages(),
+    package_data={
+        'alpaca_installer': ['EULA'],
+    },
     scripts=[
           'bin/setup-alpaca',
         ],
