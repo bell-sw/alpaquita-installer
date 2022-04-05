@@ -144,7 +144,7 @@ class Application:
                                           event_loop=urwid.AsyncioEventLoop(loop=self.aio_loop))
 
     def usage(self):
-        print(f'''Usage: setup-alpaca [OPTIONS]
+        print(f'''Usage: alpaca-installer [OPTIONS]
         OPTIONS:
             -f --config-file x Get setup configuration from yaml file x
             -n --no-ui         Run the installation without a text-based UI. Requires config-file option

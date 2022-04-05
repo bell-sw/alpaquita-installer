@@ -21,6 +21,6 @@ setuptools.setup(
         'alpaca_installer': ['EULA'],
     },
     scripts=[
-          'bin/setup-alpaca',
+          'bin/alpaca-installer',
         ],
     )
