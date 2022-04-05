@@ -9,6 +9,7 @@ import attrs
 import yaml
 
 from alpaca_installer.views.network import NetworkView
+from alpaca_installer.nmanager.manager import NetworkManager
 from alpaca_installer.nmanager.interface import InterfaceInfo
 from alpaca_installer.nmanager.ip_config import IPConfig4, IPConfig6
 from alpaca_installer.nmanager.wifi_config import WIFIConfig
@@ -23,7 +24,11 @@ log = logging.getLogger('controllers.network')
 class NetworkController(Controller):
     def __init__(self, app: Application):
         super().__init__(app)
-        self._iface_name = self._app.nmanager.get_selected_iface()
+
+        self._nmanager = NetworkManager()
+        self._nmanager.add_host_ifaces()
+
+        self._iface_name = self._nmanager.get_selected_iface()
         self._hostname = 'localhost'
 
         self._ip_config = {
@@ -31,8 +36,8 @@ class NetworkController(Controller):
             6: IPConfig6(method='disabled')
         }
         if self._iface_name:
-            self._ip_config[4] = self._app.nmanager.get_ipv4_config()
-            self._ip_config[6] = self._app.nmanager.get_ipv6_config()
+            self._ip_config[4] = self._nmanager.get_ipv4_config()
+            self._ip_config[6] = self._nmanager.get_ipv6_config()
 
         self._wifi_config: Optional[WIFIConfig] = None
 
@@ -42,24 +47,24 @@ class NetworkController(Controller):
     async def _apply_configuration(self):
         try:
             apply_task = self._app.aio_loop.run_in_executor(None,
-                                                            self._app.nmanager.apply)
+                                                            self._nmanager.apply)
             await self._app.wait_with_text_dialog(apply_task, 'Applying configuration')
             self._app.next_screen()
         except RuntimeError as exc:
             self._app.show_error_message(str(exc))
 
     def done(self):
-        self._app.nmanager.select_iface(self._iface_name)
-        self._app.nmanager.set_ipv4_config(self._ip_config[4])
-        self._app.nmanager.set_ipv6_config(self._ip_config[6])
+        self._nmanager.select_iface(self._iface_name)
+        self._nmanager.set_ipv4_config(self._ip_config[4])
+        self._nmanager.set_ipv6_config(self._ip_config[6])
 
         if self.get_iface_info(self._iface_name).type == 'wifi':
             if not self._wifi_config:
                 self._app.show_error_message('Wireless network is not configured')
                 return
-            self._app.nmanager.set_wifi_config(self._wifi_config)
+            self._nmanager.set_wifi_config(self._wifi_config)
 
-        if self._app.nmanager.apply_required:
+        if self._nmanager.apply_required:
             self._app.aio_loop.create_task(self._apply_configuration())
         else:
             self._app.next_screen()
@@ -80,17 +85,17 @@ class NetworkController(Controller):
         return self._iface_name
 
     def get_available_ifaces(self) -> set[str]:
-        return self._app.nmanager.get_available_ifaces()
+        return self._nmanager.get_available_ifaces()
 
     def get_bond_candidates(self) -> set[str]:
-        return self._app.nmanager.get_bond_candidates()
+        return self._nmanager.get_bond_candidates()
 
     def get_iface_info(self, iface_name: str) -> InterfaceInfo:
-        return self._app.nmanager.get_iface_info(iface_name)
+        return self._nmanager.get_iface_info(iface_name)
 
     def add_vlan_iface(self, base_iface_name: str, vlan_id: int):
         try:
-            new_iface = self._app.nmanager.add_vlan_iface(base_iface_name, vlan_id)
+            new_iface = self._nmanager.add_vlan_iface(base_iface_name, vlan_id)
             self._app.ui.body.update_interfaces_list(iface_to_select=new_iface)
             self._app.ui.body.remove_overlay()
         except ValueError as exc:
@@ -99,7 +104,7 @@ class NetworkController(Controller):
     def add_bond_iface(self, name: str, members: list[str],
                        mode: str, hash_policy: Optional[str]):
         try:
-            new_iface = self._app.nmanager.add_bond_iface(name=name, members=members,
+            new_iface = self._nmanager.add_bond_iface(name=name, members=members,
                                                           mode=mode, hash_policy=hash_policy)
             self._app.ui.body.update_interfaces_list(iface_to_select=new_iface)
             self._app.ui.body.remove_overlay()
@@ -108,7 +113,7 @@ class NetworkController(Controller):
 
     def del_iface(self, iface_name: str):
         try:
-            self._app.nmanager.del_iface(iface_name)
+            self._nmanager.del_iface(iface_name)
             self._app.ui.body.update_interfaces_list()
         except ValueError as exc:
             self._app.show_error_message(str(exc))

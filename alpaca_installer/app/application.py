@@ -27,7 +27,6 @@ from alpaca_installer.controllers.installer import (
     ConsoleInstallerController,
 )
 from .error import ErrorMsgStretchy
-from alpaca_installer.nmanager.manager import NetworkManager
 
 # From Ubuntu
 # When waiting for something of unknown duration, block the UI for at
@@ -107,10 +106,6 @@ class Application:
         if self._no_ui and not self._config_file:
             self.usage()
             sys.exit(1)
-
-        # TODO: maybe move this into NetworkController
-        self.nmanager = NetworkManager()
-        self.nmanager.add_host_ifaces()
 
         self._controllers = []
 
