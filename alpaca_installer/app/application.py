@@ -101,7 +101,7 @@ class Application:
             elif opt in ("-n", "--no-ui"):
                 self._no_ui = True
             elif opt in ("-d", "--debug"):
-                logging.getLogger().setLevel(logging.DEBUG)
+                logging.basicConfig(filename='installer.log', filemode='w', level=logging.DEBUG)
 
         if self._no_ui and not self._config_file:
             self.usage()
