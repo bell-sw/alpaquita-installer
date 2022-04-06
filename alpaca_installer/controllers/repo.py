@@ -46,8 +46,10 @@ class RepoController(Controller):
     def get_repos(self, url, libc):
         self._repos = []
         for name in ['core', 'universe']:
+            # TODO: fix the repo path before the release
             self._repos.append(urllib.parse.quote(
-                               f'{url}/alpaca/{libc}/{self._release}/{name}',
+                                f'http://192.168.100.54/linux/linux_bellsoft/{name}',
+#                               f'{url}/alpaca/{libc}/{self._release}/{name}',
                                safe='/:'))
         return self._repos
 
