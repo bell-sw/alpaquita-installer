@@ -1,6 +1,8 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
+from typing import Optional
+
 import urwid
 
 from subiquitycore.view import BaseView
@@ -41,7 +43,7 @@ class TimezoneView(BaseView):
             reg_opts.append(Option((region, True, region)))
         self._form.region.widget.options = reg_opts
 
-    def _set_values(self, region: str, city: str):
+    def _set_values(self, region: str, city: Optional[str]):
         if region is None:
             region = self._controller.regions[0]
         self._form.region.widget.value = region
