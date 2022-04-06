@@ -3,6 +3,7 @@
 
 from typing import Optional
 import re
+import abc
 
 import attrs
 
@@ -39,7 +40,7 @@ class InterfaceInfo:
     bond_members: list[str] = attrs.field(default=attrs.Factory(list))
 
 
-class BaseInterface:
+class BaseInterface(abc.ABC):
     def __init__(self, name: str):
         self._name = name
 
@@ -48,8 +49,9 @@ class BaseInterface:
         return self._name
 
     @property
+    @abc.abstractmethod
     def info(self) -> InterfaceInfo:
-        assert False
+        pass
 
     def get_interface_lines(self) -> list[str]:
         return []
