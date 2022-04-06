@@ -7,11 +7,13 @@ from subiquitycore.view import BaseView
 from subiquitycore.ui.form import Form, ChoiceField
 from subiquitycore.ui.selector import Option
 
+
 class TimezoneForm(Form):
     cancel_label = 'Back'
 
     region = ChoiceField('Region:', choices=['dummy'])
     city = ChoiceField('City:', choices=['dummy'])
+
 
 class TimezoneView(BaseView):
     title = 'Time Zone'

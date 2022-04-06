@@ -8,23 +8,26 @@ from subiquitycore.ui.form import (
     SubForm,
     SubFormField,
     BooleanField,
-    ChoiceField,
     NO_HELP
 )
+
 
 class KernelForm(SubForm):
     extramods = BooleanField('Install firmware and extra modules')
 
+
 class JDKForm(SubForm):
-    jdk_8  = BooleanField('JDK 8', help=NO_HELP)
+    jdk_8 = BooleanField('JDK 8', help=NO_HELP)
     jdk_11 = BooleanField('JDK 11', help=NO_HELP)
     jdk_17 = BooleanField('JDK 17')
+
 
 class NIKForm(SubForm):
     nik_21_11 = BooleanField('NIK 21-11', help=NO_HELP)
     nik_21_17 = BooleanField('NIK 21-17', help=NO_HELP)
     nik_22_11 = BooleanField('NIK 22-11', help=NO_HELP)
     nik_22_17 = BooleanField('NIK 22-17')
+
 
 class LibcForm(SubForm):
     perf = BooleanField('Install musl-perf with CPU features detection and optimized asm functions')
@@ -52,11 +55,11 @@ class PackagesView(BaseView):
         self._form = PackagesForm()
         self._form.kernel.widget.value = data.get('kernel')
 
-        for k, f  in [('kernel', self._form.kernel),
-                      ('jdk', self._form.jdk),
-                      ('nik', self._form.nik),
-                      ('libc', self._form.libc),
-                      ('other', self._form.other)]:
+        for k, f in [('kernel', self._form.kernel),
+                     ('jdk', self._form.jdk),
+                     ('nik', self._form.nik),
+                     ('libc', self._form.libc),
+                     ('other', self._form.other)]:
             if k in data:
                 f.widget.value = data.get(k)
 

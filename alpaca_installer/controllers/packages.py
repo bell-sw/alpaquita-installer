@@ -2,14 +2,13 @@
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 import yaml
-import os
 import glob
 import logging
 from .controller import Controller
-from .repo import RepoController
 from alpaca_installer.views.packages import PackagesView
 
 log = logging.getLogger('controllers.packages')
+
 
 class PackagesController(Controller):
     def __init__(self, app):

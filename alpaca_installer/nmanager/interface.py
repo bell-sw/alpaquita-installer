@@ -89,7 +89,7 @@ class VLANInterface(BaseInterface):
     def __init__(self, base_iface: BaseInterface, vlan_id: int):
         if (vlan_id < 1) or (vlan_id > 4095):
             raise ValueError('VLAN ID must be within [1; 4095]')
-        name=f'{base_iface.name}.{vlan_id}'
+        name = f'{base_iface.name}.{vlan_id}'
         super().__init__(name)
         self._base_iface = base_iface
         self._vlan_id = int(vlan_id)
@@ -101,7 +101,7 @@ class VLANInterface(BaseInterface):
     @property
     def vlan_id(self) -> int:
         return self._vlan_id
-   
+
     @property
     def info(self) -> InterfaceInfo:
         return InterfaceInfo(name=self.name,
@@ -212,8 +212,8 @@ class BondInterface(BaseInterface):
                              bond_members=[iface.name for iface in self.members])
 
     def get_interface_lines(self) -> list[str]:
-        res =  ['bond-members {}'.format(' '.join(iface.name for iface in self.members)),
-                'bond-mode {}'.format(self.mode)]
+        res = ['bond-members {}'.format(' '.join(iface.name for iface in self.members)),
+               'bond-mode {}'.format(self.mode)]
         if self.hash_policy:
             res.append('bond-xmit-hash-policy {}'.format(self.hash_policy))
         return res

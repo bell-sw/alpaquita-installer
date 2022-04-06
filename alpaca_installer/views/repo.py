@@ -9,15 +9,16 @@ from subiquitycore.ui.form import (
     SubForm,
     URLField,
     ReadOnlyField,
-    BooleanField,
     ChoiceField,
     SubFormField,
     NO_HELP
 )
 
+
 class UrlsForm(SubForm):
     field0 = ReadOnlyField('', help=NO_HELP)
     field1 = ReadOnlyField('')
+
 
 class RepoForm(Form):
     cancel_label = 'Back'
@@ -25,6 +26,7 @@ class RepoForm(Form):
     libc_type = ChoiceField('libc type:', choices=['musl', 'glibc'])
     repo_base_url = URLField('Base URL:')
     repo_fields = SubFormField(UrlsForm, 'Repositories:')
+
 
 class RepoView(BaseView):
     title = 'Installation Source'

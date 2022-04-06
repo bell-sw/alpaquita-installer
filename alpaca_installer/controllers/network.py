@@ -105,7 +105,7 @@ class NetworkController(Controller):
                        mode: str, hash_policy: Optional[str]):
         try:
             new_iface = self._nmanager.add_bond_iface(name=name, members=members,
-                                                          mode=mode, hash_policy=hash_policy)
+                                                      mode=mode, hash_policy=hash_policy)
             self._app.ui.body.update_interfaces_list(iface_to_select=new_iface)
             self._app.ui.body.remove_overlay()
         except ValueError as exc:

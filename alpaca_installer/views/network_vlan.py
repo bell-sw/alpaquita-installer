@@ -13,6 +13,7 @@ from subiquitycore.ui.stretchy import Stretchy
 if TYPE_CHECKING:
     from .network import NetworkView
 
+
 class VlanForm(Form):
     ok_label = 'Add'
     cancel_label = 'Cancel'
@@ -27,6 +28,7 @@ class VlanForm(Form):
         if (vlanid is None) or (vlanid < 1) or (vlanid > 4095):
             raise ValueError('VLAN ID must be between 1 an 4095')
         return vlanid
+
 
 class AddVlanStretchy(Stretchy):
     def __init__(self, parent: NetworkView, iface_name):

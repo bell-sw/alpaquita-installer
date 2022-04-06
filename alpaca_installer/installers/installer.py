@@ -15,19 +15,21 @@ log = logging.getLogger('installer')
 class InstallerException(Exception):
     pass
 
+
 class EventReceiver(abc.ABC):
 
-  @abc.abstractmethod
-  def start_event(self, msg):
-     pass
+    @abc.abstractmethod
+    def start_event(self, msg):
+        pass
 
-  @abc.abstractmethod
-  def stop_event(self):
-     pass
+    @abc.abstractmethod
+    def stop_event(self):
+        pass
 
-  @abc.abstractmethod
-  def add_log_line(self, msg):
-     pass
+    @abc.abstractmethod
+    def add_log_line(self, msg):
+        pass
+
 
 class Installer(abc.ABC):
     def __init__(self, name: str, config: dict,

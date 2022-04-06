@@ -4,6 +4,7 @@
 
 from .installer import Installer
 
+
 class SecureBootInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
         super().__init__(name='install_shim_bootloader', config=config,

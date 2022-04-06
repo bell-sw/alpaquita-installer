@@ -3,6 +3,7 @@
 
 import attrs
 
+
 def validate_wifi_ssid(ssid: str):
     if (len(ssid) < 2) or (len(ssid) > 32):
         raise ValueError('SSID must be from 2 to 32 characters')
@@ -10,6 +11,7 @@ def validate_wifi_ssid(ssid: str):
     # ifupdown-ng limitation
     if '#' in ssid:
         raise ValueError('SSID must not contain #')
+
 
 def validate_wifi_psk(psk: str):
     # wpa_passphrase requirement
@@ -19,6 +21,7 @@ def validate_wifi_psk(psk: str):
     # ifupdown-ng limitation
     if '#' in psk:
         raise ValueError('PSK (passphrase) must not contain #')
+
 
 @attrs.define
 class WIFIConfig:

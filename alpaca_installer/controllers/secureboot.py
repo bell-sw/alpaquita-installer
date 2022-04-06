@@ -2,9 +2,9 @@
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 import yaml
-import os
 from .controller import Controller
 from alpaca_installer.views.secureboot import SecureBootView
+
 
 class SecureBootController(Controller):
     def __init__(self, app):

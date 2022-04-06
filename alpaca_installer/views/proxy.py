@@ -13,7 +13,7 @@ class ProxyForm(Form):
     cancel_label = 'Back'
 
     proxy_url = StringField('Proxy:',
-                         help=VALID_PROXY_URL_TEMPLATE)
+                            help=VALID_PROXY_URL_TEMPLATE)
 
     def clean_proxy_url(self, value):
         if value:

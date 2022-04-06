@@ -9,11 +9,6 @@ from urwid import (
     Text,
 )
 from subiquitycore.view import BaseView
-from subiquitycore.ui.form import (
-    Form,
-    ReadOnlyField,
-)
-from subiquitycore.view import BaseView
 from subiquitycore.ui.buttons import (
     cancel_btn,
     ok_btn,
@@ -22,13 +17,13 @@ from subiquitycore.ui.buttons import (
 from subiquitycore.ui.container import Columns, ListBox, Pile
 from subiquitycore.ui.form import Toggleable
 from subiquitycore.ui.spinner import Spinner
-from subiquitycore.ui.utils import button_pile, Padding, rewrap
-from subiquitycore.ui.stretchy import Stretchy
+from subiquitycore.ui.utils import button_pile, Padding
 from subiquitycore.ui.width import widget_width
 
 from alpaca_installer.common.types import ApplicationState
 
 log = logging.getLogger('views.installer')
+
 
 class MyLineBox(LineBox):
     def format_title(self, title):
@@ -36,6 +31,7 @@ class MyLineBox(LineBox):
             return [" ", title, " "]
         else:
             return ""
+
 
 class InstallerView(BaseView):
 

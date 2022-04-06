@@ -31,7 +31,7 @@ class NetworkManager:
         self._ipv4_config = IPConfig4(method='disabled')
         self._ipv6_config = IPConfig6(method='disabled')
         self._reset_ip_configs()
-        self._wifi_config: Optional[WIFIConfig]  = None
+        self._wifi_config: Optional[WIFIConfig] = None
         self._apply_required: bool = False
 
     def _reset_ip_configs(self):
@@ -62,7 +62,6 @@ class NetworkManager:
         iface = self._iface_by_name(name)
         if iface is not None:
             raise ValueError(f"Interface '{iface.name}' already exists")
-
 
     def _check_iface_has_no_constraints(self, iface: BaseInterface):
         for bond_iface in self._all_ifaces_by_type(BondInterface):
@@ -115,7 +114,7 @@ class NetworkManager:
         return iface.name
 
     def add_bond_iface(self, name: str, members: list[str],
-                       mode: str, hash_policy: Optional[str]=None) -> str:
+                       mode: str, hash_policy: Optional[str] = None) -> str:
         self._check_valid_iface_name(name)
         self._check_no_iface_exists(name)
         validate_bond_mode_and_policy(mode, hash_policy)
@@ -136,7 +135,6 @@ class NetworkManager:
         self._available_ifaces.difference_update(member_ifaces)
 
         return iface.name
-
 
     def del_iface(self, name):
         iface_to_delete = self._iface_by_name_or_fail(name)
@@ -215,7 +213,7 @@ class NetworkManager:
         self._check_iface_is_selected()
         return attrs.evolve(self._ipv6_config)
 
-    def write_resolvconf_file(self, path: str ='/etc/resolv.conf'):
+    def write_resolvconf_file(self, path: str = '/etc/resolv.conf'):
         self._check_iface_is_selected()
 
         name_servers = []
@@ -233,7 +231,7 @@ class NetworkManager:
                 if search_domains:
                     file.write('search {}\n'.format((' '.join(search_domains))))
 
-    def write_interfaces_file(self, path: str ='/etc/network/interfaces'):
+    def write_interfaces_file(self, path: str = '/etc/network/interfaces'):
         self._check_iface_is_selected()
 
         with open(path, mode='w') as file:
@@ -249,7 +247,7 @@ class NetworkManager:
                 interface_lines.extend(self._ipv4_config.get_interface_lines())
                 interface_lines.extend(self._ipv6_config.get_interface_lines())
 
-                file.writelines((f'    {l}\n' for l in interface_lines))
+                file.writelines((f'    {line}\n' for line in interface_lines))
 
     @property
     def apply_required(self) -> bool:

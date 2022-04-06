@@ -4,8 +4,6 @@
 import asyncio
 import yaml
 import logging
-import urwid
-import time
 import abc
 
 from subiquitycore.async_helpers import run_in_thread
@@ -32,6 +30,7 @@ from alpaca_installer.common.utils import run_cmd
 from alpaca_installer.common.types import ApplicationState
 
 log = logging.getLogger('controllers.installer')
+
 
 class BaseInstallerController(Controller, EventReceiver):
     def __init__(self, app, create_config, config_file):
@@ -132,6 +131,7 @@ class ConsoleInstallerController(BaseInstallerController):
     def _print_log_line(self, msg):
         print(msg)
 
+
 class InstallerController(BaseInstallerController):
     def __init__(self, app, create_config=True, config_file='setup.yaml'):
         super().__init__(app, create_config, config_file)
@@ -142,7 +142,7 @@ class InstallerController(BaseInstallerController):
         self.start_event(f'Creating config {self._config_file} file')
         with open(self._config_file, 'w') as f:
             for c in self._app.controllers():
-                yaml_str = c.to_yaml();
+                yaml_str = c.to_yaml()
                 if yaml_str:
                     f.write(yaml_str + '\n')
 
@@ -160,8 +160,10 @@ class InstallerController(BaseInstallerController):
 
     def add_log_line(self, msg):
         self._eloop.call_soon_threadsafe(self._add_log_line, msg)
+
     def start_event(self, msg):
         self._eloop.call_soon_threadsafe(self._event_start, msg)
+
     def stop_event(self):
         self._eloop.call_soon_threadsafe(self._event_finish)
 

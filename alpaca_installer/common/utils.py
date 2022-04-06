@@ -8,7 +8,8 @@ from typing import Optional
 VALID_PROXY_URL_TEMPLATE = 'http://[[user][:password]@]hostname[:port]'
 
 
-def run_cmd(args, input: Optional[bytes] = None, timeout: float = None, ignore_status: bool = False) -> subprocess.CompletedProcess:
+def run_cmd(args, input: Optional[bytes] = None, timeout: float = None,
+            ignore_status: bool = False) -> subprocess.CompletedProcess:
     try:
         res = subprocess.run(args, input=input,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,

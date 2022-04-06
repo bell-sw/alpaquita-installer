@@ -6,8 +6,9 @@ import re
 
 import attrs
 
-HWDATA_PCI='/usr/share/hwdata/pci.ids'
-HWDATA_USB='/usr/share/hwdata/usb.ids'
+HWDATA_PCI = '/usr/share/hwdata/pci.ids'
+HWDATA_USB = '/usr/share/hwdata/usb.ids'
+
 
 @attrs.define
 class DeviceIdentification:
@@ -22,11 +23,13 @@ def _get_ids_from_uevent(pattern: str, uevent_path: str) -> tuple[int, int]:
             pattern, uevent_path))
     vendor_id = int(m.group(1), 16)
     model_id = int(m.group(2), 16)
-    return (vendor_id, model_id)
+    return vendor_id, model_id
+
 
 def read_one_line(path: str) -> str:
     with open(path, 'r') as file:
         return file.readline().strip()
+
 
 def find_match_in_file(line_pattern: str, path: str):
     with open(path, 'r') as file:

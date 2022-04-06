@@ -6,7 +6,7 @@ import ipaddress
 
 import attrs
 
-DOMAIN_REGEX=r'^((?!-)[A-Za-z0-9-]{1,63}(?<!-).)*(?!-)[A-Za-z0-9-]{1,63}(?<!-)$'
+DOMAIN_REGEX = r'^((?!-)[A-Za-z0-9-]{1,63}(?<!-).)*(?!-)[A-Za-z0-9-]{1,63}(?<!-)$'
 HOSTNAME_REGEX = r'^(?!-)[A-Za-z0-9-]{1,63}(?<!-)$'
 
 

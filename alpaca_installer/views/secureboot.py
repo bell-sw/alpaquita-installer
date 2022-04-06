@@ -9,6 +9,7 @@ from subiquitycore.ui.form import (
     ReadOnlyField,
 )
 
+
 class SecureBootForm(Form):
     cancel_label = 'Back'
     info_text = ReadOnlyField('', (
@@ -23,6 +24,7 @@ class SecureBootForm(Form):
         'also be installed.'
         ))
     install_shim = BooleanField('Install "shim" and signed "grub" bootloaders for SB')
+
 
 class SecureBootView(BaseView):
     title = 'Secure Boot'

@@ -10,6 +10,7 @@ from alpaca_installer.views.repo import RepoView
 
 log = logging.getLogger('controllers.repo')
 
+
 class RepoController(Controller):
     def __init__(self, app):
         super().__init__(app)
@@ -24,7 +25,7 @@ class RepoController(Controller):
         res = {}
         with open('/etc/os-release') as f:
             for line in f:
-                k,v = line.rstrip().split('=')
+                k, v = line.rstrip().split('=')
                 res[k] = v
         return res
 
@@ -44,7 +45,7 @@ class RepoController(Controller):
 
     def get_repos(self, url, libc):
         self._repos = []
-        for name in [ 'core', 'universe' ]:
+        for name in ['core', 'universe']:
             self._repos.append(urllib.parse.quote(
                                f'{url}/alpaca/{libc}/{self._release}/{name}',
                                safe='/:'))
@@ -57,7 +58,7 @@ class RepoController(Controller):
             res.append('/media/disk/apks')
         res.extend(self._repos)
 
-        yaml_data = yaml.dump({ "repositories" : res })
+        yaml_data = yaml.dump({"repositories": res})
 
         log.debug(f"export to yaml: {yaml_data}")
         return yaml_data

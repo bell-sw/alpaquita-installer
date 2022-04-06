@@ -3,6 +3,7 @@
 
 import enum
 
+
 class ApplicationState(enum.Enum):
     STARTING_UP = enum.auto()
     CLOUD_INIT_WAIT = enum.auto()

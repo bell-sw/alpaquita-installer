@@ -15,6 +15,7 @@ from alpaca_installer.nmanager.wifi_config import validate_wifi_ssid, validate_w
 if TYPE_CHECKING:
     from .network import NetworkView
 
+
 class WIFIForm(Form):
     ok_label = 'Save'
 
@@ -28,6 +29,7 @@ class WIFIForm(Form):
     def clean_psk(self, value: str) -> str:
         validate_wifi_psk(value)
         return value
+
 
 class EditWIFIStretchy(Stretchy):
     def __init__(self, parent: NetworkView):

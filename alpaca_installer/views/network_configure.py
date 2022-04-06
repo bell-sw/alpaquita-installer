@@ -5,7 +5,6 @@ import logging
 
 import urwid
 
-from subiquitycore.ui.container import ListBox, Columns, Pile
 from subiquitycore.view import BaseView
 from subiquitycore.ui.form import (
     Form,
@@ -14,17 +13,16 @@ from subiquitycore.ui.form import (
     StringField,
     ChoiceField,
 )
-from subiquitycore.ui.utils import screen
-from subiquitycore.ui.buttons import done_btn, cancel_btn, menu_btn
-from subiquitycore.ui.selector import Selector, Option
 
 log = logging.getLogger('views.network_configure')
+
 
 class IPv4ManualForm(SubForm):
     address = StringField('Address:', help='IP address in the CIDR form')
     gateway = StringField('Gateway:')
     name_servers = StringField('Name servers:', help='IP addresses, comma separated')
     search_domains = StringField('Search domains:', help='Domains, comma separated')
+
 
 class ConfigurationForm(Form):
     cancel_label = 'Back'
@@ -33,6 +31,7 @@ class ConfigurationForm(Form):
     ipv4_manual = SubFormField(IPv4ManualForm, '')
     ipv6_method = ChoiceField('IPv6:', choices=['disabled', 'manual'])
     ipv6_manual = SubFormField(IPv4ManualForm, '')
+
 
 class NetworkConfigureView(BaseView):
     title = 'Network interface configuration'

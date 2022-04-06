@@ -36,6 +36,7 @@ MAX_BLOCK_TIME = 0.1
 # long to avoid excessive flicker in the UI.
 MIN_SHOW_PROGRESS_TIME = 1.0
 
+
 class ApplicationUI(urwid.WidgetWrap):
     block_input = False
 
@@ -82,7 +83,7 @@ class Application:
 
         try:
             opts, args = getopt.getopt(sys.argv[1:], 'hf:nd',
-                ['help', 'config-file', 'no-ui', 'debug'])
+                                       ['help', 'config-file', 'no-ui', 'debug'])
         except getopt.GetoptError as err:
             print(f'Options parsing error: {err}')
             self.usage()
@@ -246,6 +247,7 @@ class Application:
 
                 async def w():
                     return await orig
+
                 awaitable = task_to_cancel = self.aio_loop.create_task(w())
             else:
                 task_to_cancel = None

@@ -18,7 +18,8 @@ REGIONS = [
     'Pacific',
     'Etc',
 ]
-ZONEINFO_DIR='/usr/share/zoneinfo'
+ZONEINFO_DIR = '/usr/share/zoneinfo'
+
 
 @define
 class TimezoneRegion:

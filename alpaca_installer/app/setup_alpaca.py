@@ -5,6 +5,7 @@
 
 import sys
 
+
 def main():
     from .application import Application
     from .palette import PALETTE
@@ -12,6 +13,7 @@ def main():
     app = Application(header='Alpaca Linux Installation',
                       palette=PALETTE)
     app.run()
+
 
 if __name__ == '__main__':
     sys.exit(main())

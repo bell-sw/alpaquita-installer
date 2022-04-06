@@ -2,7 +2,7 @@
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 from alpaca_installer.common.utils import run_cmd
-from .installer import Installer, InstallerException
+from .installer import Installer
 
 
 class PackagesInstaller(Installer):
@@ -22,7 +22,7 @@ class PackagesInstaller(Installer):
         self._event_receiver.start_event('Initializing APK database')
 
         common = ['apk', 'add', '--root', self.target_root,
-                  '--keys', '/etc/apk/keys', # install using keys from the host system
+                  '--keys', '/etc/apk/keys',  # install using keys from the host system
                   '--no-progress']
 
         res = run_cmd(args=(common + ['--initdb']))
