@@ -295,7 +295,7 @@ class NetworkManager:
 
         self._apply_required = False
 
-    def add_host_ifaces(self) -> list[str]:
+    def add_host_ifaces(self):
         for entry in os.scandir('/sys/class/net'):
             # A physical NIC contains a 'device' link to the actual device
             if not os.path.islink(os.path.join(entry.path, 'device')):
