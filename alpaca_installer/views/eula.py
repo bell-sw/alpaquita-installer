@@ -9,7 +9,7 @@ import urwid
 from subiquitycore.view import BaseView
 from subiquitycore.ui.buttons import cancel_btn, done_btn
 from subiquitycore.ui.container import ListBox
-from subiquitycore.ui.utils import screen
+from subiquitycore.ui.utils import screen, Padding
 
 if TYPE_CHECKING:
     from alpaca_installer.controllers.eula import EULAController
@@ -28,7 +28,7 @@ class EULAView(BaseView):
         proceed_btn = done_btn('Accept and proceed', on_press=self.done)
         exit_btn = cancel_btn('Exit', on_press=self.cancel)
 
-        super().__init__(screen(urwid.LineBox(ListBox([urwid.Text(content)])),
+        super().__init__(screen(urwid.LineBox(ListBox([Padding.push_1(urwid.Text(content))])),
                                 excerpt=self.excerpt,
                                 buttons=[proceed_btn, exit_btn], focus_buttons=False))
 
