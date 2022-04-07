@@ -20,10 +20,8 @@ from alpaca_installer.installers.network import NetworkInstaller
 from alpaca_installer.installers.kernel import KernelInstaller
 from alpaca_installer.installers.secureboot import SecureBootInstaller
 from alpaca_installer.installers.bootloader import BootloaderInstaller
-from alpaca_installer.installers.installer import (
-    InstallerException,
-    EventReceiver
-)
+from alpaca_installer.installers.installer import InstallerException
+from alpaca_installer.common.events import EventReceiver
 from .controller import Controller
 
 from alpaca_installer.common.utils import run_cmd
@@ -37,10 +35,6 @@ class BaseInstallerController(Controller, EventReceiver):
         self._config_file = config_file
         self._create_config = create_config
 
-    @abc.abstractmethod
-    def _print_log_line(self, msg):
-        pass
-
     def _run(self):
         try:
             if self._create_config:
@@ -52,12 +46,6 @@ class BaseInstallerController(Controller, EventReceiver):
             raise InstallerException(f'An error occured while parsing {self._config_file} file: {err}')
         except Exception as err:
             raise InstallerException(f'An error occured: {err}')
-
-    def _add_log_line(self, msg):
-        msgs = msg.split("\\n")
-        for m in msgs:
-            if m:
-                self._print_log_line(m)
 
     def _install_config(self):
         self.start_event('Processing configuration')
@@ -128,9 +116,6 @@ class ConsoleInstallerController(BaseInstallerController):
         pass
 
     def add_log_line(self, msg):
-        self._add_log_line(msg)
-
-    def _print_log_line(self, msg):
         print(msg)
 
 
@@ -177,7 +162,7 @@ class InstallerController(BaseInstallerController):
     def _event_finish(self):
         self._view.event_finish('')
 
-    def _print_log_line(self, msg):
+    def _add_log_line(self, msg):
         self._view.add_log_line(msg)
 
     def click_cancel(self):
