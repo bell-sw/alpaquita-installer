@@ -98,6 +98,7 @@ class InstallerView(BaseView):
         walker = self.event_listbox.base_widget.body
         spinner = walker[index][1]
         spinner.stop()
+        walker[index][0].set_text(walker[index][0].text + '.')
         walker[index] = walker[index][0]
 
     def finish_all(self):
