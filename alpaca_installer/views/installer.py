@@ -20,8 +20,6 @@ from subiquitycore.ui.spinner import Spinner
 from subiquitycore.ui.utils import button_pile, Padding
 from subiquitycore.ui.width import widget_width
 
-from alpaca_installer.common.types import ApplicationState
-
 log = logging.getLogger('views.installer')
 
 
@@ -122,27 +120,14 @@ class InstallerView(BaseView):
         p.contents[:] = [(b, p.options('pack')) for b in buttons]
         self._set_button_width()
 
-    def update_for_state(self, state):
-        if state == ApplicationState.DONE:
-            self.title = "Install complete!"
-            self.reboot_btn.base_widget.set_label("Reboot Now")
-            btns = [
-                self.view_log_btn,
-                self.cancel_btn,
-                self.reboot_btn,
-                ]
-        elif state == ApplicationState.ERROR:
-            self.title = 'An error occurred during installation'
-            self.reboot_btn.base_widget.set_label("Reboot Now")
-            self.reboot_btn.enabled = True
-            btns = [
-                self.view_log_btn,
-                self.cancel_btn,
-                self.reboot_btn,
-                ]
-        else:
-            raise Exception(state)
-        self._controller._app.ui.set_header(self.title)
+    def done(self):
+        self.reboot_btn.base_widget.set_label("Reboot Now")
+        self.reboot_btn.enabled = True
+        btns = [
+            self.view_log_btn,
+            self.reboot_btn,
+            self.cancel_btn,
+            ]
         self._set_buttons(btns)
 
     def reboot(self, btn):

@@ -27,7 +27,6 @@ from alpaca_installer.installers.installer import (
 from .controller import Controller
 
 from alpaca_installer.common.utils import run_cmd
-from alpaca_installer.common.types import ApplicationState
 
 log = logging.getLogger('controllers.installer')
 
@@ -61,7 +60,8 @@ class BaseInstallerController(Controller, EventReceiver):
                 self._print_log_line(m)
 
     def _install_config(self):
-        self.start_event(f'Reading config {self._config_file} file')
+        self.start_event('Processing configuration')
+        self.add_log_line(f'Parsing config {self._config_file} file')
 
         with open(self._config_file) as f:
             config_str = f.read()
@@ -106,6 +106,8 @@ class BaseInstallerController(Controller, EventReceiver):
         for i in reversed(installers):
             i.cleanup()
 
+        self.start_event('\nInstallation complete!')
+
 
 class ConsoleInstallerController(BaseInstallerController):
     def __init__(self, app, config_file):
@@ -139,7 +141,7 @@ class InstallerController(BaseInstallerController):
         self._eloop = asyncio.get_event_loop()
 
     def create_config(self):
-        self.start_event(f'Creating config {self._config_file} file')
+        self.add_log_line(f'Creating config {self._config_file} file')
         with open(self._config_file, 'w') as f:
             for c in self._app.controllers():
                 yaml_str = c.to_yaml()
@@ -152,11 +154,11 @@ class InstallerController(BaseInstallerController):
         except Exception as err:
             self._event_start(f'{err}')
             self._event_finish()
-            self._view.update_for_state(ApplicationState.ERROR)
+            self._view.done()
             return
 
         self._event_finish()
-        self._view.update_for_state(ApplicationState.DONE)
+        self._view.done()
 
     def add_log_line(self, msg):
         self._eloop.call_soon_threadsafe(self._add_log_line, msg)
