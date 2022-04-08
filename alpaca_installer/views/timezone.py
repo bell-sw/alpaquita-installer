@@ -50,7 +50,7 @@ class TimezoneView(BaseView):
 
         city_opts = []
         for name in self._controller.cities_for_region(region):
-            city_opts.append(Option((name, True, name)))
+            city_opts.append(Option((name.replace('_', ' '), True, name)))
         self._form.city.widget.options = city_opts
         if city is None:
             self._form.city.widget.index = 0
