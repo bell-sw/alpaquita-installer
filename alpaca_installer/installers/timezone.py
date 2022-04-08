@@ -15,7 +15,7 @@ class TimezoneInstaller(Installer):
 
         self._timezone = self._data.strip()
         tokens = self._timezone.split('/')
-        if (len(tokens) != 2) or (tokens[0] not in REGIONS):
+        if (len(tokens) < 2) or (tokens[0] not in REGIONS):
             raise InstallerException("Invalid timezone specification: {}".format(self._timezone))
 
         self.add_package('tzdata')
