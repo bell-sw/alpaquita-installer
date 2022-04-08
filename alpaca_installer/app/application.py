@@ -10,8 +10,7 @@ import getopt
 import os
 import logging
 
-from subiquitycore.ui.anchors import HeaderColumns
-from subiquitycore.ui.utils import Color, LoadingDialog
+from subiquitycore.ui.utils import Color, LoadingDialog, Padding
 
 from alpaca_installer.controllers.eula import EULAController
 from alpaca_installer.controllers.timezone import TimezoneController
@@ -41,33 +40,33 @@ class ApplicationUI(urwid.WidgetWrap):
     block_input = False
 
     def __init__(self):
-        self._header = urwid.Text('Header', align='center')
         self._title = urwid.Text('Title', align='left')
-        title_cols = HeaderColumns([Color.frame_header_fringe(urwid.Text('')),
-                                    Color.frame_header(self._title),
-                                    Color.frame_header_fringe(urwid.Text('')),
-                                    Color.frame_header_fringe(urwid.Text(''))])
-        self._pile = urwid.Pile([('pack', self._header),
-                                 ('pack', title_cols),
-                                 ('pack', urwid.Text('')),
-                                 urwid.ListBox([urwid.Text('Body')])
-                                 ])
-        self._pile.focus_position = 3
+        pile_items = [
+            (1, Color.frame_header_fringe(urwid.SolidFill('\N{upper half block}'))),
+            ('pack', Color.frame_header(Padding.center_79(self._title, min_width=76))),
+            (1, Color.frame_header_fringe(urwid.SolidFill('\N{lower half block}'))),
+            urwid.ListBox([urwid.Text('Body')])
+        ]
+        self._pile = urwid.Pile(pile_items)
+        self._body_pos = len(pile_items) - 1
+        self._pile.focus_position = self._body_pos
 
         super().__init__(Color.body(self._pile))
 
-    def set_header(self, text):
-        self._header.set_text(text)
-
     def set_title(self, title):
-        self._title.set_text(title)
+        prefix = 'Alpaca Linux Installation'
+        if title:
+            text = '{} - {}'.format(prefix, title)
+        else:
+            text = prefix
+        self._title.set_text(text)
 
     def set_body(self, body):
-        self._pile.contents[3] = (body, self._pile.contents[3][1])
+        self._pile.contents[self._body_pos] = (body, self._pile.contents[self._body_pos][1])
 
     @property
     def body(self):
-        return self._pile.contents[3][0]
+        return self._pile.contents[self._body_pos][0]
 
     def keypress(self, size, key: str):
         if not self.block_input:
@@ -77,7 +76,7 @@ class ApplicationUI(urwid.WidgetWrap):
 class Application:
     make_ui = ApplicationUI
 
-    def __init__(self, header: str, palette=()):
+    def __init__(self, palette=()):
 
         self._no_ui = False
 
@@ -136,7 +135,6 @@ class Application:
         self._ctrl_idx = 0
 
         self.ui = self.make_ui()
-        self.ui.set_header(header)
         self._palette = palette
 
         self.aio_loop = asyncio.get_event_loop()

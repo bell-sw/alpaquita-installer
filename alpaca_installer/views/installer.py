@@ -33,7 +33,7 @@ class MyLineBox(LineBox):
 
 class InstallerView(BaseView):
 
-    title = 'Installation'
+    title = ''
 
     def __init__(self, controller):
         self._controller = controller

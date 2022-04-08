@@ -10,8 +10,7 @@ def main():
     from .application import Application
     from .palette import PALETTE
 
-    app = Application(header='Alpaca Linux Installation',
-                      palette=PALETTE)
+    app = Application(palette=PALETTE)
     app.run()
 
 
