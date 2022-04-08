@@ -64,13 +64,9 @@ class StorageController(Controller):
     # Size of /boot if LVM or LUKS is enabled
     BOOT_SIZE = GB
     # A bare installation takes less than 100M.
-    # Plus the swap file will take SWAP_FILE_SIZE bytes.
     # All liberica{8,11,17} and liberica{8,11,17} lite take < 1.2G.
     # liberica{11,17}-nik both take ~ 1G.
     ROOT_MIN_SIZE = 4 * GB
-    # The size of the swap file we create by default. As it's a file (not a partition),
-    # the user can adjust the size after installation (or completely disable swap)
-    SWAP_FILE_SIZE = 512 * MB
 
     def __init__(self, app: Application):
         super().__init__(app)
@@ -227,11 +223,6 @@ class StorageController(Controller):
         if not self._app.is_efi():
             data['bootloader_device'] = self._selected_disk.path
         data['storage'] = storage_data
-
-        data['swap_file'] = {
-            'path': '/var/swapfile',
-            'size': self.SWAP_FILE_SIZE,
-        }
 
         yaml_data = yaml.dump(data)
         log.debug('export to yaml: {}'.format(yaml_data))
