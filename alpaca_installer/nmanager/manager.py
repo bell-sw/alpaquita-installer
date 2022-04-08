@@ -83,6 +83,13 @@ class NetworkManager:
                 res.add(iface)
         return res
 
+    def _update_wifi_config_for_selected_iface(self):
+        if isinstance(self._selected_iface, WIFIInterface):
+            if not self._wifi_config:
+                raise ValueError('No WIFI config is set')
+            self._selected_iface.ssid = self._wifi_config.ssid
+            self._selected_iface.psk = self._wifi_config.psk
+
     def add_eth_iface(self, name: str, mac_address: str,
                       vendor: str, model: str):
         self._check_valid_iface_name(name)
@@ -233,6 +240,7 @@ class NetworkManager:
 
     def write_interfaces_file(self, path: str = '/etc/network/interfaces'):
         self._check_iface_is_selected()
+        self._update_wifi_config_for_selected_iface()
 
         with open(path, mode='w') as file:
             file.write('auto lo\n')
@@ -260,11 +268,7 @@ class NetworkManager:
                 self._selected_iface.name
             ))
 
-        if isinstance(self._selected_iface, WIFIInterface):
-            if not self._wifi_config:
-                raise ValueError('No WIFI config is set')
-            self._selected_iface.ssid = self._wifi_config.ssid
-            self._selected_iface.psk = self._wifi_config.psk
+        self._update_wifi_config_for_selected_iface()
 
         # Stop all active interfaces
         while True:
