@@ -12,7 +12,9 @@ class ErrorMsgStretchy(Stretchy):
     def __init__(self, app, msg: str, title: str = 'Error'):
         self._app = app
         _ok_btn = ok_btn('Close', on_press=self._close)
-        super().__init__(title, [urwid.Text(msg), button_pile([_ok_btn])], 0, 1)
+        super().__init__(title, [urwid.Text(msg),
+                                 urwid.Text(''),
+                                 button_pile([_ok_btn])], 0, 2)
 
     def _close(self, sender):
         self._app.ui.body.remove_overlay(self)
