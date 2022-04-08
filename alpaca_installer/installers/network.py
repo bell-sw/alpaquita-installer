@@ -1,11 +1,16 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
+import logging
+
 from alpaca_installer.nmanager.manager import NetworkManager
 from alpaca_installer.nmanager.ip_config import IPConfig4, IPConfig6, is_valid_hostname
 from alpaca_installer.nmanager.wifi_config import WIFIConfig
 from .installer import Installer
 from .utils import read_key_or_fail
+
+log = logging.getLogger('installers.network')
+
 
 # network:
 #   hostname: your-host-name
@@ -56,6 +61,7 @@ class NetworkInstaller(Installer):
         self._hostname = read_key_or_fail(self._data, 'hostname', str)
         if not is_valid_hostname(self._hostname):
             raise ValueError('Invalid hostname: {}'.format(self._hostname))
+        log.debug('Hostname: {}'.format(self._hostname))
 
         self._nmanager = NetworkManager()
         self._nmanager.add_host_ifaces()
@@ -77,9 +83,16 @@ class NetworkInstaller(Installer):
             vlan_id = int(tokens[1])
 
         iface_type = data.get('type', 'ethernet')
+        log.debug('Interface name: {}, type: {}, vlan_id: {}'.format(
+            iface_name, iface_type, vlan_id))
         if iface_type == 'ethernet':
             pass
         elif iface_type == 'bond':
+            members = data.get('bond_members', [])
+            mode = data.get('bond_mode', '')
+            hash_policy = data.get('bond_hash_policy', None)
+            log.debug('Bond members: {}, mode: {}, hash_policy: {}'.format(
+                members, mode, hash_policy))
             self._nmanager.add_bond_iface(name=iface,
                                           members=data.get('bond_members', []),
                                           mode=data.get('bond_mode', ''),
@@ -87,6 +100,7 @@ class NetworkInstaller(Installer):
         elif iface_type == 'wifi':
             self._nmanager.set_wifi_config(WIFIConfig(ssid=data.get('wifi_ssid', ''),
                                                       psk=data.get('wifi_psk', '')))
+            log.debug('WIFI configuration: {}'.format(self._nmanager.get_wifi_config()))
 
             self.add_package('ifupdown-ng-wifi')
         else:
@@ -95,6 +109,7 @@ class NetworkInstaller(Installer):
         if vlan_id:
             iface = self._nmanager.add_vlan_iface(base_iface_name=iface, vlan_id=vlan_id)
         self._nmanager.select_iface(iface)
+        log.debug('Selected interface: {}'.format(iface))
 
     def _parse_ip(self):
         for tag in ('ipv4', 'ipv6'):
@@ -121,7 +136,11 @@ class NetworkInstaller(Installer):
                 (self._nmanager.get_ipv6_config().method == 'disabled'):
             raise ValueError('Both IPv4 and IPv6 are not configured')
 
+        log.debug('IPv4 config: {}'.format(self._nmanager.get_ipv4_config()))
+        log.debug('IPv6 config: {}'.format(self._nmanager.get_ipv6_config()))
+
     def write_hostname(self, path: str):
+        log.debug("Writing '{}' to '{}'".format(self._hostname, path))
         with open(path, 'w') as file:
             file.write('{}\n'.format(self._hostname))
 
