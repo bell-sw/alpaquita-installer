@@ -41,7 +41,11 @@ def scan_host_disks() -> list[Disk]:
     for blkdev in data['blockdevices']:
         if blkdev['type'] != 'disk':
             continue
-
+        for opt_name in ('model', 'serial'):
+            if blkdev[opt_name]:
+                blkdev[opt_name] = blkdev[opt_name].strip()
+            if not blkdev[opt_name]:
+                blkdev[opt_name] = None
         disk = Disk(path=blkdev['path'], size=blkdev['size'],
                     model=blkdev['model'], serial=blkdev['serial'])
         log.debug('Found disk: {}'.format(disk))
