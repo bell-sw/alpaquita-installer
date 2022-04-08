@@ -20,8 +20,8 @@ class TimezoneController(Controller):
         for region in read_regions():
             self._all_regions[region.name] = region
 
-        self.region = 'Etc'
-        self.city = 'UTC'
+        self.region = 'America'
+        self.city = 'New_York'
 
     @property
     def regions(self) -> list[str]:
