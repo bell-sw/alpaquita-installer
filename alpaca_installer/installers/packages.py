@@ -25,12 +25,10 @@ class PackagesInstaller(Installer):
                   '--keys', '/etc/apk/keys',  # install using keys from the host system
                   '--no-progress']
 
-        res = run_cmd(args=(common + ['--initdb']))
-        self._event_receiver.add_log_line('{}'.format(res.stdout.decode()))
+        run_cmd(args=(common + ['--initdb']), event_receiver=self._event_receiver)
 
         args = common + ['--update-cache', '--clean-protected']
         args.extend(self.packages)
 
         self._event_receiver.start_event(f'Installing packages: {sorted(self.packages)}')
-        res = run_cmd(args=args)
-        self._event_receiver.add_log_line('{}'.format(res.stdout.decode()))
+        run_cmd(args=args, event_receiver=self._event_receiver)

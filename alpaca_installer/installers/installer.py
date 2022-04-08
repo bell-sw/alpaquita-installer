@@ -63,7 +63,7 @@ class Installer(abc.ABC):
 
     def run_in_chroot(self, args: list[str]) -> subprocess.CompletedProcess:
         new_args = ['chroot', self.target_root] + args
-        return run_cmd(args=new_args)
+        return run_cmd(args=new_args, event_receiver=self._event_receiver)
 
     def enable_service(self, service: str, runlevel: str):
         self.run_in_chroot(args=['rc-update', 'add', service, runlevel])

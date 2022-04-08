@@ -272,7 +272,8 @@ class StorageInstaller(Installer):
         self._event_receiver.start_event('Creating and mounting file systems')
         # busybox's mount fails if no fs-related module is loaded
         for fs in self._file_systems:
-            run_cmd(args=['modprobe', str(fs)], ignore_status=True)
+            run_cmd(args=['modprobe', str(fs)], ignore_status=True,
+                    event_receiver=self._event_receiver)
 
         self._smanager.create_filesystems()
         self._smanager.mount()
@@ -281,7 +282,7 @@ class StorageInstaller(Installer):
             src = os.path.join('/', mount)
             dst = self.abs_target_path(mount)
             os.makedirs(dst)
-            run_cmd(args=['mount', '-o', 'bind', src, dst])
+            run_cmd(args=['mount', '-o', 'bind', src, dst], event_receiver=self._event_receiver)
 
     def post_apply(self):
         self._event_receiver.start_event('Updating storage configuration')
@@ -303,5 +304,6 @@ class StorageInstaller(Installer):
     def cleanup(self):
         self._event_receiver.start_event('Unmounting file systems')
         for mount in self._bind_mounts:
-            run_cmd(args=['umount', self.abs_target_path(mount)])
+            run_cmd(args=['umount', self.abs_target_path(mount)],
+                    event_receiver=self._event_receiver)
         self._smanager.unmount()
