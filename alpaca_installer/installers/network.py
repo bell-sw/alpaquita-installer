@@ -93,10 +93,8 @@ class NetworkInstaller(Installer):
             hash_policy = data.get('bond_hash_policy', None)
             log.debug('Bond members: {}, mode: {}, hash_policy: {}'.format(
                 members, mode, hash_policy))
-            self._nmanager.add_bond_iface(name=iface,
-                                          members=data.get('bond_members', []),
-                                          mode=data.get('bond_mode', ''),
-                                          hash_policy=data.get('bond_hash_policy', None))
+            self._nmanager.add_bond_iface(name=iface, members=members, mode=mode,
+                                          hash_policy=hash_policy)
         elif iface_type == 'wifi':
             self._nmanager.set_wifi_config(WIFIConfig(ssid=data.get('wifi_ssid', ''),
                                                       psk=data.get('wifi_psk', '')))

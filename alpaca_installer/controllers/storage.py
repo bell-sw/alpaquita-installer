@@ -42,8 +42,10 @@ def scan_host_disks() -> list[Disk]:
         if blkdev['type'] != 'disk':
             continue
 
-        disks.append(Disk(path=blkdev['path'], size=blkdev['size'],
-                          model=blkdev['model'], serial=blkdev['serial']))
+        disk = Disk(path=blkdev['path'], size=blkdev['size'],
+                    model=blkdev['model'], serial=blkdev['serial'])
+        log.debug('Found disk: {}'.format(disk))
+        disks.append(disk)
     return disks
 
 
@@ -152,6 +154,8 @@ class StorageController(Controller):
             needs_reset = True
 
         if needs_reset:
+            log.debug('Selected disk: {}, use lvm: {}, crypto passphrase: {}'.format(
+                self._selected_disk, self._use_lvm, self._crypto_passphrase))
             try:
                 self._reset_smanager()
             except (TypeError, ValueError) as exc:
