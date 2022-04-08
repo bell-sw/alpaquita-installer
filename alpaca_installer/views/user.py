@@ -45,8 +45,8 @@ class UserForm(Form):
     def clean_full_name(self, value):
         if value:
             if set(value).intersection(set(GECOS_INVALID_CHARACTERS)):
-                raise ValueError('Full name must not contain characters from {}'.format(
-                    list(GECOS_INVALID_CHARACTERS)))
+                raise ValueError('Full name must not contain characters: {}'.format(
+                    ','.join(f'\'{c}\'' for c in sorted(GECOS_INVALID_CHARACTERS))))
         return value
 
     def validate_user_name(self):
