@@ -21,6 +21,7 @@ class UrlsForm(SubForm):
 
 
 class RepoForm(Form):
+    ok_label = 'Next'
     cancel_label = 'Back'
 
     libc_type = ChoiceField('libc type:', choices=['musl', 'glibc'])

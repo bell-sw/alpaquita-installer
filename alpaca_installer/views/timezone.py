@@ -11,6 +11,7 @@ from subiquitycore.ui.selector import Option
 
 
 class TimezoneForm(Form):
+    ok_label = 'Next'
     cancel_label = 'Back'
 
     region = ChoiceField('Region:', choices=['dummy'])

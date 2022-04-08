@@ -10,6 +10,7 @@ from alpaca_installer.common.utils import validate_proxy_url, VALID_PROXY_URL_TE
 
 
 class ProxyForm(Form):
+    ok_label = 'Next'
     cancel_label = 'Back'
 
     proxy_url = StringField('Proxy:',

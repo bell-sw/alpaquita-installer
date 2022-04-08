@@ -28,7 +28,7 @@ class PassphraseForm(SubForm):
 
 
 class StorageForm(Form):
-    ok_label = 'Done'
+    ok_label = 'Next'
     cancel_label = 'Back'
 
     disk = ChoiceField('Disk:', choices=['dummy'])

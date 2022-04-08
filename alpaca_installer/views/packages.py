@@ -38,6 +38,7 @@ class OtherForm(SubForm):
 
 
 class PackagesForm(Form):
+    ok_label = 'Next'
     cancel_label = 'Back'
     kernel = SubFormField(KernelForm, 'Linux kernel')
     jdk = SubFormField(JDKForm, 'Liberica JDK')

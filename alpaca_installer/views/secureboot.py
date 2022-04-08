@@ -10,6 +10,7 @@ from subiquitycore.ui.form import (
 )
 
 class SecureBootForm(Form):
+    ok_label = 'Next'
     cancel_label = 'Back'
     install_shim = BooleanField('Install shim and signed grub bootloaders for SB')
 

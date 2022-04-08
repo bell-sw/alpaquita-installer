@@ -25,6 +25,7 @@ class UserViewData:
 
 
 class UserForm(Form):
+    ok_label = 'Next'
     cancel_label = 'Back'
 
     full_name = StringField('Full name:')

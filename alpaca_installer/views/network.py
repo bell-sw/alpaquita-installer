@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 
 class HostnameForm(Form):
-    ok_label = 'Done'
+    ok_label = 'Next'
     cancel_label = 'Back'
 
     hostname = StringField('')
