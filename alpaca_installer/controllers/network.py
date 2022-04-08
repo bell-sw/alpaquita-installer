@@ -60,7 +60,7 @@ class NetworkController(Controller):
 
         if self.get_iface_info(self._iface_name).type == 'wifi':
             if not self._wifi_config:
-                self._app.show_error_message('Wireless network is not configured')
+                self._app.show_error_message('Wireless network is not configured.')
                 return
             self._nmanager.set_wifi_config(self._wifi_config)
 

@@ -137,7 +137,7 @@ class NetworkView(BaseView):
     def _add_bond(self, button):
         candidates = self.controller.get_bond_candidates()
         if not candidates:
-            self.controller._app.show_error_message('No available interfaces')
+            self.controller._app.show_error_message('No available interfaces.')
         else:
             self.show_stretchy_overlay(CreateBondStretchy(self, candidates=candidates))
 
