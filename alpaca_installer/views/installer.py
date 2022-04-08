@@ -83,9 +83,11 @@ class InstallerView(BaseView):
         spinner = Spinner(self._controller._app.aio_loop)
         spinner.start()
         new_line = Columns([
+            ('fixed', 1, Text("")),
             ('pack', Text(message)),
+            ('fixed', 1, Text("")),
             ('pack', spinner),
-            ], dividechars=1)
+            ], dividechars=0)
         self.ongoing[context_id] = len(walker)
         self._add_line(self.event_listbox, new_line)
 
@@ -94,17 +96,19 @@ class InstallerView(BaseView):
         if index is None:
             return
         walker = self.event_listbox.base_widget.body
-        spinner = walker[index][1]
+        spinner = walker[index][3]
         spinner.stop()
-        walker[index][0].set_text(walker[index][0].text + '.')
-        walker[index] = walker[index][0]
+        text = walker[index][1].text
+        if not text.endswith(('!', '.')):
+            walker[index][1].set_text(text + '.')
+        walker[index] = Padding.push_1(walker[index][1])
 
     def finish_all(self):
         for context_id in list(self.ongoing):
             self.event_finish(context_id)
 
     def add_log_line(self, text):
-        self._add_line(self.log_listbox, Text(text))
+        self._add_line(self.log_listbox, Padding.push_1(Text(text)))
 
     def set_status(self, text):
         self.event_linebox.set_title(text)
