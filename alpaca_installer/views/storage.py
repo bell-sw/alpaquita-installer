@@ -48,7 +48,8 @@ class StorageForm(Form):
 
 class StorageView(BaseView):
     title = 'Installation Destination'
-    excerpt = 'Select a disk for installation. All existing data on this disk will be lost.'
+    excerpt = ('info_minor', (
+        'Select a disk for installation. All existing data on this disk will be lost.'))
 
     def __init__(self, controller: StorageController,
                  available_disks: list[Disk],

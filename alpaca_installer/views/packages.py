@@ -49,7 +49,7 @@ class PackagesForm(Form):
 
 class PackagesView(BaseView):
     title = 'Packages'
-    excerpt = 'Select additional packages to install.'
+    excerpt = ('info_minor', 'Select additional packages to install.')
 
     def __init__(self, controller, data, is_musl):
         self._controller = controller

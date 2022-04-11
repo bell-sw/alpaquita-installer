@@ -70,7 +70,7 @@ class UserForm(Form):
 
 class UserView(BaseView):
     title = 'User'
-    excerpt = "This account will have admin privileges."
+    excerpt = ('info_minor', 'This account will have admin privileges.')
 
     def __init__(self, controller, data: Optional[UserViewData]):
         self._controller = controller

@@ -20,7 +20,7 @@ class TimezoneForm(Form):
 
 class TimezoneView(BaseView):
     title = 'Time Zone'
-    excerpt = 'Select a time zone.'
+    excerpt = ('info_minor', 'Select a time zone.')
 
     def __init__(self, controller, region: str, city: str):
         self._controller = controller

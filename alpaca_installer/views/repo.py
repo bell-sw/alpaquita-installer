@@ -31,8 +31,9 @@ class RepoForm(Form):
 
 class RepoView(BaseView):
     title = 'Installation Source'
-    excerpt = ('Specify the URL of the repository server that '
-               'will be used to install the packages.')
+    excerpt = ('info_minor', (
+        'Specify the URL of the repository server that '
+        'will be used to install the packages.'))
 
     def __init__(self, controller, repo_base_url: str, libc_type: str):
         self._controller = controller
