@@ -8,6 +8,7 @@ import urwid
 import sys
 import getopt
 import os
+import atexit
 import logging
 
 from subiquitycore.ui.utils import Color, LoadingDialog, Padding
@@ -137,6 +138,7 @@ class Application:
         self.ui = self.make_ui()
         self._palette = palette
 
+        atexit.register(self.cleanup)
         self.aio_loop = asyncio.get_event_loop()
         self._urwid_loop = urwid.MainLoop(widget=self.ui, palette=self._palette,
                                           handle_mouse=False, pop_ups=True,
@@ -261,6 +263,10 @@ class Application:
 
         return await self._wait_with_indication(
             awaitable, show_load, hide_load)
+
+    @staticmethod
+    def cleanup():
+        os.system('clear')
 
     def exit(self):
         self.aio_loop.stop()
