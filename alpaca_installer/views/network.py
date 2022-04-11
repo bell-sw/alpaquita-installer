@@ -6,11 +6,11 @@ from typing import TYPE_CHECKING, Optional
 
 import urwid
 
-from subiquitycore.ui.buttons import cancel_btn, done_btn
+from subiquitycore.ui.buttons import done_btn
 from subiquitycore.ui.container import ListBox, Pile
-from subiquitycore.ui.form import Form, StringField
+from subiquitycore.ui.form import Form, ChoiceField, StringField
 from subiquitycore.ui.utils import screen
-from subiquitycore.ui.selector import Selector, Option
+from subiquitycore.ui.selector import Option
 from subiquitycore.ui.table import ColSpec, TablePile, TableRow
 from subiquitycore.view import BaseView
 
@@ -24,11 +24,12 @@ if TYPE_CHECKING:
     from alpaca_installer.controllers.network import NetworkController
 
 
-class HostnameForm(Form):
+class NetworkForm(Form):
     ok_label = 'Next'
     cancel_label = 'Back'
 
-    hostname = StringField('')
+    hostname = StringField('Hostname:')
+    interface = ChoiceField('Interface:', choices=['dummy'])
 
     def clean_hostname(self, value):
         if not is_valid_hostname(value):
@@ -38,12 +39,14 @@ class HostnameForm(Form):
 
 class NetworkView(BaseView):
     title = 'Network'
+    excerpt = ('info_minor', (
+        'Enter the hostname of the system and select a network interface connected to the Internet.'))
 
     def __init__(self, controller: NetworkController):
         self.controller = controller
         self._selected_iface = self.controller.get_selected_iface()
 
-        self._hostname_form = HostnameForm(initial={'hostname': self.controller.get_hostname()})
+        self._network_form = NetworkForm(initial={'hostname': self.controller.get_hostname()})
 
         self._bond_btn = done_btn('Create bond interface', on_press=self._add_bond)
         self._vlan_btn = done_btn('Add VLAN', on_press=self._add_vlan)
@@ -67,8 +70,8 @@ class NetworkView(BaseView):
             1: ColSpec()
         })
 
-        self._iface_selector = Selector(opts=['dummy'])
-        urwid.connect_signal(self._iface_selector, 'select', self._iface_selected)
+        urwid.connect_signal(self._network_form.interface.widget, 'select',
+                             self._iface_selected)
 
         table = TablePile([
             TableRow([urwid.Text('IPv4:'), self._ipv4_status, edit_ipv4_btn]),
@@ -79,32 +82,28 @@ class NetworkView(BaseView):
             2: ColSpec()
         })
 
-        hostname_rows = [urwid.Padding(r, width=79) for r in self._hostname_form.as_rows()]
-        self._pile = Pile([urwid.Text('Hostname'), urwid.Text('')] + hostname_rows +
-                          [urwid.Text('Network interface'),
-                           urwid.Text(''),
-                           self._iface_selector,
-                           urwid.Text(''),
-                           self._actions_placeholder,
+        hostname_rows = self._network_form.as_rows()
+        self._pile = Pile(hostname_rows +
+                          [self._actions_placeholder,
                            urwid.Text(''),
                            urwid.Padding(self._bond_btn, width=25, align='left'),
                            urwid.Text(''),
                            self._wifi_placeholder,
                            urwid.Text(''),
-                           urwid.Text('IP address configuration'),
+                           urwid.Text('IP address configuration:'),
                            urwid.Text(''),
                            table])
-        # Adjust it if any widgets above the self._iface_selector are added/removed
-        self._iface_selector_pos = 2 + len(hostname_rows) + 2
+        # Adjust it if any widgets above the interface selector are added/removed
+        self._iface_selector_pos = len(hostname_rows) - 1
 
         self.update_interfaces_list(iface_to_select=self._selected_iface)
         self.update_wifi_status()
 
-        urwid.connect_signal(self._hostname_form, 'submit', self.done)
-        urwid.connect_signal(self._hostname_form, 'cancel', self.cancel)
+        urwid.connect_signal(self._network_form, 'submit', self.done)
+        urwid.connect_signal(self._network_form, 'cancel', self.cancel)
 
-        super().__init__(screen(ListBox([self._pile]), buttons=self._hostname_form.buttons,
-                                focus_buttons=True))
+        super().__init__(screen(ListBox([self._pile]), excerpt=self.excerpt,
+                                buttons=self._network_form.buttons, focus_buttons=True))
 
     def _reset_focus(self):
         self._pile.focus_position = self._iface_selector_pos
@@ -119,7 +118,7 @@ class NetworkView(BaseView):
         elif iface_info.type == 'vlan':
             widget = urwid.Padding(self._delete_btn, width=14, align='left')
         elif iface_info.type == 'wifi':
-            wifi_widget = Pile([urwid.Text('Wireless configuration'),
+            wifi_widget = Pile([urwid.Text('Wireless configuration:'),
                                 urwid.Text(''),
                                 self._wifi_table])
         elif iface_info.type == 'bond':
@@ -178,13 +177,14 @@ class NetworkView(BaseView):
         iface_opts = []
         for iface in sorted(self.controller.get_available_ifaces()):
             iface_opts.append(Option((self._iface_label(iface), True, iface)))
-        self._iface_selector.options = iface_opts
+        self._network_form.interface.widget.options = iface_opts
 
         if not iface_to_select:
             iface_to_select = iface_opts[0].value
 
-        self._iface_selector.value = iface_to_select
-        urwid.emit_signal(self._iface_selector, 'select', None, iface_to_select)
+        self._network_form.interface.widget.value = iface_to_select
+        urwid.emit_signal(self._network_form.interface.widget, 'select', None,
+                          iface_to_select)
 
     def update_ip_statuses(self):
         def _to_status(data: dict[str, str]):
@@ -209,7 +209,7 @@ class NetworkView(BaseView):
         self._wifi_status.set_text(text)
 
     def done(self, sender):
-        self.controller.set_hostname(self._hostname_form.hostname.value)
+        self.controller.set_hostname(self._network_form.hostname.value)
         self.controller.select_iface(self._selected_iface)
         self.controller.done()
 
