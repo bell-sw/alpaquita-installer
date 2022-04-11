@@ -7,6 +7,7 @@ import logging
 import os
 from .controller import Controller
 from alpaca_installer.views.repo import RepoView
+from alpaca_installer.common.utils import MEDIA_PATH
 
 log = logging.getLogger('controllers.repo')
 
@@ -57,7 +58,7 @@ class RepoController(Controller):
         res = []
 
         if self._host_libc_type == self._libc_type:
-            res.append('/media/disk/apks')
+            res.append(MEDIA_PATH)
         res.extend(self._repos)
 
         yaml_data = yaml.dump({"repositories": res})

@@ -8,7 +8,7 @@ from typing import Optional
 from .events import EventReceiver
 
 VALID_PROXY_URL_TEMPLATE = 'http://[[user][:password]@]hostname[:port]'
-
+MEDIA_PATH = '/media/disk/apks'
 
 def run_cmd(args, input: Optional[bytes] = None,
             timeout: float = None, ignore_status: bool = False,
