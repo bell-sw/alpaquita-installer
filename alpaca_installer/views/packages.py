@@ -13,38 +13,40 @@ from subiquitycore.ui.form import (
 
 
 class KernelForm(SubForm):
-    extramods = BooleanField('Install firmware and extra modules')
+    extramods = BooleanField('Install firmware and extra modules', help=NO_HELP)
 
 
-class JDKForm(SubForm):
-    jdk_8 = BooleanField('JDK 8', help=NO_HELP)
-    jdk_11 = BooleanField('JDK 11', help=NO_HELP)
-    jdk_17 = BooleanField('JDK 17')
-
-
-class NIKForm(SubForm):
-    nik_21_11 = BooleanField('NIK 21-11', help=NO_HELP)
-    nik_21_17 = BooleanField('NIK 21-17', help=NO_HELP)
-    nik_22_11 = BooleanField('NIK 22-11', help=NO_HELP)
-    nik_22_17 = BooleanField('NIK 22-17')
+class JavaForm(SubForm):
+    jdk_8 = BooleanField('Liberica Standard JDK 8', help=NO_HELP)
+    jdk_11 = BooleanField('Liberica Standard JDK 11', help=NO_HELP)
+    jdk_17 = BooleanField('Liberica Standard JDK 17', help=NO_HELP)
+    nik_21_11 = BooleanField('Liberica Native Image Kit 21 (Java 11)', help=NO_HELP)
+    nik_21_17 = BooleanField('Liberica Native Image Kit 21 (Java 17)', help=NO_HELP)
+    nik_22_11 = BooleanField('Liberica Native Image Kit 22 (Java 11)', help=NO_HELP)
+    nik_22_17 = BooleanField('Liberica Nativa Image Kit 22 (Java 17)', help=NO_HELP)
 
 
 class LibcForm(SubForm):
-    perf = BooleanField('Install musl-perf with CPU features detection and optimized asm functions')
+    perf = BooleanField('Install musl-perf with CPU features detection and optimized asm functions',
+                        help=NO_HELP)
 
 
 class OtherForm(SubForm):
-    ssh_server = BooleanField('OpenSSH server', help=NO_HELP)
+    ssh_server = BooleanField('Enable SSH access', help=NO_HELP)
+    coreutils = BooleanField('Install GNU Core Utilities',
+                             help=('info_minor', (
+                                 'This option installs basic file, shell and text manipulation utilities '
+                                 'from the GNU coreutils project on top of busybox (which is always '
+                                 'installed by default).')))
 
 
 class PackagesForm(Form):
     ok_label = 'Next'
     cancel_label = 'Back'
     kernel = SubFormField(KernelForm, 'Linux kernel')
-    jdk = SubFormField(JDKForm, 'Liberica JDK')
-    nik = SubFormField(NIKForm, 'Liberica Native Image Kit')
+    jdk = SubFormField(JavaForm, 'Java')
     libc = SubFormField(LibcForm, 'libc')
-    other = SubFormField(OtherForm, 'Other components')
+    other = SubFormField(OtherForm, 'Other components', help=NO_HELP)
 
 
 class PackagesView(BaseView):
@@ -58,7 +60,6 @@ class PackagesView(BaseView):
 
         for k, f in [('kernel', self._form.kernel),
                      ('jdk', self._form.jdk),
-                     ('nik', self._form.nik),
                      ('libc', self._form.libc),
                      ('other', self._form.other)]:
             if k in data:
@@ -76,7 +77,6 @@ class PackagesView(BaseView):
         self._controller.done({
             'kernel': self._form.kernel.widget.value,
             'jdk': self._form.jdk.widget.value,
-            'nik': self._form.nik.widget.value,
             'libc': self._form.libc.widget.value,
             'other': self._form.other.widget.value,
             })

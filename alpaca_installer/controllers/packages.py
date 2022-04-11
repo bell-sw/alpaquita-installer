@@ -51,17 +51,19 @@ class PackagesController(Controller):
         self._add_pkg(epkgs, 'jdk', 'jdk_8', 'liberica8')
         self._add_pkg(epkgs, 'jdk', 'jdk_11', 'liberica11')
         self._add_pkg(epkgs, 'jdk', 'jdk_17', 'liberica17')
-
-        self._add_pkg(epkgs, 'nik', 'nik_21_11', 'liberica-nik-21-11')
-        self._add_pkg(epkgs, 'nik', 'nik_21_17', 'liberica-nik-21-17')
-        self._add_pkg(epkgs, 'nik', 'nik_22_11', 'liberica-nik-22-11')
-        self._add_pkg(epkgs, 'nik', 'nik_22_17', 'liberica-nik-22-17')
+        self._add_pkg(epkgs, 'jdk', 'nik_21_11', 'liberica-nik-21-11')
+        self._add_pkg(epkgs, 'jdk', 'nik_21_17', 'liberica-nik-21-17')
+        self._add_pkg(epkgs, 'jdk', 'nik_22_11', 'liberica-nik-22-11')
+        self._add_pkg(epkgs, 'jdk', 'nik_22_17', 'liberica-nik-22-17')
 
         self._add_pkg(epkgs, 'libc', 'perf', 'musl-perf')
 
+        self._add_pkg(epkgs, 'other', 'ssh_server', 'openssh')
         self._add_pkg(epkgs, 'other', 'ssh_server', 'openssh-server')
         if self._is_group_item(group='other', item='ssh_server'):
             enable_services.append('sshd')
+
+        self._add_pkg(epkgs, 'other', 'coreutils', 'coreutils')
 
         data = {'extra_packages': epkgs}
         if enable_services:
