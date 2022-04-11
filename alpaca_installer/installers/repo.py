@@ -35,7 +35,3 @@ class RepoInstaller(Installer):
 
     def cleanup(self):
         self.create_repo_file(media_disabled=True)
-
-        cd_dev = '/dev/cdrom'
-        if os.path.exists(cd_dev):
-            run_cmd(args=['eject', cd_dev])
