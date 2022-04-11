@@ -95,6 +95,7 @@ class NetworkInstaller(Installer):
                 members, mode, hash_policy))
             self._nmanager.add_bond_iface(name=iface, members=members, mode=mode,
                                           hash_policy=hash_policy)
+            self.add_package('bonding')
         elif iface_type == 'wifi':
             self._nmanager.set_wifi_config(WIFIConfig(ssid=data.get('wifi_ssid', ''),
                                                       psk=data.get('wifi_psk', '')))
