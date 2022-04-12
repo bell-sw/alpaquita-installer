@@ -55,5 +55,8 @@ class SwapfileInstaller(Installer):
         self.run_in_chroot(args=['mkswap', self._path])
 
     def post_apply(self):
+        if not self._path:
+            return
+
         with open(self.abs_target_path('/etc/fstab'), 'a') as file:
             file.write('{} swap swap defaults 0 0\n'.format(self._path))
