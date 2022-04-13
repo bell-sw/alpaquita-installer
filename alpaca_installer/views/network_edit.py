@@ -18,21 +18,28 @@ if TYPE_CHECKING:
 
 IP_INTERFACE_CLS = {4: ipaddress.IPv4Interface,
                     6: ipaddress.IPv6Interface}
+IP_INTERFACE_SUFFIX_NAME = {4: 'netmask',
+                            6: 'prefix'}
 IP_ADDRESS_CLS = {4: ipaddress.IPv4Address,
                   6: ipaddress.IPv6Address}
 
 
 def _clean_address(ip_ver: int):
     def func(self, value):
-        err_msg = f'Invalid IPv{ip_ver} CIDR notation'
+        suffix = IP_INTERFACE_SUFFIX_NAME[ip_ver]
+
+        if '/' not in value:
+            raise ValueError(f'No {suffix} specified')
 
         try:
             addr = IP_INTERFACE_CLS[ip_ver](value)
         except ipaddress.AddressValueError:
-            raise ValueError(err_msg) from None
+            raise ValueError(f'Must be in the address/{suffix} format') from None
+        except ipaddress.NetmaskValueError:
+            raise ValueError(f'Invalid {suffix} specified') from None
 
         if addr.network.num_addresses == 1:
-            raise ValueError(err_msg)
+            raise ValueError(f'The {suffix} describes a single-host network')
 
         return value
     return func
@@ -43,7 +50,7 @@ def _clean_gateway(ip_ver: int):
         try:
             IP_ADDRESS_CLS[ip_ver](value)
         except ipaddress.AddressValueError:
-            raise ValueError('Invalid format') from None
+            raise ValueError('Invalid address') from None
         return value
     return func
 
@@ -74,7 +81,7 @@ def _clean_search_domains(ip_ver: int):
 # make a parent IPStaticForm with IP_INTERFACE_CLS and IP_ADDRESS_CLS
 # as class members and subclass ipv4 and ipv6 variants. It didn't work.
 class IPv4StaticForm(SubForm):
-    address = StringField('Address:', help='IP address in the CIDR form')
+    address = StringField('Address:', help=f'IP address in the address/{IP_INTERFACE_SUFFIX_NAME[4]} format')
     gateway = StringField('Gateway:')
     name_servers = StringField('Name servers:', help='IP addresses, comma separated')
     search_domains = StringField('Search domains:', help='Domains, comma separated')
@@ -86,7 +93,7 @@ class IPv4StaticForm(SubForm):
 
 
 class IPv6StaticForm(SubForm):
-    address = StringField('Address:', help='IP address in the CIDR form')
+    address = StringField('Address:', help=f'IP address in the address/{IP_INTERFACE_SUFFIX_NAME[6]} format')
     gateway = StringField('Gateway:')
     name_servers = StringField('Name servers:', help='IP addresses, comma separated')
     search_domains = StringField('Search domains:', help='Domains, comma separated')
