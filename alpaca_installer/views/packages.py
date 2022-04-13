@@ -20,8 +20,6 @@ class JavaForm(SubForm):
     jdk_8 = BooleanField('Liberica Standard JDK 8', help=NO_HELP)
     jdk_11 = BooleanField('Liberica Standard JDK 11', help=NO_HELP)
     jdk_17 = BooleanField('Liberica Standard JDK 17', help=NO_HELP)
-    nik_21_11 = BooleanField('Liberica Native Image Kit 21 (Java 11)', help=NO_HELP)
-    nik_21_17 = BooleanField('Liberica Native Image Kit 21 (Java 17)', help=NO_HELP)
     nik_22_11 = BooleanField('Liberica Native Image Kit 22 (Java 11)', help=NO_HELP)
     nik_22_17 = BooleanField('Liberica Nativa Image Kit 22 (Java 17)', help=NO_HELP)
 
