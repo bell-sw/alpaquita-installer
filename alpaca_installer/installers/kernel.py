@@ -47,7 +47,7 @@ class KernelInstaller(Installer):
             raise RuntimeError('Unable to determine the installed kernel version')
         self.run_in_chroot(args=['dracut', '-f', '/boot/initramfs-lts', kver])
 
-        data = """GRUB_DISTRIBUTOR="Alpaca"
+        data = """
 GRUB_TIMEOUT=2
 GRUB_DISABLE_SUBMENU=y
 GRUB_DISABLE_RECOVERY=true
