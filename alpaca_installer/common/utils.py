@@ -10,6 +10,7 @@ from .events import EventReceiver
 VALID_PROXY_URL_TEMPLATE = 'http://[[user][:password]@]hostname[:port]'
 MEDIA_PATH = '/media/disk/apks'
 
+
 def run_cmd(args, input: Optional[bytes] = None,
             timeout: float = None, ignore_status: bool = False,
             event_receiver: EventReceiver = None) -> subprocess.CompletedProcess:
@@ -53,3 +54,8 @@ def validate_proxy_url(url: str):
         _ = pr.port
     except ValueError:
         raise ValueError(msg) from None
+
+
+def button_width_for_label(label: str) -> int:
+    # '[ ' + label + ' ]'
+    return len(label) + 4

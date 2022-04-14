@@ -19,6 +19,7 @@ from .network_edit import EditIPStretchy
 from .network_wifi import EditWIFIStretchy
 from .network_bond import CreateBondStretchy
 from alpaca_installer.nmanager.ip_config import is_valid_hostname
+from alpaca_installer.common.utils import button_width_for_label
 
 if TYPE_CHECKING:
     from alpaca_installer.controllers.network import NetworkController
@@ -89,7 +90,8 @@ class NetworkView(BaseView):
         self._pile = Pile(hostname_rows +
                           [self._actions_placeholder,
                            urwid.Text(''),
-                           urwid.Padding(self._bond_btn, width=len(self._bond_btn_label) + 4, align='left'),
+                           urwid.Padding(self._bond_btn,
+                                         width=button_width_for_label(self._bond_btn_label), align='left'),
                            urwid.Text(''),
                            self._wifi_placeholder,
                            urwid.Text(''),
@@ -117,9 +119,11 @@ class NetworkView(BaseView):
         widget = urwid.Text('')
         wifi_widget = urwid.Text('')
         if iface_info.type == 'ethernet':
-            widget = urwid.Padding(self._vlan_btn, width=len(self._vlan_btn_label) + 4, align='left')
+            widget = urwid.Padding(self._vlan_btn,
+                                   width=button_width_for_label(self._vlan_btn_label), align='left')
         elif iface_info.type == 'vlan':
-            widget = urwid.Padding(self._delete_btn, width=len(self._delete_btn_label) + 4, align='left')
+            widget = urwid.Padding(self._delete_btn,
+                                   width=button_width_for_label(self._delete_btn_label), align='left')
         elif iface_info.type == 'wifi':
             wifi_widget = Pile([urwid.Text('Wireless configuration:'),
                                 urwid.Text(''),
