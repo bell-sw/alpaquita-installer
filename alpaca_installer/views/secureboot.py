@@ -12,20 +12,20 @@ from subiquitycore.ui.form import (
 class SecureBootForm(Form):
     ok_label = 'Next'
     cancel_label = 'Back'
-    install_shim = BooleanField('Install shim and signed grub bootloaders for SB')
+    install_shim = BooleanField('Install Secure Boot required packages to sign with own keys')
 
 class SecureBootView(BaseView):
     title = 'Secure Boot'
     excerpt = ('info_minor', (
         'Alpaca Linux provides pre-bootloader shim with a built-in certificate, '
         'signed MOKManager utility, grub and kernel (automatically locked down if '
-        'Secure Boot (SB) is enabled).\n\n'
+        'Secure Boot is enabled).\n\n'
         'The currently provided shim EFI image is not yet signed by Microsoft, so '
-        'it cannot be loaded with SB enabled using Microsoft certificates. For it '
-        'to work, the shim must be signed with your own trusted SB key from UEFI '
-        'Signature Database (db) or the shim hash added there.\n\n'
-        'If the option is selected, sbsigntool, efitools and mokutil packages will '
-        'also be installed.'))
+        'it cannot be loaded with Secure Boot enabled using Microsoft certificates. '
+        'For it to work, the shim must be signed with your own trusted Secure Boot '
+        'key from UEFI Signature Database (db) or the shim hash added there.\n\n'
+        'If the option is selected, shim, signed grub, sbsigntool, efitools and '
+        'mokutil packages will also be installed.'))
 
     def __init__(self, controller, install_shim):
         self._controller = controller
