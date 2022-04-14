@@ -48,9 +48,12 @@ class NetworkView(BaseView):
 
         self._network_form = NetworkForm(initial={'hostname': self.controller.get_hostname()})
 
-        self._bond_btn = done_btn('Create bond interface', on_press=self._add_bond)
-        self._vlan_btn = done_btn('Add VLAN', on_press=self._add_vlan)
-        self._delete_btn = done_btn('Delete', on_press=self._del_iface)
+        self._bond_btn_label = 'Create bond interface'
+        self._bond_btn = done_btn(self._bond_btn_label, on_press=self._add_bond)
+        self._vlan_btn_label = 'Add VLAN'
+        self._vlan_btn = done_btn(self._vlan_btn_label, on_press=self._add_vlan)
+        self._delete_btn_label = 'Delete'
+        self._delete_btn = done_btn(self._delete_btn_label, on_press=self._del_iface)
 
         self._actions_placeholder = urwid.WidgetPlaceholder(urwid.Text(''))
         self._wifi_placeholder = urwid.WidgetPlaceholder(urwid.Text(''))
@@ -86,7 +89,7 @@ class NetworkView(BaseView):
         self._pile = Pile(hostname_rows +
                           [self._actions_placeholder,
                            urwid.Text(''),
-                           urwid.Padding(self._bond_btn, width=25, align='left'),
+                           urwid.Padding(self._bond_btn, width=len(self._bond_btn_label) + 4, align='left'),
                            urwid.Text(''),
                            self._wifi_placeholder,
                            urwid.Text(''),
@@ -114,9 +117,9 @@ class NetworkView(BaseView):
         widget = urwid.Text('')
         wifi_widget = urwid.Text('')
         if iface_info.type == 'ethernet':
-            widget = urwid.Padding(self._vlan_btn, width=14, align='left')
+            widget = urwid.Padding(self._vlan_btn, width=len(self._vlan_btn_label) + 4, align='left')
         elif iface_info.type == 'vlan':
-            widget = urwid.Padding(self._delete_btn, width=14, align='left')
+            widget = urwid.Padding(self._delete_btn, width=len(self._delete_btn_label) + 4, align='left')
         elif iface_info.type == 'wifi':
             wifi_widget = Pile([urwid.Text('Wireless configuration:'),
                                 urwid.Text(''),
