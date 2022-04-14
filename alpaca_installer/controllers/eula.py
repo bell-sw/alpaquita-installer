@@ -23,10 +23,13 @@ class EULAController(Controller):
             self._content = file.read()
 
     def make_ui(self):
-        return EULAView(self, self._content)
+        return EULAView(self, self._content, iso_mode=self._app.iso_mode)
 
     def done(self):
         self._app.next_screen()
 
     def cancel(self):
-        self._app.exit()
+        if self._app.iso_mode:
+            self._app.reboot()
+        else:
+            self._app.exit()

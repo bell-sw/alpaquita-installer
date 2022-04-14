@@ -10,6 +10,7 @@ import getopt
 import os
 import atexit
 import logging
+import signal
 from typing import TYPE_CHECKING
 
 from subiquitycore.ui.utils import Color, LoadingDialog, Padding
@@ -105,10 +106,11 @@ class Application:
     def __init__(self, palette=()):
 
         self._no_ui = False
+        self._iso_mode = False
 
         try:
-            opts, args = getopt.getopt(sys.argv[1:], 'hf:nd',
-                                       ['help', 'config-file', 'no-ui', 'debug'])
+            opts, args = getopt.getopt(sys.argv[1:], 'hf:ndi',
+                                       ['help', 'config-file', 'no-ui', 'debug', 'iso-mode'])
         except getopt.GetoptError as err:
             print(f'Options parsing error: {err}')
             self.usage()
@@ -128,10 +130,15 @@ class Application:
                 self._no_ui = True
             elif opt in ("-d", "--debug"):
                 logging.basicConfig(filename='installer.log', filemode='w', level=logging.DEBUG)
+            elif opt in ("-i", "--iso-mode"):
+                self._iso_mode = True
 
         if self._no_ui and not self._config_file:
             self.usage()
             sys.exit(1)
+
+        if self._iso_mode:
+            signal.signal(signal.SIGINT, signal.SIG_IGN)
 
         self._controllers = []
 
@@ -175,7 +182,12 @@ class Application:
             -f --config-file x Get setup configuration from yaml file x
             -n --no-ui         Run the installation without a text-based UI. Requires config-file option
             -d --debug         Enable debug-level log
+            -i --iso-mode      Run the installer in the ISO mode (no exit feature in the UI)
         ''')
+
+    @property
+    def iso_mode(self) -> bool:
+        return self._iso_mode
 
     def is_efi(self) -> bool:
         return os.path.exists('/sys/firmware/efi')
@@ -295,3 +307,7 @@ class Application:
 
     def exit(self):
         self.aio_loop.stop()
+
+    @staticmethod
+    def reboot():
+        run_cmd(args=['reboot'])

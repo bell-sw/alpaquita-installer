@@ -21,11 +21,16 @@ class EULAView(BaseView):
         'To install and use Alpaca Linux you must read and accept '
         'the terms of the End User License Agreement (EULA).'))
 
-    def __init__(self, controller: EULAController, content: str):
+    def __init__(self, controller: EULAController, content: str,
+                 iso_mode: bool):
         self._controller = controller
 
         proceed_btn = done_btn('Accept and proceed', on_press=self.done)
-        exit_btn = cancel_btn('Exit', on_press=self.cancel)
+        if iso_mode:
+            exit_label = 'Reboot'
+        else:
+            exit_label = 'Exit'
+        exit_btn = cancel_btn(exit_label, on_press=self.cancel)
 
         super().__init__(screen(urwid.LineBox(ListBox([Padding.push_1(urwid.Text(content))])),
                                 excerpt=self.excerpt,

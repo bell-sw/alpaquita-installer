@@ -2,7 +2,9 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
+from __future__ import annotations
 import logging
+from typing import TYPE_CHECKING
 
 from urwid import (
     LineBox,
@@ -20,6 +22,9 @@ from subiquitycore.ui.spinner import Spinner
 from subiquitycore.ui.utils import button_pile, Padding
 from subiquitycore.ui.width import widget_width
 
+if TYPE_CHECKING:
+    from alpaca_installer.controllers.installer import InstallerController
+
 log = logging.getLogger('views.installer')
 
 
@@ -35,8 +40,9 @@ class InstallerView(BaseView):
 
     title = ''
 
-    def __init__(self, controller):
+    def __init__(self, controller: InstallerController, iso_mode: bool):
         self._controller = controller
+        self._iso_mode = iso_mode
         self.ongoing = {}  # context_id -> line containing a spinner
 
         self.reboot_btn = Toggleable(ok_btn(
@@ -130,8 +136,9 @@ class InstallerView(BaseView):
         btns = [
             self.view_log_btn,
             self.reboot_btn,
-            self.cancel_btn,
             ]
+        if not self._iso_mode:
+            btns.append(self.cancel_btn)
         self._set_buttons(btns)
 
     def reboot(self, btn):

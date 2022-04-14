@@ -122,7 +122,7 @@ class ConsoleInstallerController(BaseInstallerController):
 class InstallerController(BaseInstallerController):
     def __init__(self, app, create_config=True, config_file='setup.yaml'):
         super().__init__(app, create_config, config_file)
-        self._view = InstallerView(self)
+        self._view = InstallerView(self, iso_mode=self._app.iso_mode)
         self._eloop = asyncio.get_event_loop()
 
     def create_config(self):
@@ -169,7 +169,7 @@ class InstallerController(BaseInstallerController):
         self._app.exit()
 
     def click_reboot(self):
-        run_cmd(args=['/sbin/reboot'])
+        self._app.reboot()
 
     def make_ui(self):
         self._event_start('Starting installation')
