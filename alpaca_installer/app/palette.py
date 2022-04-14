@@ -17,7 +17,7 @@ PALETTE = [
 
     ('menu_button',         'white',   'black'),
     ('menu_button focus',   'black',   'light cyan'),
-    ('frame_button',        'black',   'white'),
+    ('frame_button',        'black',   'light cyan'),
     ('frame_button focus',  'white',   'black'),
 
     ('info_primary',        'white',   'black'),

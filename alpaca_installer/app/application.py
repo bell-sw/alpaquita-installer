@@ -2,17 +2,20 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
+from __future__ import annotations
 import asyncio
-
 import urwid
 import sys
 import getopt
 import os
 import atexit
 import logging
+from typing import TYPE_CHECKING
 
 from subiquitycore.ui.utils import Color, LoadingDialog, Padding
+from subiquitycore.ui.buttons import header_btn
 
+from alpaca_installer.common.utils import run_cmd
 from alpaca_installer.controllers.eula import EULAController
 from alpaca_installer.controllers.timezone import TimezoneController
 from alpaca_installer.controllers.proxy import ProxyController
@@ -27,6 +30,10 @@ from alpaca_installer.controllers.installer import (
     ConsoleInstallerController,
 )
 from .error import ErrorMsgStretchy
+from .help import HelpMsgStretchy
+
+if TYPE_CHECKING:
+    from subiquitycore.view import BaseView
 
 # From Ubuntu
 # When waiting for something of unknown duration, block the UI for at
@@ -41,10 +48,16 @@ class ApplicationUI(urwid.WidgetWrap):
     block_input = False
 
     def __init__(self):
+        self._help_msg = HelpMsgStretchy(self)
+        self._shown_help_msg = None
+
         self._title = urwid.Text('Title', align='left')
+        help_btn = header_btn('Help (F1)', on_press=self._show_help)
+        cols = urwid.Columns([('pack', self._title),
+                              urwid.Padding(help_btn, align='right', width=13)])
         pile_items = [
             (1, Color.frame_header_fringe(urwid.SolidFill('\N{upper half block}'))),
-            ('pack', Color.frame_header(Padding.center_79(self._title, min_width=76))),
+            ('pack', Color.frame_header(Padding.center_79(cols, min_width=76))),
             (1, Color.frame_header_fringe(urwid.SolidFill('\N{lower half block}'))),
             urwid.ListBox([urwid.Text('Body')])
         ]
@@ -62,16 +75,28 @@ class ApplicationUI(urwid.WidgetWrap):
             text = prefix
         self._title.set_text(text)
 
-    def set_body(self, body):
+    def set_body(self, body: BaseView):
         self._pile.contents[self._body_pos] = (body, self._pile.contents[self._body_pos][1])
 
     @property
-    def body(self):
+    def body(self) -> BaseView:
         return self._pile.contents[self._body_pos][0]
+
+    def _show_help(self, sender=None):
+        if self._shown_help_msg is None:
+            def on_close():
+                self._shown_help_msg = None
+            urwid.connect_signal(self._help_msg, 'closed', on_close)
+            self._shown_help_msg = self._help_msg
+            self.body.show_stretchy_overlay(self._shown_help_msg)
+            self._pile.focus_position = self._body_pos
 
     def keypress(self, size, key: str):
         if not self.block_input:
-            return super().keypress(size, key)
+            if key == 'f1':
+                self._show_help()
+            else:
+                return super().keypress(size, key)
 
 
 class Application:
