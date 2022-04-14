@@ -3,7 +3,7 @@
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 from .installer import Installer
-
+from alpaca_installer.common.utils import run_cmd
 
 class SecureBootInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
@@ -15,8 +15,13 @@ class SecureBootInstaller(Installer):
         if not self._data:
             return
 
-        self.add_package('shim-signed', 'grub-efi-signed',
-                         'sbsigntool', 'efitools', 'mokutil')
+        self.add_package('sbsigntool', 'efitools', 'mokutil')
 
     def apply(self):
         pass
+
+    def post_apply(self):
+        if not self._data:
+            return
+        self._event_receiver.start_event('Installing shim and grub-efi-signed bootloaders')
+        self.apk_add(args=['shim-signed', 'grub-efi-signed'])

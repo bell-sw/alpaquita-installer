@@ -74,3 +74,10 @@ class Installer(abc.ABC):
                                                  runlevel, service))
         if is_enabled:
             self.run_in_chroot(args=['rc-update', 'del', service, runlevel])
+
+    def apk_add(self, args: list):
+        all_args = ['apk', 'add', '--root', self.target_root,
+                    '--keys', '/etc/apk/keys',  # install using keys from the host system
+                    '--no-progress', '--update-cache', '--clean-protected']
+        all_args.extend(args)
+        run_cmd(args=all_args, event_receiver=self._event_receiver)

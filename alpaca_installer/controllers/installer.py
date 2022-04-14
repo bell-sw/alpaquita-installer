@@ -77,9 +77,9 @@ class BaseInstallerController(Controller, EventReceiver):
             UsersInstaller(target_root=target_root, config=config, event_receiver=self),
             NetworkInstaller(target_root=target_root, config=config, event_receiver=self),
             KernelInstaller(target_root=target_root, config=config, event_receiver=self),
-            SecureBootInstaller(target_root=target_root, config=config, event_receiver=self),
             BootloaderInstaller(target_root=target_root, config=config, event_receiver=self,
                                 efi_mount=efi_mount),
+            SecureBootInstaller(target_root=target_root, config=config, event_receiver=self),
         ]
 
         for i in installers:
