@@ -7,7 +7,7 @@ import setuptools
 
 setuptools.setup(
     name='alpaca_installer',
-    version="0.1.0",
+    version="0.2.0",
     description="Alpaca Installer",
     long_description="",
     author='BellSoft',
