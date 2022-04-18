@@ -36,6 +36,7 @@ class TimezoneController(Controller):
     def done(self, region: str, city: str):
         self.region = region
         self.city = city
+        log.debug('Timezone: {}/{}'.format(self.region, self.city))
         self._app.next_screen()
 
     def cancel(self):

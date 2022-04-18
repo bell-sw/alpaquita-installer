@@ -41,6 +41,7 @@ class UserController(Controller):
                 return
 
         self._model = new_model
+        log.debug('User = {}'.format(self._model))
         self._app.next_screen()
 
     def cancel(self):

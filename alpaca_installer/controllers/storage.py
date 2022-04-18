@@ -154,13 +154,13 @@ class StorageController(Controller):
             needs_reset = True
 
         if needs_reset:
-            log.debug('Selected disk: {}, use lvm: {}, crypto passphrase: {}'.format(
-                self._selected_disk, self._use_lvm, self._crypto_passphrase))
             try:
                 self._reset_smanager()
             except (TypeError, ValueError) as exc:
                 self._app.show_error_message(str(exc))
                 return
+        log.debug('Selected disk: {}, use lvm: {}, crypto passphrase: {}'.format(
+            self._selected_disk, self._use_lvm, self._crypto_passphrase))
         self._app.next_screen()
 
     def cancel(self):

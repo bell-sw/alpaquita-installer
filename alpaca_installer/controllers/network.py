@@ -58,7 +58,8 @@ class NetworkController(Controller):
         self._nmanager.set_ipv4_config(self._ip_config[4])
         self._nmanager.set_ipv6_config(self._ip_config[6])
 
-        if self.get_iface_info(self._iface_name).type == 'wifi':
+        iface_info = self.get_iface_info(self._iface_name)
+        if iface_info.type == 'wifi':
             if not self._wifi_config:
                 self._app.show_error_message('Wireless network is not configured.')
                 return
@@ -68,6 +69,13 @@ class NetworkController(Controller):
             self._app.aio_loop.create_task(self._apply_configuration())
         else:
             self._app.next_screen()
+
+        log.debug('Hostname: {}'.format(self.get_hostname()))
+        log.debug('Interface: {}'.format(iface_info))
+        log.debug('IPv4: {}'.format(self.get_ip_config(4)))
+        log.debug('IPv6: {}'.format(self.get_ip_config(6)))
+        if iface_info.type == 'wifi':
+            log.debug('WIFI config: {}'.format(self.get_wifi_config()))
 
     def cancel(self):
         self._app.prev_screen()

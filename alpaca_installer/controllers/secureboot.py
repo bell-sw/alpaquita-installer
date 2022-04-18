@@ -1,9 +1,13 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
+import logging
+
 import yaml
 from .controller import Controller
 from alpaca_installer.views.secureboot import SecureBootView
+
+log = logging.getLogger('controllers.secureboot')
 
 
 class SecureBootController(Controller):
@@ -18,10 +22,13 @@ class SecureBootController(Controller):
 
     def done(self, install_shim):
         self._install_shim = install_shim
+        log.debug('Install shim: {}'.format(self._install_shim))
         self._app.next_screen()
 
     def cancel(self):
         self._app.prev_screen()
 
     def to_yaml(self):
-        return yaml.dump({'install_shim_bootloader': self._install_shim})
+        yaml_data = yaml.dump({'install_shim_bootloader': self._install_shim})
+        log.debug('export to yaml: {}'.format(yaml_data))
+        return yaml_data

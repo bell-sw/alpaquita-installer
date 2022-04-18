@@ -41,6 +41,8 @@ class RepoController(Controller):
     def done(self, repo_base_url: str, libc_type: str):
         self._repo_base_url = repo_base_url
         self._libc_type = libc_type
+        log.debug("libc: {}, base_url: '{}'".format(self._libc_type,
+                                                    self._repo_base_url))
         self._app.next_screen()
 
     def cancel(self):

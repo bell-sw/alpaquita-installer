@@ -21,6 +21,7 @@ class ProxyController(Controller):
 
     def done(self, proxy: str):
         self.proxy = proxy
+        log.debug("Proxy: '{}'".format(self.proxy))
         self._app.next_screen()
 
     def cancel(self):
