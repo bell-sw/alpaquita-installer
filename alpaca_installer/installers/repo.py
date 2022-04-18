@@ -5,7 +5,7 @@ import os
 import logging
 
 from .installer import Installer
-from alpaca_installer.common.utils import run_cmd, MEDIA_PATH
+from alpaca_installer.common.utils import MEDIA_PATH, write_file
 
 log = logging.getLogger('installer.repo')
 
@@ -27,11 +27,12 @@ class RepoInstaller(Installer):
         self.create_repo_file()
 
     def create_repo_file(self, media_disabled: bool = False):
-        with open(self._repo_file, 'w') as apk_repo_file:
-            for r in self._data:
-                if media_disabled and r == MEDIA_PATH:
-                    r = '#' + r
-                apk_repo_file.write(r + '\n')
+        lines = []
+        for r in self._data:
+            if media_disabled and r == MEDIA_PATH:
+                r = '#' + r
+            lines.append(r + '\n')
+        write_file(self._repo_file, 'w', data=''.join(lines))
 
     def cleanup(self):
         self.create_repo_file(media_disabled=True)

@@ -5,6 +5,7 @@ import os
 import stat
 from typing import Optional
 
+from alpaca_installer.common.utils import write_file
 from .installer import Installer
 from .utils import read_key_or_fail, str_size_to_bytes
 
@@ -65,5 +66,5 @@ class SwapfileInstaller(Installer):
         if not self._path:
             return
 
-        with open(self.abs_target_path('/etc/fstab'), 'a') as file:
-            file.write('{} swap swap defaults 0 0\n'.format(self._path))
+        write_file(self.abs_target_path('/etc/fstab'), 'a',
+                   data='{} swap swap defaults 0 0\n'.format(self._path))

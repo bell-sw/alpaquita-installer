@@ -13,7 +13,7 @@ from .raid import RAID
 from .cryptsetup import Cryptsetup
 from .storage_unit import Partition
 from .file_system import FSType
-from alpaca_installer.common.utils import run_cmd
+from alpaca_installer.common.utils import run_cmd, write_file
 
 if TYPE_CHECKING:
     from .storage_device import StorageDevice
@@ -169,40 +169,40 @@ class StorageManager:
         if not res.stdout:
             raise RuntimeError('mdadm did not find any RAID devices')
 
-        with open(path, 'wb') as file:
-            file.write(res.stdout)
+        write_file(path, 'wb', res.stdout)
 
     def write_fstab(self, path: str):
         swap_units = [u for u in self.storage_units if u.fs_type == FSType.SWAP]
         mount_units = [x[1] for x in sorted(self.mount_points, key=lambda x: x[0])]
 
-        with open(path, 'w') as file:
-            for unit in chain(mount_units, swap_units):
-                fs_spec = unit.fs_uuid
+        lines = []
+        for unit in chain(mount_units, swap_units):
+            fs_spec = unit.fs_uuid
 
-                if unit.fs_type == FSType.SWAP:
-                    fs_file = 'none'
-                else:
-                    fs_file = unit.mount_point
+            if unit.fs_type == FSType.SWAP:
+                fs_file = 'none'
+            else:
+                fs_file = unit.mount_point
 
-                fs_vfstype = str(unit.fs_type)
+            fs_vfstype = str(unit.fs_type)
 
-                if (unit.fs_type == FSType.SWAP) or (not unit.fs_opts):
-                    fs_mntopts = 'defaults'
-                else:
-                    fs_mntopts = ','.join(unit.fs_opts)
+            if (unit.fs_type == FSType.SWAP) or (not unit.fs_opts):
+                fs_mntopts = 'defaults'
+            else:
+                fs_mntopts = ','.join(unit.fs_opts)
 
-                fs_freq = 0
+            fs_freq = 0
 
-                if unit.fs_type == FSType.SWAP:
-                    fs_passno = 0
-                elif unit.mount_point == '/':
-                    fs_passno = 1
-                else:
-                    fs_passno = 2
+            if unit.fs_type == FSType.SWAP:
+                fs_passno = 0
+            elif unit.mount_point == '/':
+                fs_passno = 1
+            else:
+                fs_passno = 2
 
-                file.write('UUID={} {} {} {} {} {}\n'.format(
-                    fs_spec, fs_file, fs_vfstype, fs_mntopts, fs_freq, fs_passno))
+            lines.append('UUID={} {} {} {} {} {}\n'.format(
+                fs_spec, fs_file, fs_vfstype, fs_mntopts, fs_freq, fs_passno))
+        write_file(path, 'w', data=''.join(lines))
 
     def write_dmcrypt(self, path: str):
         key_timeout = 1
@@ -229,5 +229,4 @@ class StorageManager:
         # This is mandatory per the dmcrypt file format
         lines.append('')
 
-        with open(path, 'w') as file:
-            file.write('\n'.join(lines))
+        write_file(path, 'w', '\n'.join(lines))

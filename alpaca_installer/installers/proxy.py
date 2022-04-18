@@ -4,7 +4,7 @@
 import os
 
 from .installer import Installer
-from alpaca_installer.common.utils import validate_proxy_url
+from alpaca_installer.common.utils import validate_proxy_url, write_file
 
 # Optional
 #
@@ -37,6 +37,8 @@ class ProxyInstaller(Installer):
             return
 
         self._event_receiver.start_event('Creating a proxy configuration file')
-        with open(self.abs_target_path('/etc/profile.d/proxy.sh'), 'w') as file:
-            for v in self.ENV_VARS:
-                file.write('export {}="{}"\n'.format(v, self._data))
+        lines = []
+        for v in self.ENV_VARS:
+            lines.append('export {}="{}"\n'.format(v, self._data))
+        write_file(self.abs_target_path('/etc/profile.d/proxy.sh'), 'w',
+                   data=''.join(lines))

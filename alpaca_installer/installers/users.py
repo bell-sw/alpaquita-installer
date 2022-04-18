@@ -3,6 +3,7 @@
 
 import datetime
 
+from alpaca_installer.common.utils import write_file
 from alpaca_installer.models.user import UserModel
 from .installer import Installer, InstallerException
 
@@ -45,8 +46,7 @@ def update_user_hash(etc_shadow: str, user: str, password_hash: str):
     if not found_user:
         raise RuntimeError("No user '{}' found in '{}'".format(user, etc_shadow))
 
-    with open(etc_shadow, 'w') as file:
-        file.writelines(lines)
+    write_file(etc_shadow, 'w', data=''.join(lines))
 
 
 class UsersInstaller(Installer):
@@ -95,5 +95,5 @@ class UsersInstaller(Installer):
                 wheel_sudoers_needed = True
 
         if wheel_sudoers_needed:
-            with open(self.abs_target_path('/etc/sudoers.d/wheel'), 'w') as file:
-                file.write('%wheel ALL=(ALL) ALL\n')
+            write_file(self.abs_target_path('/etc/sudoers.d/wheel'), 'w',
+                       data='%wheel ALL=(ALL) ALL\n')

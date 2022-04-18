@@ -3,6 +3,7 @@
 
 import logging
 
+from alpaca_installer.common.utils import write_file
 from alpaca_installer.nmanager.manager import NetworkManager
 from alpaca_installer.nmanager.ip_config import IPConfig4, IPConfig6, is_valid_hostname
 from alpaca_installer.nmanager.wifi_config import WIFIConfig
@@ -145,9 +146,7 @@ class NetworkInstaller(Installer):
         log.debug('IPv6 config: {}'.format(self._nmanager.get_ipv6_config()))
 
     def write_hostname(self, path: str):
-        log.debug("Writing '{}' to '{}'".format(self._hostname, path))
-        with open(path, 'w') as file:
-            file.write('{}\n'.format(self._hostname))
+        write_file(path, 'w', data='{}\n'.format(self._hostname))
 
     def apply(self):
         self.write_hostname(self.abs_target_path('/etc/hostname'))

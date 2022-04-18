@@ -4,8 +4,11 @@
 import subprocess
 import urllib
 from typing import Optional
+import logging
 
 from .events import EventReceiver
+
+log = logging.getLogger('common.utils')
 
 VALID_PROXY_URL_TEMPLATE = 'http://[[user][:password]@]hostname[:port]'
 MEDIA_PATH = '/media/disk/apks'
@@ -38,6 +41,19 @@ def run_cmd(args, input: Optional[bytes] = None,
     if event_receiver:
         event_receiver.add_log_line(f'{stdout}')
     return res
+
+
+def write_file(path, mode: str, data):
+    action = {'w': 'Wrote', 'wb': 'Wrote',
+              'a': 'Appended'}.get(mode, None)
+    if action is None:
+        raise ValueError("Unsupported mode '{}' for file '{}'".format(
+            mode, path))
+
+    with open(path, mode) as file:
+        file.write(data)
+
+    log.debug("{} to '{}' data: '{}'".format(action, path, data))
 
 
 def validate_proxy_url(url: str):

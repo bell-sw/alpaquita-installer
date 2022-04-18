@@ -4,6 +4,7 @@
 import os
 import re
 
+from alpaca_installer.common.utils import write_file
 from .installer import Installer
 from .utils import read_list
 
@@ -54,5 +55,4 @@ GRUB_DISABLE_SUBMENU=y
 GRUB_DISABLE_RECOVERY=true
 GRUB_CMDLINE_LINUX_DEFAULT="{}"
 """.format(' '.join(self._cmdline))
-        with open(self.abs_target_path('/etc/default/grub'), 'w') as file:
-            file.write(data)
+        write_file(self.abs_target_path('/etc/default/grub'), 'w', data=data)

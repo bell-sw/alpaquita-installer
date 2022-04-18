@@ -14,7 +14,7 @@ from .wifi_config import WIFIConfig
 from .bond_config import validate_bond_mode_and_policy
 from .identification import identify_device, find_match_in_file, read_one_line
 from .utils import get_active_iface_names, wait_iface_gets_ip
-from alpaca_installer.common.utils import run_cmd
+from alpaca_installer.common.utils import run_cmd, write_file
 
 _InterfaceType = TypeVar('_InterfaceType')
 
@@ -232,30 +232,30 @@ class NetworkManager:
             name_servers.extend(self._ipv6_config.name_servers)
             search_domains.extend(self._ipv6_config.search_domains)
 
-        with open(path, mode='w') as file:
-            if name_servers:
-                file.writelines((f'nameserver {n}\n' for n in name_servers))
-                if search_domains:
-                    file.write('search {}\n'.format((' '.join(search_domains))))
+        lines = []
+        if name_servers:
+            lines.extend((f'nameserver {n}\n' for n in name_servers))
+            if search_domains:
+                lines.append('search {}\n'.format((' '.join(search_domains))))
+        write_file(path, 'w', data=''.join(lines))
 
     def write_interfaces_file(self, path: str = '/etc/network/interfaces'):
         self._check_iface_is_selected()
         self._update_wifi_config_for_selected_iface()
 
-        with open(path, mode='w') as file:
-            file.write('auto lo\n')
-            file.write('iface lo inet loopback\n\n')
+        lines = ['auto lo\n',
+                 'iface lo inet loopback\n',
+                 '\n']
+        if (self._ipv4_config.method != 'disabled') or (self._ipv6_config.method != 'disabled'):
+            lines.append('auto {}\n'.format(self._selected_iface.name))
+            lines.append('iface {}\n'.format(self._selected_iface.name))
 
-            if (self._ipv4_config.method != 'disabled') or (self._ipv6_config.method != 'disabled'):
-                file.write('auto {}\n'.format(self._selected_iface.name))
-                file.write('iface {}\n'.format(self._selected_iface.name))
-
-                interface_lines = []
-                interface_lines.extend(self._selected_iface.get_interface_lines())
-                interface_lines.extend(self._ipv4_config.get_interface_lines())
-                interface_lines.extend(self._ipv6_config.get_interface_lines())
-
-                file.writelines((f'    {line}\n' for line in interface_lines))
+            interface_lines = []
+            interface_lines.extend(self._selected_iface.get_interface_lines())
+            interface_lines.extend(self._ipv4_config.get_interface_lines())
+            interface_lines.extend(self._ipv6_config.get_interface_lines())
+            lines.extend((f'    {line}\n' for line in interface_lines))
+        write_file(path, 'w', data=''.join(lines))
 
     @property
     def apply_required(self) -> bool:
