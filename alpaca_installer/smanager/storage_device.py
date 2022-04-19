@@ -7,6 +7,7 @@ import time
 import os
 import json
 import abc
+import logging
 
 from .file_system import FSType
 from .storage_unit import Partition, StorageUnitFlag
@@ -17,6 +18,7 @@ if TYPE_CHECKING:
     from .storage_unit import StorageUnit
     from .manager import StorageManager
 
+log = logging.getLogger('smanager.storage_device')
 
 DEVICE_CREATION_TIMEOUT = 10.0
 
@@ -141,9 +143,11 @@ class StorageDeviceWithPartitions(StorageDeviceOfLimitedSize):
                          flags=flags[:], crypto_passphrase=crypto_passphrase)
 
         self._add_storage_unit(part)
+        log.debug('{}: added {}'.format(self, part))
         return part
 
     def create_partitions(self):
+        log.debug('{}: creating partitions'.format(self))
         run_cmd(args=['wipefs', '-a', self.block_device])
 
         script = ['label: gpt']

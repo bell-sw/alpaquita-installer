@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Iterable, Collection
 import os
 import re
+import logging
 
 from .storage_device import StorageDeviceWithPartitions
 from .storage_unit import Partition, CryptoVolume
@@ -13,6 +14,8 @@ from alpaca_installer.common.utils import run_cmd
 
 if TYPE_CHECKING:
     from .manager import StorageManager
+
+log = logging.getLogger('smanager.raid')
 
 RAID_ID_PATTERN = r'/dev/md/[a-z0-9-_]+'
 
@@ -69,6 +72,7 @@ class RAID(StorageDeviceWithPartitions):
     def create(self):
         if self._raid_created:
             return
+        log.debug('{}: initialising'.format(self))
 
         args = ['mdadm', '--create', '-f',
                 '--metadata={}'.format(self.metadata),

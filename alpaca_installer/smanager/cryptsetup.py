@@ -3,10 +3,13 @@
 
 from typing import Optional, Iterable, Collection, cast
 import os
+import logging
 
 from .file_system import FSType
 from .storage_unit import Partition, CryptoVolume
 from .storage_device import StorageDevice
+
+log = logging.getLogger('smanager.cryptsetup')
 
 # Looking at the stock /etc/conf.d/dmcrypt it's not clear
 # how to implement encrypted logical volumes, so as of now only
@@ -17,6 +20,9 @@ class Cryptsetup(StorageDevice):
     @property
     def volumes(self) -> Collection[CryptoVolume]:
         return cast(Collection[CryptoVolume], self.storage_units)
+
+    def __str__(self) -> str:
+        return 'Cryptsetup ({})'.format(self.id)
 
     def add_volume(self, id: str, partition: Partition,
                    fs_type: Optional[FSType] = None,
@@ -43,9 +49,11 @@ class Cryptsetup(StorageDevice):
         volume.block_device = block_device
 
         self._add_storage_unit(volume)
+        log.debug('{}: added {}'.format(self, volume))
         return volume
 
     def open_volumes(self):
+        log.debug('{}: opening volumes'.format(self))
         for volume in self.volumes:
             volume.open()
 

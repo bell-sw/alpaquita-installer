@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Iterable, Collection, cast
 import re
 import os
+import logging
 
 from .storage_unit import LogicalVolume, CryptoVolume
 from .storage_device import StorageDeviceOfLimitedSize
@@ -15,6 +16,8 @@ from alpaca_installer.common.utils import run_cmd
 if TYPE_CHECKING:
     from .manager import StorageManager
     from .storage_unit import Partition
+
+log = logging.getLogger('smanager.lvm')
 
 
 def contains_only_valid_lvm_chars(name: str) -> bool:
@@ -91,9 +94,11 @@ class VolumeGroup(StorageDeviceOfLimitedSize):
         lv = LogicalVolume(id=id, size=size, fs_type=fs_type, fs_opts=opts,
                            mount_point=mount_point, storage_device=self)
         self._add_storage_unit(lv)
+        log.debug('{}: added {}'.format(self, lv))
         return lv
 
     def create_logical_volumes(self):
+        log.debug('{}: creating logical volumes'.format(self))
         args = ['vgcreate', self.id]
         args.extend(pv.block_device for pv in self.physical_volumes)
         run_cmd(args)

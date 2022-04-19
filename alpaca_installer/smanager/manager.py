@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Optional, Iterable, TypeVar, Type
 from collections.abc import Collection
 from itertools import chain
 import os
+import logging
 
 from .disk import Disk
 from .lvm import VolumeGroup
@@ -18,6 +19,8 @@ from alpaca_installer.common.utils import run_cmd, write_file
 if TYPE_CHECKING:
     from .storage_device import StorageDevice
     from .storage_unit import StorageUnit, CryptoVolume
+
+log = logging.getLogger('smanager.manager')
 
 _DEVICE_TYPE = TypeVar('_DEVICE_TYPE')
 
@@ -102,6 +105,7 @@ class StorageManager:
             raise ValueError("{} already exists".format(device))
         disk = Disk(manager=self, id=id)
         self._devices[id] = disk
+        log.debug('Added {}'.format(disk))
         return disk
 
     def add_vg(self, id: str, physical_volumes: Iterable[Partition | CryptoVolume]) -> VolumeGroup:
@@ -110,6 +114,7 @@ class StorageManager:
             raise ValueError("{} already exists".format(device))
         vg = VolumeGroup(manager=self, id=id, physical_volumes=physical_volumes)
         self._devices[id] = vg
+        log.debug('Added {}'.format(vg))
         return vg
 
     def add_raid(self, id: str, level: int, members: Iterable[Partition | CryptoVolume],
@@ -119,9 +124,11 @@ class StorageManager:
             raise ValueError('{} already exists'.format(device))
         raid = RAID(manager=self, id=id, metadata=metadata, level=level, members=members)
         self._devices[id] = raid
+        log.debug('Added {}'.format(raid))
         return raid
 
     def create_filesystems(self):
+        log.debug('Creating file systems')
         for disk in self.get_devices_by_type(Disk):
             disk.create_partitions()
             for part in disk.partitions:
@@ -142,6 +149,7 @@ class StorageManager:
                 lv.make_fs()
 
     def mount(self):
+        log.debug('Mounting')
         items = sorted(self.mount_points, key=lambda x: x[0])
         for mount_point, unit in items:
             mnt_dir = self._path_relative_to_mount_root_base(mount_point)
@@ -150,6 +158,7 @@ class StorageManager:
             run_cmd(args=['mount', '-t', str(unit.fs_type), unit.block_device, mnt_dir])
 
     def unmount(self):
+        log.debug('Unmounting')
         items = sorted(self.mount_points, key=lambda x: x[0], reverse=True)
         for mount_point, _ in items:
             mnt_dir = self._path_relative_to_mount_root_base(mount_point)
@@ -165,6 +174,7 @@ class StorageManager:
         self.cryptsetup.close_volumes()
 
     def write_mdadm_conf(self, path: str):
+        log.debug('Writing {}'.format(path))
         res = run_cmd(args=['mdadm', '--detail', '--scan'])
         if not res.stdout:
             raise RuntimeError('mdadm did not find any RAID devices')
@@ -172,6 +182,7 @@ class StorageManager:
         write_file(path, 'wb', res.stdout)
 
     def write_fstab(self, path: str):
+        log.debug('Writing {}'.format(path))
         swap_units = [u for u in self.storage_units if u.fs_type == FSType.SWAP]
         mount_units = [x[1] for x in sorted(self.mount_points, key=lambda x: x[0])]
 
@@ -205,6 +216,7 @@ class StorageManager:
         write_file(path, 'w', data=''.join(lines))
 
     def write_dmcrypt(self, path: str):
+        log.debug('Writing {}'.format(path))
         key_timeout = 1
         max_timeout = 300
         retries = 5
