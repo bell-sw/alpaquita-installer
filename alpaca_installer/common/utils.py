@@ -9,6 +9,7 @@ from .events import EventReceiver
 
 VALID_PROXY_URL_TEMPLATE = 'http://[[user][:password]@]hostname[:port]'
 MEDIA_PATH = '/media/disk/apks'
+DEFAULT_CONFIG_FILE = 'setup.yaml'
 
 
 def run_cmd(args, input: Optional[bytes] = None,

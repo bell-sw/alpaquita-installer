@@ -5,6 +5,9 @@ import asyncio
 import yaml
 import logging
 import abc
+import os
+import shutil
+import stat
 
 from subiquitycore.async_helpers import run_in_thread
 from alpaca_installer.views.installer import InstallerView
@@ -22,6 +25,7 @@ from alpaca_installer.installers.secureboot import SecureBootInstaller
 from alpaca_installer.installers.bootloader import BootloaderInstaller
 from alpaca_installer.installers.installer import InstallerException
 from alpaca_installer.common.events import EventReceiver
+from alpaca_installer.common.utils import DEFAULT_CONFIG_FILE
 from .controller import Controller
 
 from alpaca_installer.common.utils import run_cmd
@@ -30,6 +34,8 @@ log = logging.getLogger('controllers.installer')
 
 
 class BaseInstallerController(Controller, EventReceiver):
+    TARGET_ROOT = '/mnt/target_root'
+
     def __init__(self, app, create_config, config_file):
         super().__init__(app)
         self._config_file = config_file
@@ -47,6 +53,15 @@ class BaseInstallerController(Controller, EventReceiver):
         except Exception as err:
             raise InstallerException(f'An error occured: {err}')
 
+    def _copy_yaml_config(self):
+        copied_config_rel = os.path.join('/root', os.path.basename(DEFAULT_CONFIG_FILE))
+        self.start_event((f"Saving the config file for this installation to "
+                          f"'{copied_config_rel}' on the new system."))
+        copied_config_abs = os.path.join(self.TARGET_ROOT, copied_config_rel.lstrip('/'))
+        shutil.copy(self._config_file, copied_config_abs)
+        os.chown(copied_config_abs, 0, 0)
+        os.chmod(copied_config_abs, stat.S_IRUSR | stat.S_IWUSR)
+
     def _install_config(self):
         self.start_event('Processing configuration')
         self.add_log_line(f'Parsing config {self._config_file} file')
@@ -58,28 +73,27 @@ class BaseInstallerController(Controller, EventReceiver):
             raise InstallerException(f'Config is empty')
 
         config = yaml.safe_load(config_str)
-        target_root = '/mnt/target_root'
-        self.add_log_line(f'Using new root {target_root}')
-        storage_installer = StorageInstaller(target_root=target_root,
+        self.add_log_line(f'Using new root {self.TARGET_ROOT}')
+        storage_installer = StorageInstaller(target_root=self.TARGET_ROOT,
                                              config=config, event_receiver=self)
         efi_mount = storage_installer.efi_mount_point
-        pkgs_installer = PackagesInstaller(target_root=target_root,
+        pkgs_installer = PackagesInstaller(target_root=self.TARGET_ROOT,
                                            config=config, event_receiver=self)
 
         installers = [
             storage_installer,
-            RepoInstaller(target_root=target_root, config=config, event_receiver=self),
-            ProxyInstaller(target_root=target_root, config=config, event_receiver=self),
+            RepoInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
+            ProxyInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
             pkgs_installer,
-            ServicesInstaller(target_root=target_root, config=config, event_receiver=self),
-            SwapfileInstaller(target_root=target_root, config=config, event_receiver=self),
-            TimezoneInstaller(target_root=target_root, config=config, event_receiver=self),
-            UsersInstaller(target_root=target_root, config=config, event_receiver=self),
-            NetworkInstaller(target_root=target_root, config=config, event_receiver=self),
-            KernelInstaller(target_root=target_root, config=config, event_receiver=self),
-            BootloaderInstaller(target_root=target_root, config=config, event_receiver=self,
+            ServicesInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
+            SwapfileInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
+            TimezoneInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
+            UsersInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
+            NetworkInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
+            KernelInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
+            BootloaderInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self,
                                 efi_mount=efi_mount),
-            SecureBootInstaller(target_root=target_root, config=config, event_receiver=self),
+            SecureBootInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
         ]
 
         for i in installers:
@@ -90,6 +104,8 @@ class BaseInstallerController(Controller, EventReceiver):
 
         for i in installers:
             i.post_apply()
+
+        self._copy_yaml_config()
 
         for i in reversed(installers):
             i.cleanup()
@@ -120,7 +136,7 @@ class ConsoleInstallerController(BaseInstallerController):
 
 
 class InstallerController(BaseInstallerController):
-    def __init__(self, app, create_config=True, config_file='setup.yaml'):
+    def __init__(self, app, create_config=True, config_file=DEFAULT_CONFIG_FILE):
         super().__init__(app, create_config, config_file)
         self._view = InstallerView(self, iso_mode=self._app.iso_mode)
         self._eloop = asyncio.get_event_loop()
