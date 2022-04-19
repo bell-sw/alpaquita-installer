@@ -4,6 +4,7 @@
 from typing import Optional, TypeVar, Type, cast
 import re
 import os
+import logging
 
 import attrs
 
@@ -15,6 +16,8 @@ from .bond_config import validate_bond_mode_and_policy
 from .identification import identify_device, find_match_in_file, read_one_line
 from .utils import get_active_iface_names, wait_iface_gets_ip
 from alpaca_installer.common.utils import run_cmd, write_file
+
+log = logging.getLogger('nmanager.manager')
 
 _InterfaceType = TypeVar('_InterfaceType')
 
@@ -37,6 +40,7 @@ class NetworkManager:
     def _reset_ip_configs(self):
         self._ipv4_config = IPConfig4(method='disabled')
         self._ipv6_config = IPConfig6(method='disabled')
+        log.debug('Reset IP configurations')
 
     def _iface_by_name(self, name) -> Optional[BaseInterface]:
         for iface in self._all_ifaces:
@@ -98,6 +102,7 @@ class NetworkManager:
                                   vendor=vendor, model=model)
         self._all_ifaces.add(iface)
         self._available_ifaces.add(iface)
+        log.debug('Added interface: {}'.format(iface.info))
         return iface.name
 
     def add_vlan_iface(self, base_iface_name: str, vlan_id: int) -> str:
@@ -108,6 +113,7 @@ class NetworkManager:
         self._check_no_iface_exists(iface.name)
         self._all_ifaces.add(iface)
         self._available_ifaces.add(iface)
+        log.debug('Added interface: {}'.format(iface.info))
         return iface.name
 
     def add_wifi_iface(self, name: str, mac_address: str,
@@ -118,6 +124,7 @@ class NetworkManager:
                               vendor=vendor, model=model)
         self._all_ifaces.add(iface)
         self._available_ifaces.add(iface)
+        log.debug('Added interface: {}'.format(iface.info))
         return iface.name
 
     def add_bond_iface(self, name: str, members: list[str],
@@ -140,7 +147,7 @@ class NetworkManager:
         self._all_ifaces.add(iface)
         self._available_ifaces.add(iface)
         self._available_ifaces.difference_update(member_ifaces)
-
+        log.debug('Added interface: {}'.format(iface.info))
         return iface.name
 
     def del_iface(self, name):
@@ -155,6 +162,7 @@ class NetworkManager:
 
         self._all_ifaces.remove(iface_to_delete)
         self._available_ifaces.remove(iface_to_delete)
+        log.debug('Deleted interface: {}'.format(iface_to_delete.info))
 
     # interfaces available for selection/configuration
     def get_available_ifaces(self) -> set[str]:
@@ -178,6 +186,7 @@ class NetworkManager:
         if new_iface != self._selected_iface:
             self._selected_iface = new_iface
             self._apply_required = True
+            log.debug('Selected interface: {}'.format(self._selected_iface.info))
             self._reset_ip_configs()
 
     def get_selected_iface(self) -> Optional[str]:
@@ -194,6 +203,7 @@ class NetworkManager:
         if new_config != self._wifi_config:
             self._wifi_config = new_config
             self._apply_required = True
+            log.debug('Set WIFI config: {}'.format(self._wifi_config))
 
     def get_wifi_config(self) -> Optional[WIFIConfig]:
         return self._wifi_config
@@ -204,6 +214,7 @@ class NetworkManager:
         if new_config != self._ipv4_config:
             self._ipv4_config = new_config
             self._apply_required = True
+            log.debug('Set IPv4 config: {}'.format(self._ipv4_config))
 
     def set_ipv6_config(self, config: IPConfig6):
         self._check_iface_is_selected()
@@ -211,6 +222,7 @@ class NetworkManager:
         if new_config != self._ipv6_config:
             self._ipv6_config = new_config
             self._apply_required = True
+            log.debug('Set IPv6 config: {}'.format(self._ipv6_config))
 
     def get_ipv4_config(self) -> IPConfig4:
         self._check_iface_is_selected()
@@ -221,6 +233,7 @@ class NetworkManager:
         return attrs.evolve(self._ipv6_config)
 
     def write_resolvconf_file(self, path: str = '/etc/resolv.conf'):
+        log.debug('Writing {}'.format(path))
         self._check_iface_is_selected()
 
         name_servers = []
@@ -240,28 +253,29 @@ class NetworkManager:
         write_file(path, 'w', data=''.join(lines))
 
     def write_interfaces_file(self, path: str = '/etc/network/interfaces'):
+        log.debug('Writing {}'.format(path))
         self._check_iface_is_selected()
         self._update_wifi_config_for_selected_iface()
 
-        lines = ['auto lo\n',
-                 'iface lo inet loopback\n',
-                 '\n']
+        lines = ['auto lo',
+                 'iface lo inet loopback']
         if (self._ipv4_config.method != 'disabled') or (self._ipv6_config.method != 'disabled'):
-            lines.append('auto {}\n'.format(self._selected_iface.name))
-            lines.append('iface {}\n'.format(self._selected_iface.name))
+            lines.append('auto {}'.format(self._selected_iface.name))
+            lines.append('iface {}'.format(self._selected_iface.name))
 
-            interface_lines = []
+            interface_lines = ['']
             interface_lines.extend(self._selected_iface.get_interface_lines())
             interface_lines.extend(self._ipv4_config.get_interface_lines())
             interface_lines.extend(self._ipv6_config.get_interface_lines())
-            lines.extend((f'    {line}\n' for line in interface_lines))
-        write_file(path, 'w', data=''.join(lines))
+            lines.extend((f'    {line}' for line in interface_lines))
+        write_file(path, 'w', data='\n'.join(lines) + '\n')
 
     @property
     def apply_required(self) -> bool:
         return self._apply_required
 
     def apply(self):
+        log.debug('Applying configuration')
         self._check_iface_is_selected()
         if (self._ipv4_config.method == 'disabled') and (self._ipv6_config.method == 'disabled'):
             raise RuntimeError("No IPv4 or IPv6 is configured on interface '{}'".format(
@@ -300,6 +314,7 @@ class NetworkManager:
         self._apply_required = False
 
     def add_host_ifaces(self):
+        log.debug('Adding host network interfaces')
         for entry in os.scandir('/sys/class/net'):
             # A physical NIC contains a 'device' link to the actual device
             if not os.path.islink(os.path.join(entry.path, 'device')):
