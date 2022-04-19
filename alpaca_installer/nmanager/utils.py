@@ -3,8 +3,11 @@
 
 import re
 import time
+import logging
 
 from alpaca_installer.common.utils import run_cmd
+
+log = logging.getLogger('nmanager.utils')
 
 
 def wait_iface_gets_ip(iface_name: str, ip_ver: int, timeout: float):
@@ -36,12 +39,12 @@ def wait_iface_gets_ip(iface_name: str, ip_ver: int, timeout: float):
 
 
 def get_active_iface_names() -> set[str]:
+    ifstate_path = '/run/ifstate'
     res = set()
     try:
-        with open('/run/ifstate', 'r') as file:
+        with open(ifstate_path, 'r') as file:
             for line in file.readlines():
                 res.add(line.split('=')[0].strip())
     except FileNotFoundError:
-        # TODO: log that /run/ifstate does not exist
-        pass
+        log.debug('{} does not exist'.format(ifstate_path))
     return res
