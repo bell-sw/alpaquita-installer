@@ -46,8 +46,6 @@ class BaseInstallerController(Controller, EventReceiver):
             if self._create_config:
                 self.create_config()
             self._install_config()
-        except IOError as err:
-            raise InstallerException(f'Failed to open/read {self._config_file} file: {err}')
         except yaml.YAMLError as err:
             raise InstallerException(f'An error occured while parsing {self._config_file} file: {err}')
         except Exception as err:
