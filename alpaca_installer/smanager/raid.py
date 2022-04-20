@@ -4,6 +4,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Iterable, Collection
 import os
+import re
 
 from .storage_device import StorageDeviceWithPartitions
 from .file_system import FSType
@@ -12,6 +13,8 @@ from alpaca_installer.common.utils import run_cmd
 if TYPE_CHECKING:
     from .storage_unit import Partition, CryptoVolume
     from .manager import StorageManager
+
+RAID_ID_PATTERN = r'/dev/md/[a-z0-9-_]+'
 
 
 class RAID(StorageDeviceWithPartitions):
@@ -26,6 +29,9 @@ class RAID(StorageDeviceWithPartitions):
         if level != 1:
             raise ValueError('Only RAID1 is supported')
         self._level = level
+
+        if not re.match(RAID_ID_PATTERN, id):
+            raise ValueError("RAID id '{}' does not match format '{}'".format(id, RAID_ID_PATTERN))
 
         if metadata not in ('1.0', '1.1', '1.2'):
             raise ValueError("Metadata {} is not supported".format(metadata))
