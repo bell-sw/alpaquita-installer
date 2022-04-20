@@ -6,7 +6,7 @@ from typing import Optional
 import urwid
 
 from subiquitycore.view import BaseView
-from subiquitycore.ui.form import Form, ChoiceField
+from subiquitycore.ui.form import Form, ChoiceField, NO_HELP
 from subiquitycore.ui.selector import Option
 
 
@@ -14,8 +14,8 @@ class TimezoneForm(Form):
     ok_label = 'Next'
     cancel_label = 'Back'
 
-    region = ChoiceField('Region:', choices=['dummy'])
-    city = ChoiceField('City:', choices=['dummy'])
+    region = ChoiceField('Region:', choices=['dummy'], help=NO_HELP)
+    city = ChoiceField('City:', choices=['dummy'], help=NO_HELP)
 
 
 class TimezoneView(BaseView):
