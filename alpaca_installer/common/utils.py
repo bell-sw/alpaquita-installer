@@ -6,7 +6,7 @@ import urllib
 from typing import Optional
 import logging
 
-from .events import EventReceiver
+from .events import EventReceiver, LoggingReceiver
 
 log = logging.getLogger('common.utils')
 
@@ -17,7 +17,7 @@ DEFAULT_CONFIG_FILE = 'setup.yaml'
 
 def run_cmd(args, input: Optional[bytes] = None,
             timeout: float = None, ignore_status: bool = False,
-            event_receiver: EventReceiver = None) -> subprocess.CompletedProcess:
+            event_receiver: EventReceiver = LoggingReceiver()) -> subprocess.CompletedProcess:
 
     if event_receiver:
         event_receiver.add_log_line(f'Running command: {args}')
@@ -38,8 +38,9 @@ def run_cmd(args, input: Optional[bytes] = None,
             ' '.join(args), res.returncode, stdout
         ))
 
-    if event_receiver:
-        event_receiver.add_log_line(f'{stdout}')
+    if event_receiver and stdout:
+        event_receiver.add_log_line(f'Command output: {stdout}')
+
     return res
 
 
