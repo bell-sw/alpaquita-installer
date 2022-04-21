@@ -109,3 +109,6 @@ class VolumeGroup(StorageDeviceOfLimitedSize):
 
             lv.block_device = '/dev/{}/{}'.format(self.id, lv.id)
             lv.size = get_block_device_size(lv.block_device)
+
+    def deactivate(self):
+        run_cmd(args=['vgchange', '--activate', 'n', self.id])
