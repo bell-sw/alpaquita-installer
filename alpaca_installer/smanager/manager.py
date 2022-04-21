@@ -155,6 +155,15 @@ class StorageManager:
             mnt_dir = self._path_relative_to_mount_root_base(mount_point)
             run_cmd(args=['umount', mnt_dir])
 
+    def deactivate_block_devices(self):
+        for vg in self.get_devices_by_type(VolumeGroup):
+            vg.deactivate()
+
+        for raid in self.get_devices_by_type(RAID):
+            raid.stop()
+
+        self.cryptsetup.close_volumes()
+
     def write_mdadm_conf(self, path: str):
         res = run_cmd(args=['mdadm', '--detail', '--scan'])
         if not res.stdout:
