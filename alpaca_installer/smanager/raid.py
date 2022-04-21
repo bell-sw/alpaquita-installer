@@ -83,3 +83,6 @@ class RAID(StorageDeviceWithPartitions):
     def create_partitions(self):
         self.create()
         super().create_partitions()
+
+    def stop(self):
+        run_cmd(args=['mdadm', '--stop', self.id])
