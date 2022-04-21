@@ -136,7 +136,7 @@ class StorageInstaller(Installer):
         self._validate()
 
         if self._has_raids:
-            self.add_package('mdadm')
+            self.add_package('mdadm', 'mdadm-udev')
         if self._has_crypto:
             self.add_package('cryptsetup', 'cryptsetup-openrc')
         if self._has_lvm:
