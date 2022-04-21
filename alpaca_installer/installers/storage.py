@@ -308,3 +308,4 @@ class StorageInstaller(Installer):
             run_cmd(args=['umount', self.abs_target_path(mount)],
                     event_receiver=self._event_receiver)
         self._smanager.unmount()
+        self._smanager.deactivate_block_devices()
