@@ -46,3 +46,7 @@ class Cryptsetup(StorageDevice):
     def open_volumes(self):
         for volume in self.volumes:
             volume.open()
+
+    def close_volumes(self):
+        for volume in self.volumes:
+            volume.close()
