@@ -32,7 +32,8 @@ class EULAView(BaseView):
             exit_label = 'Exit'
         exit_btn = cancel_btn(exit_label, on_press=self.cancel)
 
-        super().__init__(screen(urwid.LineBox(ListBox([Padding.push_1(urwid.Text(content))])),
+        super().__init__(screen(urwid.LineBox(ListBox([
+                                Padding.pull_1(Padding.push_1(urwid.Text(content)))])),
                                 excerpt=self.excerpt,
                                 buttons=[proceed_btn, exit_btn], focus_buttons=False))
 
