@@ -3,6 +3,7 @@
 
 import abc
 
+
 class EventReceiver(abc.ABC):
 
     @abc.abstractmethod

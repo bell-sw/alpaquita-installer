@@ -12,8 +12,10 @@ from alpaca_installer.common.events import EventReceiver
 
 log = logging.getLogger('installer')
 
+
 class InstallerException(Exception):
     pass
+
 
 class Installer(abc.ABC):
     def __init__(self, name: str, config: dict,

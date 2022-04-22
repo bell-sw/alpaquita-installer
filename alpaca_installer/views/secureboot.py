@@ -9,10 +9,12 @@ from subiquitycore.ui.form import (
     ReadOnlyField,
 )
 
+
 class SecureBootForm(Form):
     ok_label = 'Next'
     cancel_label = 'Back'
     install_shim = BooleanField('Install Secure Boot required packages to sign with own keys')
+
 
 class SecureBootView(BaseView):
     title = 'Secure Boot'

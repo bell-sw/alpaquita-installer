@@ -5,6 +5,7 @@
 from .installer import Installer
 from alpaca_installer.common.utils import run_cmd
 
+
 class SecureBootInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
         super().__init__(name='install_shim_bootloader', config=config,

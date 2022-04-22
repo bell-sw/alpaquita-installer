@@ -332,9 +332,9 @@ class StorageInstaller(Installer):
                 self.enable_service(service=service, runlevel='boot')
 
         # TODO: write dmcrypt config only for non-root partitions
-        #if self._has_crypto:
-        #    self._smanager.write_dmcrypt(self.abs_target_path('/etc/conf.d/dmcrypt'))
-        #    self.enable_service(service='dmcrypt', runlevel='sysinit')
+        # if self._has_crypto:
+        #     self._smanager.write_dmcrypt(self.abs_target_path('/etc/conf.d/dmcrypt'))
+        #     self.enable_service(service='dmcrypt', runlevel='sysinit')
 
         if self._has_lvm:
             self.enable_service(service='lvm', runlevel='boot')
