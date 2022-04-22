@@ -3,12 +3,12 @@
 
 from __future__ import annotations
 import os
-from typing import Optional
+from typing import Optional, Union, cast
 
 import attrs
 
 from alpaca_installer.smanager.manager import StorageManager
-from alpaca_installer.smanager.storage_unit import StorageUnit, StorageUnitFlag
+from alpaca_installer.smanager.storage_unit import Partition, StorageUnit, StorageUnitFlag, CryptoVolume
 from alpaca_installer.smanager.file_system import FSType
 from alpaca_installer.common.utils import run_cmd
 from .installer import Installer
@@ -219,7 +219,7 @@ class StorageInstaller(Installer):
                                      error_label=f'{error_label}/{members_key}')
             members = []
             for m_item in members_list:
-                part = self._unit_by_id(m_item)
+                part = cast(Union[CryptoVolume, Partition], self._unit_by_id(m_item))
                 members.append(part)
 
             raid = self._smanager.add_raid(id=os.path.join('/dev/md', raid_id),
@@ -253,7 +253,7 @@ class StorageInstaller(Installer):
             params = UnitParams.from_dict(crypto_item)
             part_id = read_key_or_fail(crypto_item, 'on_partition', str,
                                        error_label=f'{error_label}/on_partition')
-            part = self._unit_by_id(part_id)
+            part = cast(Partition, self._unit_by_id(part_id))
             unit = self._smanager.cryptsetup.add_volume(id=params.id, partition=part,
                                                         fs_type=params.fs_type, fs_opts=params.fs_opts,
                                                         mount_point=params.mount_point)
@@ -281,6 +281,7 @@ class StorageInstaller(Installer):
             physical_volumes = []
             for pv_item in pv_list:
                 p_volume = self._unit_by_id(pv_item)
+                p_volume = cast(Union[Partition, CryptoVolume], self._unit_by_id(pv_item))
                 physical_volumes.append(p_volume)
 
             vg = self._smanager.add_vg(id=vg_id, physical_volumes=physical_volumes)
