@@ -125,12 +125,14 @@ class ConsoleInstallerController(BaseInstallerController):
 
     def start_event(self, msg):
         print(msg)
+        log.debug(msg)
 
     def stop_event(self):
         pass
 
     def add_log_line(self, msg):
-        print(msg)
+        # No need to litter the stdout. If you need details, just enable debugging.
+        log.debug(msg)
 
 
 class InstallerController(BaseInstallerController):
@@ -161,9 +163,11 @@ class InstallerController(BaseInstallerController):
 
     def add_log_line(self, msg):
         self._eloop.call_soon_threadsafe(self._add_log_line, msg)
+        log.debug(msg)
 
     def start_event(self, msg):
         self._eloop.call_soon_threadsafe(self._event_start, msg)
+        log.debug(msg)
 
     def stop_event(self):
         self._eloop.call_soon_threadsafe(self._event_finish)
