@@ -5,7 +5,7 @@ import os
 import re
 
 from .installer import Installer
-from .utils import read_key_or_fail
+from .utils import read_list
 
 # Optional
 #
@@ -16,17 +16,18 @@ from .utils import read_key_or_fail
 
 class KernelInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
-        super().__init__(name='kernel', config=config,
+        yaml_tag = 'kernel'
+        super().__init__(name=yaml_tag, config=config,
                          event_receiver=event_receiver,
                          data_type=dict, data_is_optional=True,
                          target_root=target_root)
 
         self._cmdline: list[str] = []
         if self._data is not None:
-            self._cmdline = read_key_or_fail(self._data, 'cmdline', str)
-            if not all(isinstance(x, str) for x in self._cmdline):
-                raise ValueError("All 'cmdline' elements must be strings")
-        if not self._cmdline:
+            yaml_key = 'cmdline'
+            self._cmdline = read_list(self._data, key=yaml_key, item_type=str,
+                                      error_label=f'{yaml_tag}/{yaml_key}')
+        else:
             self._cmdline = ['quiet']
 
         self.add_package('linux-lts')

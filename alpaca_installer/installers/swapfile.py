@@ -16,7 +16,8 @@ from .utils import read_key_or_fail, str_size_to_bytes
 
 class SwapfileInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
-        super().__init__(name='swap_file', config=config,
+        yaml_tag='swap_file'
+        super().__init__(name=yaml_tag, config=config,
                          event_receiver=event_receiver,
                          data_type=dict, data_is_optional=True,
                          target_root=target_root)
@@ -27,15 +28,21 @@ class SwapfileInstaller(Installer):
         if self._data is None:
             return
 
-        self._path = read_key_or_fail(self._data, 'path', str)
+        yaml_path_key = 'path'
+        self._path = read_key_or_fail(self._data, yaml_path_key, str,
+                                      error_label=f'{yaml_tag}/{yaml_path_key}')
         if not self._path:
-            raise ValueError('No swap file path is specified')
+            raise ValueError(f"No '{yaml_tag}/{yaml_path_key}' is specified")
         self._path = os.path.join('/', self._path.lstrip('/'))
 
-        size = self._data.get('size', None)
+        yaml_size_key = 'size'
+        size = self._data.get(yaml_size_key, None)
         if size is None:
-            raise ValueError('No swap file size is specified')
-        size_in_bytes = str_size_to_bytes(str(size))
+            raise ValueError(f"No '{yaml_tag}/{yaml_size_key}' is specified")
+        try:
+            size_in_bytes = str_size_to_bytes(str(size))
+        except ValueError as exc:
+            raise ValueError('{}/{}: {}'.format(yaml_tag, yaml_size_key, str(exc))) from None
         # We keep the self._size in megabytes
         self._size = size_in_bytes // (1024 * 1024)
         if not self._size:

@@ -2,7 +2,7 @@
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 from .installer import Installer
-from .utils import read_key_or_fail
+from .utils import read_list
 
 
 # Optional
@@ -30,10 +30,8 @@ class ServicesInstaller(Installer):
                 if name not in self._data:
                     continue
 
-                lst = read_key_or_fail(self._data, name, list)
-                if not all(isinstance(x, str) for x in lst):
-                    raise ValueError("All '{}/{}' elements must be strings".format(yaml_tag, name))
-                lists[name] = lst
+                lists[name] = read_list(self._data, key=name, item_type=str,
+                                        error_label=f'{yaml_tag}/{name}')
 
         self._disabled = lists['disabled']
         self._enabled = lists['enabled']

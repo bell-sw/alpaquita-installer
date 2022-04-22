@@ -12,7 +12,8 @@ from alpaca_installer.smanager.storage_unit import StorageUnit, StorageUnitFlag
 from alpaca_installer.smanager.file_system import FSType
 from alpaca_installer.common.utils import run_cmd
 from .installer import Installer
-from .utils import read_key_or_fail, str_size_to_bytes
+from .utils import read_key_or_fail, str_size_to_bytes, read_list
+
 
 # Each unit id is unique in the file
 #
@@ -86,7 +87,7 @@ class UnitParams:
 
     @staticmethod
     def from_dict(data: dict) -> UnitParams:
-        id = read_key_or_fail(data, 'id', str)
+        id = data.get('id', None)
 
         size = data.get('size', None)
         if size is None:
@@ -119,7 +120,8 @@ class UnitParams:
 
 class StorageInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
-        super().__init__(name='storage', config=config,
+        self._yaml_tag = 'storage'
+        super().__init__(name=self._yaml_tag, config=config,
                          event_receiver=event_receiver,
                          data_type=dict, target_root=target_root)
 
@@ -172,12 +174,21 @@ class StorageInstaller(Installer):
         # Probably here will be more checks
 
     def _parse_disks(self) -> bool:
+        yaml_key = 'disks'
+        error_label = f'{self._yaml_tag}/{yaml_key}'
+        disk_list = read_list(self._data, key=yaml_key, item_type=dict,
+                              error_label=error_label)
         disk_created = False
-        for disk_item in read_key_or_fail(self._data, 'disks', list):
-            disk = self._smanager.add_disk(id=read_key_or_fail(disk_item, 'id', str))
+        for i, disk_item in enumerate(disk_list):
+            error_label = f'{error_label}/{i}'
+            disk = self._smanager.add_disk(id=read_key_or_fail(disk_item, 'id', str,
+                                                               error_label=f'{error_label}/id'))
             disk_created = True
 
-            for part_item in read_key_or_fail(disk_item, 'partitions', list):
+            part_key = 'partitions'
+            part_list = read_list(disk_item, key=part_key, item_type=dict,
+                                  error_label=f'{error_label}/{part_key}')
+            for part_item in part_list:
                 params = UnitParams.from_dict(part_item)
                 unit = disk.add_partition(id=params.id, size=params.size,
                                           fs_type=params.fs_type, fs_opts=params.fs_opts,
@@ -191,16 +202,23 @@ class StorageInstaller(Installer):
         if yaml_key not in self._data:
             return False
 
+        error_label = f'{self._yaml_tag}/{yaml_key}'
+        raid_list = read_list(self._data, key=yaml_key, item_type=dict,
+                              error_label=error_label)
         raid_created = False
-        for raid_item in read_key_or_fail(self._data, yaml_key, list):
-            raid_id = read_key_or_fail(raid_item, 'id', str)
-            level = read_key_or_fail(raid_item, 'level', int)
-            metadata = read_key_or_fail(raid_item, 'metadata', str)
+        for i, raid_item in enumerate(raid_list):
+            error_label = f'{error_label}/{i}'
+            raid_id = read_key_or_fail(raid_item, 'id', str, error_label=f'{error_label}/id')
+            level = read_key_or_fail(raid_item, 'level', int, error_label=f'{error_label}/level')
+            metadata = read_key_or_fail(raid_item, 'metadata', str, error_label=f'{error_label}/metadata')
             if not metadata:
                 metadata = '1.2'
 
+            members_key = 'members'
+            members_list = read_list(raid_item, key=members_key, item_type=str,
+                                     error_label=f'{error_label}/{members_key}')
             members = []
-            for m_item in read_key_or_fail(raid_item, 'members', list):
+            for m_item in members_list:
                 part = self._unit_by_id(m_item)
                 members.append(part)
 
@@ -208,7 +226,10 @@ class StorageInstaller(Installer):
                                            level=level, members=members, metadata=metadata)
             raid_created = True
 
-            for part_item in read_key_or_fail(raid_item, 'partitions', list):
+            part_key = 'partitions'
+            part_list = read_list(raid_item, key=part_key, item_type=dict,
+                                  error_label=f'{error_label}/{part_key}')
+            for part_item in part_list:
                 params = UnitParams.from_dict(part_item)
                 unit = raid.add_partition(id=params.id, size=params.size,
                                           fs_type=params.fs_type, fs_opts=params.fs_opts,
@@ -223,10 +244,15 @@ class StorageInstaller(Installer):
         if yaml_key not in self._data:
             return False
 
+        error_label = f'{self._yaml_tag}/{yaml_key}'
+        crypto_list = read_list(self._data, key=yaml_key, item_type=dict,
+                                error_label=error_label)
         volume_created = False
-        for crypto_item in read_key_or_fail(self._data, yaml_key, list):
+        for i, crypto_item in enumerate(crypto_list):
+            error_label = f'{error_label}/{i}'
             params = UnitParams.from_dict(crypto_item)
-            part_id = read_key_or_fail(crypto_item, 'on_partition', str)
+            part_id = read_key_or_fail(crypto_item, 'on_partition', str,
+                                       error_label=f'{error_label}/on_partition')
             part = self._unit_by_id(part_id)
             unit = self._smanager.cryptsetup.add_volume(id=params.id, partition=part,
                                                         fs_type=params.fs_type, fs_opts=params.fs_opts,
@@ -241,19 +267,29 @@ class StorageInstaller(Installer):
         if yaml_key not in self._data:
             return False
 
+        error_label = f'{self._yaml_tag}/{yaml_key}'
+        vg_list = read_list(self._data, key=yaml_key, item_type=dict,
+                            error_label=error_label)
         vg_created = False
-        for vg_item in read_key_or_fail(self._data, yaml_key, list):
-            vg_id = read_key_or_fail(vg_item, 'id', str)
+        for i, vg_item in enumerate(vg_list):
+            error_label = f'{error_label}/{i}'
+            vg_id = read_key_or_fail(vg_item, 'id', str, error_label=f'{error_label}/id')
 
+            pv_key = 'physical_volumes'
+            pv_list = read_list(data=vg_item, key=pv_key, item_type=str,
+                                error_label=f'{error_label}/{pv_key}')
             physical_volumes = []
-            for pv_item in read_key_or_fail(vg_item, 'physical_volumes', list):
+            for pv_item in pv_list:
                 p_volume = self._unit_by_id(pv_item)
                 physical_volumes.append(p_volume)
 
             vg = self._smanager.add_vg(id=vg_id, physical_volumes=physical_volumes)
             vg_created = True
 
-            for lv_item in read_key_or_fail(vg_item, 'logical_volumes', list):
+            lv_key = 'logical_volumes'
+            lv_list = read_list(data=vg_item, key=lv_key, item_type=dict,
+                                error_label=f'{error_label}/{lv_key}')
+            for lv_item in lv_list:
                 params = UnitParams.from_dict(lv_item)
                 unit = vg.add_lv(id=params.id, size=params.size,
                                  fs_type=params.fs_type, fs_opts=params.fs_opts,

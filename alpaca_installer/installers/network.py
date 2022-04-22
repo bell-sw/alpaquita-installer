@@ -54,11 +54,13 @@ log = logging.getLogger('installers.network')
 
 class NetworkInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
-        super().__init__(name='network', config=config,
+        self._yaml_tag = 'network'
+        super().__init__(name=self._yaml_tag, config=config,
                          event_receiver=event_receiver,
                          data_type=dict, target_root=target_root)
 
-        self._hostname = read_key_or_fail(self._data, 'hostname', str)
+        self._hostname = read_key_or_fail(self._data, 'hostname', str,
+                                          error_label=f'{self._yaml_tag}/hostname')
         if not is_valid_hostname(self._hostname):
             raise ValueError('Invalid hostname: {}'.format(self._hostname))
         log.debug('Hostname: {}'.format(self._hostname))
@@ -71,8 +73,11 @@ class NetworkInstaller(Installer):
         self.add_package('ifupdown-ng')
 
     def _parse_interface(self):
-        data = read_key_or_fail(self._data, 'interface', dict)
-        iface_name = read_key_or_fail(data, 'name', str)
+        yaml_key = 'interface'
+        data = read_key_or_fail(self._data, yaml_key, dict,
+                                error_label=f'{self._yaml_tag}/{yaml_key}')
+        iface_name = read_key_or_fail(data, 'name', str,
+                                      error_label=f'{self._yaml_tag}/{yaml_key}/name')
         if not iface_name:
             raise ValueError('Interface name is empty')
 
@@ -114,7 +119,8 @@ class NetworkInstaller(Installer):
         for tag in ('ipv4', 'ipv6'):
             if tag not in self._data:
                 continue
-            ip_data = read_key_or_fail(self._data, tag, dict)
+            ip_data = read_key_or_fail(self._data, tag, dict,
+                                       error_label=f'{self._yaml_tag}/{tag}')
 
             method = ip_data.get('method', '')
             address = ip_data.get('address', '')
