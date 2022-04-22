@@ -60,7 +60,7 @@ class ApplicationUI(urwid.WidgetWrap):
             (1, Color.frame_header_fringe(urwid.SolidFill('\N{upper half block}'))),
             ('pack', Color.frame_header(Padding.center_79(cols, min_width=76))),
             (1, Color.frame_header_fringe(urwid.SolidFill('\N{lower half block}'))),
-            urwid.ListBox([urwid.Text('Body')])
+            urwid.Text('Body')
         ]
         self._pile = urwid.Pile(pile_items)
         self._body_pos = len(pile_items) - 1
