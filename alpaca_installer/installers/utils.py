@@ -2,15 +2,19 @@
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 import re
-from typing import Type, TypeVar
+from typing import Type, TypeVar, Optional
 
 TV = TypeVar(name='TV')
 
 
-def read_key_or_fail(data: dict, key: str, value_type: Type[TV]) -> TV:
+def read_key_or_fail(data: dict, key: str, value_type: Type[TV],
+                     error_label: Optional[str] = None) -> TV:
+    if error_label is None:
+        error_label = key
     value = data.get(key, value_type())
     if not isinstance(value, value_type):
-        raise ValueError("'{}' must be of type '{}'".format(key, str(value_type)))
+        raise ValueError("'{}' must be of type '{}', but is '{}'".format(
+            error_label, str(value_type), type(value)))
     return value
 
 
