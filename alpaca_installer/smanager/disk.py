@@ -17,10 +17,10 @@ class Disk(StorageDeviceWithPartitions):
         """id must be block device name"""
 
         if not os.path.exists(id):
-            raise ValueError('{}: does not exist'.format(id))
+            raise ValueError("Device file '{}' does not exist".format(id))
         st = os.stat(id)
         if not os.path.stat.S_ISBLK(st.st_mode):
-            raise ValueError('{}: not a block device'.format(id))
+            raise ValueError("'{}' is not a block device file".format(id))
 
         super().__init__(manager=manager, id=id, size=get_block_device_size(id))
 
