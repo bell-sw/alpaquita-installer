@@ -196,9 +196,10 @@ class StorageController(Controller):
         storage_data = {}
 
         for disk in self._smanager.get_devices_by_type(SM_Disk):
-            entry = {'id': disk.block_device}
+            entry = {'id': disk.block_device,
+                     'partitions': []}
             for part in disk.partitions:
-                entry.setdefault('partitions', []).append(_part_to_dict(part))
+                entry['partitions'].append(_part_to_dict(part))
             storage_data.setdefault('disks', []).append(entry)
 
         for volume in self._smanager.cryptsetup.volumes:
@@ -207,16 +208,18 @@ class StorageController(Controller):
         for raid in self._smanager.get_devices_by_type(RAID):
             entry = {'id': raid.id,
                      'level': raid.level,
-                     'members': [m.id for m in raid.members]}
+                     'members': [m.id for m in raid.members],
+                     'partitions': []}
             for part in raid.partitions:
-                entry.setdefault('partitions', []).append(_part_to_dict(part))
+                entry['partitions'].append(_part_to_dict(part))
             storage_data.setdefault('raids', []).append(entry)
 
         for vg in self._smanager.get_devices_by_type(VolumeGroup):
             entry = {'id': vg.id,
-                     'physical_volumes': [pv.id for pv in vg.physical_volumes]}
+                     'physical_volumes': [pv.id for pv in vg.physical_volumes],
+                     'logical_volumes': []}
             for lv in vg.logical_volumes:
-                entry.setdefault('logical_volumes', []).append(_unit_to_dict(lv))
+                entry['logical_volumes'].append(_unit_to_dict(lv))
             storage_data.setdefault('volume_groups', []).append(entry)
 
         data = {}
