@@ -124,9 +124,9 @@ class NetworkController(Controller):
                 raise ValueError(f'Unknown IP version {ip_ver}')
 
             if 'name_servers' in data:
-                data['name_servers'] = data['name_servers'].split(',')
+                data['name_servers'] = data['name_servers'].split(',')  # type: ignore
             if 'search_domains' in data:
-                data['search_domains'] = data['search_domains'].split(',')
+                data['search_domains'] = data['search_domains'].split(',')  # type: ignore
 
             if ip_ver == 4:
                 cfg = IPConfig4(**data)
