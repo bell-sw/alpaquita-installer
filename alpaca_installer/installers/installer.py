@@ -5,7 +5,7 @@ import logging
 import abc
 import os
 import subprocess
-from typing import Collection
+from typing import Collection, Iterable
 
 from alpaca_installer.common.utils import run_cmd
 from alpaca_installer.common.events import EventReceiver
@@ -75,7 +75,7 @@ class Installer(abc.ABC):
         if is_enabled:
             self.run_in_chroot(args=['rc-update', 'del', service, runlevel])
 
-    def apk_add(self, args: list):
+    def apk_add(self, args: Iterable):
         all_args = ['apk', 'add', '--root', self.target_root,
                     '--keys', '/etc/apk/keys',  # install using keys from the host system
                     '--no-progress', '--update-cache', '--clean-protected']
