@@ -1,7 +1,7 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
-from typing import Optional, Iterable, Collection
+from typing import Optional, Iterable, Collection, cast
 import os
 
 from .file_system import FSType
@@ -16,13 +16,15 @@ from .storage_device import StorageDevice
 class Cryptsetup(StorageDevice):
     @property
     def volumes(self) -> Collection[CryptoVolume]:
-        return self.storage_units
+        return cast(Collection[CryptoVolume], self.storage_units)
 
     def add_volume(self, id: str, partition: Partition,
                    fs_type: Optional[FSType] = None,
                    fs_opts: Optional[Iterable[str]] = None,
                    mount_point: Optional[str] = None) -> CryptoVolume:
 
+        if not isinstance(partition, Partition):
+            raise ValueError('{}: must be a partition'.format(partition))
         if partition.fs_type != FSType.CRYPTO_PARTITION:
             raise ValueError('{}: must be of the crypto partition type'.format(partition))
 

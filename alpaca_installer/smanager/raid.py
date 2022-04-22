@@ -7,11 +7,11 @@ import os
 import re
 
 from .storage_device import StorageDeviceWithPartitions
+from .storage_unit import Partition, CryptoVolume
 from .file_system import FSType
 from alpaca_installer.common.utils import run_cmd
 
 if TYPE_CHECKING:
-    from .storage_unit import Partition, CryptoVolume
     from .manager import StorageManager
 
 RAID_ID_PATTERN = r'/dev/md/[a-z0-9-_]+'
@@ -42,6 +42,8 @@ class RAID(StorageDeviceWithPartitions):
             raise ValueError('Provide at least 2 RAID members')
         if any(m.fs_type != FSType.RAID_MEMBER for m in members):
             raise ValueError('All members must be of the RAID type')
+        if any(not isinstance(m, (Partition, CryptoVolume)) for m in members):
+            raise ValueError('All members must be of the Partition or CryptoVolume types')
         size = min(m.size for m in members)
 
         self._raid_created = False

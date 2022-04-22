@@ -2,7 +2,7 @@
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Iterable, Collection
+from typing import TYPE_CHECKING, Optional, Iterable, Collection, cast
 import re
 import os
 
@@ -78,7 +78,7 @@ class VolumeGroup(StorageDeviceOfLimitedSize):
 
     @property
     def logical_volumes(self) -> Collection[LogicalVolume]:
-        return self.storage_units
+        return cast(Collection[LogicalVolume], self.storage_units)
 
     def add_lv(self, id: str, fs_type: Optional[FSType] = None,
                fs_opts: Optional[Iterable[str]] = None,

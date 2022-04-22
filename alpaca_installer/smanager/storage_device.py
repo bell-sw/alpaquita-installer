@@ -2,7 +2,7 @@
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Iterable, Collection
+from typing import TYPE_CHECKING, Optional, Iterable, Collection, cast
 import time
 import os
 import json
@@ -102,7 +102,7 @@ class StorageDeviceWithPartitions(StorageDeviceOfLimitedSize):
 
     @property
     def partitions(self) -> Collection[Partition]:
-        return self.storage_units
+        return cast(Collection[Partition], self.storage_units)
 
     @property
     def block_device(self) -> str:
