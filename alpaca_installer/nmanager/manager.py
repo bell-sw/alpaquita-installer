@@ -1,7 +1,7 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
-from typing import Optional, TypeVar, Type
+from typing import Optional, TypeVar, Type, cast
 import re
 import os
 
@@ -133,7 +133,7 @@ class NetworkManager:
             if not isinstance(member_iface, EthernetInterface):
                 raise ValueError("'{}' is not an Ethernet interface".format(member_iface.name))
             self._check_iface_has_no_constraints(member_iface)
-            member_ifaces.append(self._iface_by_name_or_fail(member))
+            member_ifaces.append(cast(EthernetInterface, member_iface))
 
         iface = BondInterface(name=name, members=member_ifaces,
                               mode=mode, hash_policy=hash_policy)
