@@ -46,7 +46,9 @@ class InstallerView(BaseView):
         self.ongoing = {}  # context_id -> line containing a spinner
 
         self.reboot_btn = Toggleable(ok_btn(
-            "Reboot Now", on_press=self.reboot))
+            "Reboot", on_press=self.reboot))
+        self.poweroff_btn = Toggleable(ok_btn(
+            "Poweroff", on_press=self.poweroff))
         self.cancel_btn = cancel_btn(
             "Exit", on_press=self.cancel)
         self.view_log_btn = other_btn(
@@ -131,23 +133,30 @@ class InstallerView(BaseView):
         self._set_button_width()
 
     def done(self):
-        self.reboot_btn.base_widget.set_label("Reboot Now")
         self.reboot_btn.enabled = True
         btns = [
             self.view_log_btn,
             self.reboot_btn,
+            self.poweroff_btn,
             ]
         if not self._iso_mode:
             btns.append(self.cancel_btn)
         self._set_buttons(btns)
 
-    def reboot(self, btn):
-        log.debug('reboot clicked')
-        self.reboot_btn.base_widget.set_label("Rebooting...")
-        self.reboot_btn.enabled = False
+    def shutdown_prepare(self, btn, new_label):
+        log.debug('{} clicked'.format(btn.base_widget.label))
+        btn.base_widget.set_label(new_label)
+        btn.enabled = False
         self.event_buttons.original_widget._select_first_selectable()
-        self._controller.click_reboot()
         self._set_button_width()
+
+    def reboot(self, btn):
+        self.shutdown_prepare(btn, "Rebooting...")
+        self._controller.click_reboot()
+
+    def poweroff(self, btn):
+        self.shutdown_prepare(btn, "Poweroff...")
+        self._controller.click_poweroff()
 
     def cancel(self, btn):
         self._controller.click_cancel()

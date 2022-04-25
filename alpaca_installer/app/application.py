@@ -317,3 +317,7 @@ class Application:
     @staticmethod
     def reboot():
         run_cmd(args=['reboot'])
+
+    @staticmethod
+    def poweroff():
+        run_cmd(args=['poweroff'])

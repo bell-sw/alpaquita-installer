@@ -199,6 +199,9 @@ class InstallerController(BaseInstallerController):
     def click_reboot(self):
         self._app.reboot()
 
+    def click_poweroff(self):
+        self._app.poweroff()
+
     def make_ui(self):
         self._event_start('Starting installation')
         self._app.aio_loop.create_task(self._start())
