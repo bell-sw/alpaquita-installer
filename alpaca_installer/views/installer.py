@@ -105,7 +105,7 @@ class InstallerView(BaseView):
         spinner = walker[index][3]
         spinner.stop()
         text = walker[index][1].text
-        if not text.endswith(('!', '.')):
+        if not text.endswith(('!', '.', ':')):
             walker[index][1].set_text(text + '.')
         walker[index] = Padding.push_1(walker[index][1])
 
