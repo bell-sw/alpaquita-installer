@@ -3,7 +3,7 @@
 
 import subprocess
 import urllib
-from typing import Optional
+from typing import Optional, Callable
 import logging
 
 from .events import EventReceiver, LoggingReceiver
@@ -42,6 +42,32 @@ def run_cmd(args, input: Optional[bytes] = None,
         event_receiver.add_log_line(f'Command output: {stdout}')
 
     return res
+
+
+def run_cmd_live(args, ignore_status: bool = False,
+                 event_receiver: EventReceiver = LoggingReceiver(),
+                 event_transform: Callable = None) -> subprocess.CompletedProcess:
+
+    event_receiver.add_log_line(f'Running command: {args}')
+
+    with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
+        for b_line in iter(proc.stdout.readline, b''):
+            line = b_line.decode().strip(' \n')
+            if not line:
+                continue
+            if event_transform:
+                new_line = event_transform(line)
+                if new_line:
+                    event_receiver.start_event(new_line)
+                    continue
+            event_receiver.add_log_line(line)
+
+        ret = proc.wait()
+
+        if (not ignore_status) and (ret != 0):
+            raise RuntimeError("'{}' exited with {}".format(' '.join(args), ret))
+
+    return subprocess.CompletedProcess(proc.args, ret)
 
 
 def write_file(path, mode: str, data):

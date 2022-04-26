@@ -22,5 +22,5 @@ class PackagesInstaller(Installer):
         self._event_receiver.start_event('Initializing APK database')
         self.apk_add(args=['--initdb'])
 
-        self._event_receiver.start_event(f'Installing packages: {sorted(self.packages)}')
+        self._event_receiver.start_event('Installing packages:')
         self.apk_add(args=self.packages)

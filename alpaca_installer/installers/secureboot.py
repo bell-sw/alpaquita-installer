@@ -24,5 +24,5 @@ class SecureBootInstaller(Installer):
     def post_apply(self):
         if not self._data:
             return
-        self._event_receiver.start_event('Installing shim and grub-efi-signed bootloaders')
+        self._event_receiver.start_event('Installing shim and grub-efi-signed bootloaders:')
         self.apk_add(args=['shim-signed', 'grub-efi-signed'])
