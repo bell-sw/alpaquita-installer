@@ -1,6 +1,7 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
+from __future__ import annotations
 import asyncio
 import yaml
 import logging
@@ -8,6 +9,7 @@ import abc
 import os
 import shutil
 import stat
+from typing import TYPE_CHECKING
 
 from subiquitycore.async_helpers import run_in_thread
 from alpaca_installer.views.installer import InstallerView
@@ -28,15 +30,23 @@ from alpaca_installer.common.events import EventReceiver
 from alpaca_installer.common.utils import DEFAULT_CONFIG_FILE
 from .controller import Controller
 
-from alpaca_installer.common.utils import run_cmd
+if TYPE_CHECKING:
+    from alpaca_installer.app.application import Application
 
 log = logging.getLogger('controllers.installer')
+
+
+def err_msg_with_debug_log_file(err_msg: str, app: Application):
+    if app.debug_log_file:
+        return f"{err_msg}\nAdditional debug information is available in '{app.debug_log_file}'."
+    else:
+        return err_msg
 
 
 class BaseInstallerController(Controller, EventReceiver):
     TARGET_ROOT = '/mnt/target_root'
 
-    def __init__(self, app, create_config, config_file):
+    def __init__(self, app: Application, create_config, config_file):
         super().__init__(app)
         self._config_file = config_file
         self._create_config = create_config
@@ -112,14 +122,14 @@ class BaseInstallerController(Controller, EventReceiver):
 
 
 class ConsoleInstallerController(BaseInstallerController):
-    def __init__(self, app, config_file):
+    def __init__(self, app: Application, config_file):
         super().__init__(app, False, config_file)
 
     def run(self):
         try:
             self._run()
         except Exception as err:
-            print(f'{err}')
+            print(err_msg_with_debug_log_file(f'{err}', app=self._app))
             return 1
         return 0
 
@@ -136,7 +146,7 @@ class ConsoleInstallerController(BaseInstallerController):
 
 
 class InstallerController(BaseInstallerController):
-    def __init__(self, app, create_config=True, config_file=DEFAULT_CONFIG_FILE):
+    def __init__(self, app: Application, create_config=True, config_file=DEFAULT_CONFIG_FILE):
         super().__init__(app, create_config, config_file)
         self._view = InstallerView(self, iso_mode=self._app.iso_mode)
         self._eloop = asyncio.get_event_loop()
@@ -153,7 +163,7 @@ class InstallerController(BaseInstallerController):
         try:
             await run_in_thread(self._run)
         except Exception as err:
-            self._event_start(f'{err}')
+            self._event_start(err_msg_with_debug_log_file(f'{err}', app=self._app))
             self._event_finish()
             self._view.done()
             return

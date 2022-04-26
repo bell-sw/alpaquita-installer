@@ -11,7 +11,7 @@ import os
 import atexit
 import logging
 import signal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from subiquitycore.ui.utils import Color, LoadingDialog, Padding
 from subiquitycore.ui.buttons import header_btn
@@ -107,6 +107,7 @@ class Application:
 
         self._no_ui = False
         self._iso_mode = False
+        self._debug_log_file = None
 
         try:
             opts, args = getopt.getopt(sys.argv[1:], 'hf:ndi',
@@ -129,7 +130,8 @@ class Application:
             elif opt in ("-n", "--no-ui"):
                 self._no_ui = True
             elif opt in ("-d", "--debug"):
-                logging.basicConfig(filename='installer.log', filemode='w', level=logging.DEBUG)
+                self._debug_log_file = os.path.abspath('installer.log')
+                logging.basicConfig(filename=self._debug_log_file, filemode='w', level=logging.DEBUG)
             elif opt in ("-i", "--iso-mode"):
                 self._iso_mode = True
 
@@ -184,6 +186,10 @@ class Application:
             -d --debug         Enable debug-level log
             -i --iso-mode      Run the installer in the ISO mode (no exit feature in the UI)
         ''')
+
+    @property
+    def debug_log_file(self) -> Optional[str]:
+        return self._debug_log_file
 
     @property
     def iso_mode(self) -> bool:
