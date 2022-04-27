@@ -6,6 +6,7 @@ import yaml
 import logging
 import os
 from .controller import Controller
+import alpaca_installer
 from alpaca_installer.views.repo import RepoView
 from alpaca_installer.common.utils import MEDIA_PATH
 
@@ -64,7 +65,13 @@ class RepoController(Controller):
             res.append(MEDIA_PATH)
         res.extend(self._repos)
 
-        yaml_data = yaml.dump({"repositories": res})
+        ai_path = os.path.abspath(os.path.realpath(alpaca_installer.__file__))
+        keys_dir = os.path.join(os.path.dirname(ai_path), 'keys', self._libc_type)
+
+        yaml_data = yaml.dump({"repositories": {
+            'keys': keys_dir,
+            'urls': res,
+        }})
 
         log.debug(f"export to yaml: {yaml_data}")
         return yaml_data

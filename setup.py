@@ -16,7 +16,7 @@ setuptools.setup(
     license="AGPLv3+",
     packages=setuptools.find_packages(),
     package_data={
-        'alpaca_installer': ['EULA'],
+        'alpaca_installer': ['EULA', 'keys/README'],
     },
     scripts=[
           'bin/alpaca-installer',

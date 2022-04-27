@@ -87,7 +87,6 @@ class Installer(abc.ABC):
 
     def apk_add(self, args: Iterable):
         all_args = ['apk', 'add', '--root', self.target_root,
-                    '--keys', '/etc/apk/keys',  # install using keys from the host system
                     '--no-progress', '--update-cache', '--clean-protected']
         all_args.extend(args)
         run_cmd_live(args=all_args, event_receiver=self._event_receiver,
