@@ -36,7 +36,8 @@ class RepoController(Controller):
         return self._libc_type
 
     def make_ui(self):
-        return RepoView(self, self._repo_base_url, self._libc_type)
+        return RepoView(self, self._repo_base_url, self._libc_type,
+                        iso_mode=self._app.iso_mode)
 
     def done(self, repo_base_url: str, libc_type: str):
         self._repo_base_url = repo_base_url

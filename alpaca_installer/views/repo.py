@@ -35,7 +35,8 @@ class RepoView(BaseView):
         'Specify the URL of the repository server that '
         'will be used to install the packages.'))
 
-    def __init__(self, controller, repo_base_url: str, libc_type: str):
+    def __init__(self, controller, repo_base_url: str, libc_type: str,
+                 iso_mode: bool):
         self._controller = controller
 
         self._form = RepoForm()
@@ -51,6 +52,10 @@ class RepoView(BaseView):
                              self._update_repos_text_url)
         urwid.connect_signal(self._form.libc_type.widget, 'select',
                              self._update_repos_text_libc)
+
+        # We prohibit cross-libc installations on ISOs.
+        if iso_mode:
+            self._form.libc_type.enabled = False
 
         super().__init__(self._form.as_screen(excerpt=self.excerpt,
                                               focus_buttons=True))
