@@ -5,6 +5,7 @@ import subprocess
 import urllib
 from typing import Optional, Callable
 import logging
+import os
 
 from .events import EventReceiver, LoggingReceiver
 
@@ -25,6 +26,7 @@ def run_cmd(args, input: Optional[bytes] = None,
     try:
         res = subprocess.run(args, input=input,
                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                             preexec_fn=os.setpgrp,
                              timeout=timeout, check=False)
     except subprocess.TimeoutExpired:
         raise RuntimeError("'{}' did not complete in {} seconds".format(
@@ -49,8 +51,8 @@ def run_cmd_live(args, ignore_status: bool = False,
                  event_transform: Callable = None) -> subprocess.CompletedProcess:
 
     event_receiver.add_log_line(f'Running command: {args}')
-
-    with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
+    with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                          preexec_fn=os.setpgrp) as proc:
         for b_line in iter(proc.stdout.readline, b''):
             line = b_line.decode().strip(' \n')
             if not line:
