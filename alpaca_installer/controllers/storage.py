@@ -99,7 +99,9 @@ class StorageController(Controller):
         if create_esp:
             disk.add_partition(id='efi', size=self.BOOT_EFI_SIZE,
                                mount_point='/boot/efi',
-                               fs_type=FSType.VFAT, flags=[StorageUnitFlag.ESP])
+                               fs_type=FSType.VFAT,
+                               fs_opts=['umask=0077'],
+                               flags=[StorageUnitFlag.ESP])
         else:
             disk.add_partition(id='bios_boot', size=self.BIOS_BOOT_SIZE,
                                flags=[StorageUnitFlag.BIOS_BOOT])
