@@ -141,6 +141,7 @@ class Application:
 
         if self._iso_mode:
             signal.signal(signal.SIGINT, signal.SIG_IGN)
+            signal.signal(signal.SIGQUIT, signal.SIG_IGN)
 
         self._controllers = []
 
