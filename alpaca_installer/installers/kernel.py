@@ -47,7 +47,7 @@ class KernelInstaller(Installer):
                 break
         if not kver:
             raise RuntimeError('Unable to determine the installed kernel version')
-        self.run_in_chroot(args=['dracut', '-f', '/boot/initramfs-lts', kver])
+        self.run_in_chroot(args=['dracut', '-f', f'/boot/initramfs-{kver}', kver])
 
         data = """
 GRUB_TIMEOUT=2
