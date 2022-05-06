@@ -14,7 +14,12 @@ setuptools.setup(
     author_email='info@bell-sw.com',
     url='https://bell-sw.com',
     license="AGPLv3+",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(
+        exclude=['subiquitycore.tests',
+                 'subiquitycore.ui.tests',
+                 'subiquitycore.ui.views.tests',
+                 'tests']
+    ),
     package_data={
         'alpaca_installer': ['EULA', 'keys/README'],
     },
