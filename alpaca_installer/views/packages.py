@@ -21,7 +21,7 @@ class JavaForm(SubForm):
     jdk_11 = BooleanField('Liberica Standard JDK 11', help=NO_HELP)
     jdk_17 = BooleanField('Liberica Standard JDK 17', help=NO_HELP)
     nik_22_11 = BooleanField('Liberica Native Image Kit 22 (Java 11)', help=NO_HELP)
-    nik_22_17 = BooleanField('Liberica Nativa Image Kit 22 (Java 17)', help=NO_HELP)
+    nik_22_17 = BooleanField('Liberica Native Image Kit 22 (Java 17)', help=NO_HELP)
 
 
 class LibcForm(SubForm):
