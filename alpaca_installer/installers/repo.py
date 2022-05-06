@@ -3,6 +3,7 @@
 
 import os
 import logging
+import urllib
 
 from .installer import Installer
 from alpaca_installer.common.utils import MEDIA_PATH, write_file
@@ -15,6 +16,19 @@ log = logging.getLogger('installer.repo')
 #   keys: /dir/with/keys # optional
 #   urls: [ url1, url2, .. ]
 #
+
+
+def validate_repo_url(url: str):
+    msg = "'{}' is an invalid repository url".format(url)
+
+    url = url.strip()
+    if not url:
+        raise ValueError(msg)
+
+    pr = urllib.parse.urlparse(url)
+    if pr.scheme:
+        if (pr.scheme not in ('http', 'https')) or (not pr.hostname):
+            raise ValueError(msg)
 
 
 class RepoInstaller(Installer):
@@ -31,6 +45,8 @@ class RepoInstaller(Installer):
                                error_label=f'{yaml_tag}/urls')
         if not self._urls:
             raise ValueError(f"'{yaml_tag}/urls' is empty")
+        for url in self._urls:
+            validate_repo_url(url)
 
         self._keys_dir = read_key_or_fail(self._data, 'keys', value_type=str,
                                           error_label=f'{yaml_tag}/keys')
