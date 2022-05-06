@@ -276,7 +276,6 @@ class StorageInstaller(Installer):
                                 error_label=f'{error_label}/{pv_key}')
             physical_volumes = []
             for pv_item in pv_list:
-                p_volume = self._unit_by_id(pv_item)
                 p_volume = cast(Union[Partition, CryptoVolume], self._unit_by_id(pv_item))
                 physical_volumes.append(p_volume)
 
