@@ -75,7 +75,7 @@ class IPConfig:
                 raise ValueError('Non-str name server value: {}'.format(server))
             server = server.strip()
             if not server:
-                raise ValueError('An empty search domain was passed')
+                raise ValueError('An empty name server was passed')
             try:
                 server_ip = self._IP_ADDRESS_CLS(server)
             except ipaddress.AddressValueError as exc:
