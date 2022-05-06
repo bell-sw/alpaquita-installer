@@ -57,6 +57,10 @@ class StorageDevice(abc.ABC):
         if self.get_unit_by_id(unit.id):
             raise ValueError("{} already contains id '{}'".format(self, unit.id))
 
+        if unit.mount_point and (not unit.fs_type):
+            raise ValueError("{}: fs_type is not set for '{}' mount point".format(
+                self, unit.mount_point))
+
         if unit.mount_point is not None:
             self.manager.check_can_mount_to(unit.mount_point)
 
