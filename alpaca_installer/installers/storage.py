@@ -102,13 +102,9 @@ class UnitParams:
         mount_point = data.get('mount_point', None)
         crypto_passphrase = data.get('crypto_passphrase', None)
 
-        fs_opts = data.get('fs_opts', [])
-        if not isinstance(fs_opts, list):
-            raise ValueError("'fs_opts' must be a list")
+        fs_opts = read_list(data, key='fs_opts', item_type=str, error_label='fs_opts')
 
-        flags_s = data.get('flags', [])
-        if not isinstance(flags_s, list):
-            raise ValueError("'flags' must be a list")
+        flags_s = read_list(data, key='flags', item_type=str, error_label='flags')
         flags = []
         for flag_s in flags_s:
             flags.append(StorageUnitFlag.from_str(flag_s))
