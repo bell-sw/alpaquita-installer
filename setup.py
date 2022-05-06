@@ -14,6 +14,7 @@ setuptools.setup(
     author_email='info@bell-sw.com',
     url='https://bell-sw.com',
     license="AGPLv3+",
+    install_requires=['attrs', 'PyYAML', 'urwid'],
     packages=setuptools.find_packages(
         exclude=['subiquitycore.tests',
                  'subiquitycore.ui.tests',
