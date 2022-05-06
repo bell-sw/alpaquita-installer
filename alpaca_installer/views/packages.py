@@ -13,7 +13,10 @@ from subiquitycore.ui.form import (
 
 
 class KernelForm(SubForm):
-    extramods = BooleanField('Install firmware and extra modules', help=NO_HELP)
+    extramods = BooleanField('Install firmware and extra modules',
+                             help=('info_minor', (
+                                 'This option installs components which may be required for '
+                                 'operating Alpaca Linux on bare-metal machines.')))
 
 
 class JavaForm(SubForm):
