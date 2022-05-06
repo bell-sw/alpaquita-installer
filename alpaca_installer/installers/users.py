@@ -6,6 +6,7 @@ import datetime
 from alpaca_installer.common.utils import write_file
 from alpaca_installer.models.user import UserModel
 from .installer import Installer, InstallerException
+from .utils import read_list
 
 
 def read_user_from_dict(data: dict) -> UserModel:
@@ -51,14 +52,15 @@ def update_user_hash(etc_shadow: str, user: str, password_hash: str):
 
 class UsersInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):
-        super().__init__(name='users', target_root=target_root,
+        yaml_tag = 'users'
+        super().__init__(name=yaml_tag, target_root=target_root,
                          event_receiver=event_receiver,
                          data_type=list, config=config)
 
         self._users: list[UserModel] = []
 
         admin_defined = False
-        for item in self._data:
+        for item in read_list(config, key=yaml_tag, item_type=dict, error_label=yaml_tag):
             try:
                 user = read_user_from_dict(item)
             except (TypeError, ValueError) as exc:
