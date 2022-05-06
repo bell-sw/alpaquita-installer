@@ -43,9 +43,6 @@ def str_size_to_bytes(size: str) -> int:
                 'G': 1024 * 1024 * 1024}
     suffix = m.group(2)
     if suffix:
-        mult = suffixes.get(suffix, None)
-        if not mult:
-            raise ValueError("Invalid suffix '{}' in size {}".format(suffix, size))
-        nbytes *= mult
+        nbytes *= suffixes.get(suffix)
 
     return nbytes
