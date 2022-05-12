@@ -54,5 +54,11 @@ GRUB_TIMEOUT=2
 GRUB_DISABLE_SUBMENU=y
 GRUB_DISABLE_RECOVERY=true
 GRUB_CMDLINE_LINUX_DEFAULT="{}"
+GRUB_DEFAULT=saved
+
+# Note that Alpaca doesn't have os-prober installed by default,
+# therefore /etc/grub.d/30_os-prober is no-op. In order to use it,
+# you need to install the os-prober package.
+GRUB_DISABLE_OS_PROBER=false
 """.format(' '.join(self._cmdline))
         write_file(self.abs_target_path('/etc/default/grub'), 'w', data=data)
