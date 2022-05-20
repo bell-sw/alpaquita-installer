@@ -22,7 +22,7 @@ setuptools.setup(
                  'tests']
     ),
     package_data={
-        'alpaca_installer': ['EULA', 'keys/README'],
+        'alpaca_installer': ['EULA', 'keys/**/*'],
     },
     scripts=[
           'bin/alpaca-installer',
