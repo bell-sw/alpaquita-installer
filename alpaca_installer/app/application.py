@@ -111,7 +111,7 @@ class Application:
 
         try:
             opts, args = getopt.getopt(sys.argv[1:], 'hf:ndi',
-                                       ['help', 'config-file', 'no-ui', 'debug', 'iso-mode'])
+                                       ['help', 'config-file=', 'no-ui', 'debug', 'iso-mode'])
         except getopt.GetoptError as err:
             print(f'Options parsing error: {err}')
             self.usage()
