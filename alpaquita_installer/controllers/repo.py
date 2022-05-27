@@ -16,9 +16,7 @@ log = logging.getLogger('controllers.repo')
 class RepoController(Controller):
     def __init__(self, app):
         super().__init__(app)
-        # TODO: fix the repo path before the release
-#        self._repo_base_url = 'https://packages.bell-sw.com'
-        self._repo_base_url = 'http://192.168.100.54/linux/repositories'
+        self._repo_base_url = 'https://packages.bell-sw.com'
         self._repos = []
         self._release = self.get_os_release().get('VERSION_ID', '').split('.')[0]
         self._release = self._release if self._release else 'stream'
