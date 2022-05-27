@@ -18,8 +18,8 @@ class RepoController(Controller):
         super().__init__(app)
         self._repo_base_url = 'https://packages.bell-sw.com'
         self._repos = []
-        self._release = self.get_os_release().get('VERSION_ID', '').split('.')[0]
-        self._release = self._release if self._release else 'stream'
+        ver_id = self.get_os_release().get('VERSION_ID', '').split('.')
+        self._release = ver_id[0] if len(ver_id) > 1 and ver_id[0] else 'stream'
         self._libc_type = 'musl' if os.path.exists('/lib/ld-musl-x86_64.so.1') else 'glibc'
         self._host_libc_type = self._libc_type
 
