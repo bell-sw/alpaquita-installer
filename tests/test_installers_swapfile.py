@@ -3,8 +3,8 @@
 
 import pytest
 
-from alpaca_installer.installers.installer import InstallerException
-from alpaca_installer.installers.swapfile import SwapfileInstaller
+from alpaquita_installer.installers.installer import InstallerException
+from alpaquita_installer.installers.swapfile import SwapfileInstaller
 from .utils import new_installer
 
 

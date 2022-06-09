@@ -1,0 +1,8 @@
+This location should contain APK public keys used to install the alpaquita-keys
+package. All other APK packages will be installed using the keys from alpaquita-keys.
+
+The keys must be organized in 2 subdirectories:
+ * glibc - for glibc Alpaquita
+ * musl - for musl Alpaquita
+
+ The layout of keys in each subdirectory is the same as in /etc/apk/keys.

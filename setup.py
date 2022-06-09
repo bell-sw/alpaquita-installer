@@ -6,9 +6,9 @@
 import setuptools
 
 setuptools.setup(
-    name='alpaca_installer',
+    name='alpaquita_installer',
     version="0.3.0",
-    description="Alpaca Installer",
+    description="Alpaquita Installer",
     long_description="",
     author='BellSoft',
     author_email='info@bell-sw.com',
@@ -22,9 +22,9 @@ setuptools.setup(
                  'tests']
     ),
     package_data={
-        'alpaca_installer': ['EULA', 'keys/**/*'],
+        'alpaquita_installer': ['EULA', 'keys/**/*'],
     },
     scripts=[
-          'bin/alpaca-installer',
+          'bin/alpaquita-installer',
         ],
     )

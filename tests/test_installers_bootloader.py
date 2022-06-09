@@ -5,8 +5,8 @@ from typing import Optional
 
 import pytest
 
-from alpaca_installer.installers.installer import InstallerException
-from alpaca_installer.installers.bootloader import BootloaderInstaller
+from alpaquita_installer.installers.installer import InstallerException
+from alpaquita_installer.installers.bootloader import BootloaderInstaller
 from .utils import new_installer
 
 

@@ -5,8 +5,8 @@ import os
 
 import pytest
 
-from alpaca_installer.installers.installer import InstallerException
-from alpaca_installer.installers.repo import RepoInstaller
+from alpaquita_installer.installers.installer import InstallerException
+from alpaquita_installer.installers.repo import RepoInstaller
 from .utils import new_installer
 
 

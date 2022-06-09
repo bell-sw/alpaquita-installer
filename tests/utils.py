@@ -3,7 +3,7 @@
 
 from typing import Type, TypeVar
 
-from alpaca_installer.common.events import EventReceiver
+from alpaquita_installer.common.events import EventReceiver
 
 
 class StubEventReceiver(EventReceiver):

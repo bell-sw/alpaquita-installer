@@ -6,8 +6,8 @@ from typing import Optional
 
 import pytest
 
-from alpaca_installer.common.events import EventReceiver
-from alpaca_installer.common.utils import (
+from alpaquita_installer.common.events import EventReceiver
+from alpaquita_installer.common.utils import (
     run_cmd, run_cmd_live, write_file, button_width_for_label, validate_proxy_url)
 
 

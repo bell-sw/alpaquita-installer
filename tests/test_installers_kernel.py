@@ -3,8 +3,8 @@
 
 import pytest
 
-from alpaca_installer.installers.installer import InstallerException
-from alpaca_installer.installers.kernel import KernelInstaller
+from alpaquita_installer.installers.installer import InstallerException
+from alpaquita_installer.installers.kernel import KernelInstaller
 from .utils import new_installer
 
 

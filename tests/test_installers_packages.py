@@ -3,8 +3,8 @@
 
 import pytest
 
-from alpaca_installer.installers.installer import InstallerException
-from alpaca_installer.installers.packages import PackagesInstaller
+from alpaquita_installer.installers.installer import InstallerException
+from alpaquita_installer.installers.packages import PackagesInstaller
 from .utils import new_installer
 
 
@@ -14,7 +14,7 @@ def create_installer(config: dict) -> PackagesInstaller:
 
 def test_no_extra_packages():
     installer = create_installer({})
-    assert 'alpaca-base' in installer.packages
+    assert 'alpaquita-base' in installer.packages
 
 
 def test_invalid_extra_packages_type():
@@ -29,5 +29,5 @@ def test_invalid_extra_packages_list():
 
 def test_extra_packages():
     installer = create_installer({'extra_packages': ['pkg1', 'pkg2']})
-    for pkg in ('alpaca-base', 'pkg1', 'pkg2'):
+    for pkg in ('alpaquita-base', 'pkg1', 'pkg2'):
         assert pkg in installer.packages

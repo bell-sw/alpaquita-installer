@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from alpaca_installer.installers.installer import InstallerException
-from alpaca_installer.installers.network import NetworkInstaller
+from alpaquita_installer.installers.installer import InstallerException
+from alpaquita_installer.installers.network import NetworkInstaller
 from .utils import new_installer
 
 if TYPE_CHECKING:
-    from alpaca_installer.nmanager.manager import NetworkManager
+    from alpaquita_installer.nmanager.manager import NetworkManager
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def mock_host_ifaces(monkeypatch):
         self.add_wifi_iface('wlan0', mac_address='00:11:22:33:44:55',
                             vendor='Some vendor', model='Some model')
 
-    monkeypatch.setattr('alpaca_installer.nmanager.manager.NetworkManager.add_host_ifaces',
+    monkeypatch.setattr('alpaquita_installer.nmanager.manager.NetworkManager.add_host_ifaces',
                         add_host_ifaces)
 
 
