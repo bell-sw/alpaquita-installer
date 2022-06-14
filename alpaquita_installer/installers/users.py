@@ -79,6 +79,8 @@ class UsersInstaller(Installer):
                 user = read_user_from_dict(item)
             except (TypeError, ValueError) as exc:
                 raise InstallerException(str(exc)) from None
+            if user.name == 'root':
+                raise InstallerException('No root user must be defined')
             if user.is_admin:
                 admin_defined = True
                 self.add_package('sudo')

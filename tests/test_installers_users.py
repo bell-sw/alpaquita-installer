@@ -31,6 +31,11 @@ def test_no_admin_user():
         create_installer({'users': [{'name': 'user', 'password': 'password_hash'}]})
 
 
+def test_root_user():
+    with pytest.raises(InstallerException, match=r'(?i)root user'):
+        create_installer({'users': [{'name': 'root', 'password': 'password_hash', 'is_admin': True}]})
+
+
 def test_invalid_user():
     users = [{'name': 'user name', 'password': 'password_hash'},
              {'name': 'user'},
