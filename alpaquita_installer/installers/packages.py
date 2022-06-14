@@ -5,6 +5,11 @@ from alpaquita_installer.common.utils import run_cmd
 from .installer import Installer
 from .utils import read_list
 
+# Optional
+#
+# extra_packages: [ 'pkg1', 'pkg2' ]
+#
+
 
 class PackagesInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):

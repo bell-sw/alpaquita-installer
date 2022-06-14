@@ -5,6 +5,11 @@
 from .installer import Installer
 from alpaquita_installer.common.utils import run_cmd
 
+# Optional
+#
+# install_shim_bootloader: true
+#
+
 
 class SecureBootInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):

@@ -6,6 +6,10 @@ import os
 from alpaquita_installer.models.timezone import REGIONS, ZONEINFO_DIR
 from .installer import Installer, InstallerException
 
+#
+# timezone: America/New_York
+#
+
 
 class TimezoneInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver):

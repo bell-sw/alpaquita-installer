@@ -6,6 +6,11 @@ import os
 from .installer import Installer
 from typing import Optional
 
+# Required for non-EFI installations
+#
+# bootloader_device: /dev/vdX
+#
+
 
 class BootloaderInstaller(Installer):
     def __init__(self, target_root: str, config: dict, event_receiver,

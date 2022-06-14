@@ -8,6 +8,20 @@ from alpaquita_installer.models.user import UserModel
 from .installer import Installer, InstallerException
 from .utils import read_list
 
+#
+# The root user is always disabled, so at least one
+# user with admin privileges must be defined.
+#
+# users:
+#   - name: user1
+#     password: <password hash> # for example, with crypt.crypt()
+#     gecos: 'gecos for user1' # optional
+#     is_admin: false
+#   - name: admin
+#     password: <password hash>
+#     is_admin: true
+#
+
 
 def read_user_from_dict(data: dict) -> UserModel:
     name = data.get('name', None)

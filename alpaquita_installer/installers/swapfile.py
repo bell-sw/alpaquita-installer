@@ -10,6 +10,7 @@ from .installer import Installer
 from .utils import read_key_or_fail, str_size_to_bytes
 
 # Optional
+#
 # swap_file:
 #    path: /swapfile
 #    size: 512M
