@@ -24,8 +24,7 @@ The installer operates in 2 modes:
 The former performs an installation based on the user's answers
 in the UI, the latter - in accordance with a provided `.yaml` file.
 
-Please consult header comments in `alpaquita_installer/installers/*.py`
-for the syntax of the `.yaml` file.
+Please consult `AUTOMATING_INSTALLATION.md` for the syntax of the `.yaml` file.
 
 The interactive mode also generates a `setup.yaml` file with a description
 of the current installation.
