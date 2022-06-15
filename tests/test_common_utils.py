@@ -5,10 +5,12 @@ import os
 from typing import Optional
 
 import pytest
+import pytest_httpserver
 
 from alpaquita_installer.common.events import EventReceiver
 from alpaquita_installer.common.utils import (
-    run_cmd, run_cmd_live, write_file, button_width_for_label, validate_proxy_url)
+    run_cmd, run_cmd_live, write_file, button_width_for_label,
+    validate_proxy_url, validate_apk_repo)
 
 
 def test_run_cmd_timeout():
@@ -110,3 +112,34 @@ def test_validate_proxy_url():
 def test_button_width_for_label():
     label = 'some label'
     assert len(f'[ {label} ]') == button_width_for_label(label)
+
+
+def test_validate_apk_repo_bad_url(httpserver: pytest_httpserver.HTTPServer,
+                                   tmp_path_factory: pytest.TempPathFactory):
+    with pytest.raises(ValueError, match=r'(?i)remote server returned error'):
+        validate_apk_repo(url=httpserver.url_for('/bad_url'),
+                          keys_dir=str(tmp_path_factory.mktemp('bad_url')), timeout=5)
+
+
+def test_validate_apk_repo_no_packages(httpserver: pytest_httpserver.HTTPServer,
+                                       tmp_path_factory: pytest.TempPathFactory):
+    tmpdir = tmp_path_factory.mktemp('no_packages')
+    keys_dir = tmpdir / 'keys'
+    os.makedirs(keys_dir)
+
+    # In the future the key generation may be moved into a fixture.
+    privkey = keys_dir / 'apk.rsa'
+    pubkey = keys_dir / 'apk.rsa.pub'
+    run_cmd(args=['openssl', 'genrsa', '-out', str(privkey), '2048'])
+    run_cmd(args=['openssl', 'rsa', '-in', str(privkey), '-pubout', '-out', str(pubkey)])
+
+    apkindex = 'APKINDEX.tar.gz'
+    run_cmd(args=['apk', 'index', '-o', apkindex])
+    run_cmd(args=['abuild-sign', '-k', str(privkey), apkindex])
+
+    arch = os.uname()[4]
+    httpserver.expect_request(uri=f'/no_packages/{arch}/{apkindex}', method='GET').respond_with_data(
+        response_data=open(apkindex, 'br').read(), content_type='application/octet-stream')
+
+    with pytest.raises(ValueError, match=r'(?i)contains no packages'):
+        validate_apk_repo(url=httpserver.url_for('/no_packages'), keys_dir=str(keys_dir), timeout=5)

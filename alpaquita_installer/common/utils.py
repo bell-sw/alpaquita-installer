@@ -3,9 +3,10 @@
 
 import subprocess
 import urllib
-from typing import Optional, Callable
+from typing import Optional, Callable, Iterable
 import logging
 import os
+from tempfile import TemporaryDirectory
 
 from .events import EventReceiver, LoggingReceiver
 
@@ -105,3 +106,23 @@ def validate_proxy_url(url: str):
 def button_width_for_label(label: str) -> int:
     # '[ ' + label + ' ]'
     return len(label) + 4
+
+
+def validate_apk_repo(url: str, keys_dir: str, timeout: float):
+    with TemporaryDirectory() as tmpdir:
+        args = ['apk', '--root', tmpdir, '--keys', keys_dir,
+                '--repository', url]
+        try:
+            run_cmd(args=(args + ['add', '--initdb']))
+            run_cmd(args=(args + ['update']), timeout=timeout)
+            res = run_cmd(args=(args + ['list', '-a']))
+        except RuntimeError as exc:
+            raise ValueError(str(exc)) from None
+
+        if not res.stdout:
+            raise ValueError('Repository {} contains no packages.'.format(url))
+
+
+def validate_apk_repos(urls: Iterable[str], keys_dir: str, timeout: float):
+    for url in urls:
+        validate_apk_repo(url=url, keys_dir=keys_dir, timeout=timeout)
