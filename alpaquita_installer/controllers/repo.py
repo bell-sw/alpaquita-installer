@@ -17,7 +17,6 @@ class RepoController(Controller):
     def __init__(self, app):
         super().__init__(app)
         self._repo_base_url = 'https://packages.bell-sw.com'
-        self._repos = []
         ver_id = self.get_os_release().get('VERSION_ID', '').split('.')
         self._release = ver_id[0] if len(ver_id) > 1 and ver_id[0] else 'stream'
         self._libc_type = 'musl' if os.path.exists('/lib/ld-musl-x86_64.so.1') else 'glibc'
@@ -49,19 +48,19 @@ class RepoController(Controller):
         self._app.prev_screen()
 
     def get_repos(self, url, libc):
-        self._repos = []
+        repos = []
         for name in ['core', 'universe']:
-            self._repos.append(urllib.parse.quote(
+            repos.append(urllib.parse.quote(
                 f'{url}/alpaquita/{libc}/{self._release}/{name}',
                 safe='/:'))
-        return self._repos
+        return repos
 
     def to_yaml(self):
         res = []
 
         if self._host_libc_type == self._libc_type:
             res.append(MEDIA_PATH)
-        res.extend(self._repos)
+        res.extend(self.get_repos(self._repo_base_url, self._libc_type))
 
         ai_path = os.path.abspath(os.path.realpath(alpaquita_installer.__file__))
         keys_dir = os.path.join(os.path.dirname(ai_path), 'keys', self._libc_type)
