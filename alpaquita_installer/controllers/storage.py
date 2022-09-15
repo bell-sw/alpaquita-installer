@@ -143,6 +143,15 @@ class StorageController(Controller):
                                crypto_passphrase=self._crypto_passphrase)
         return StorageView(self, self._available_disks[:], data)
 
+    @property
+    def min_disk_size(self) -> float:
+        size = self.ROOT_MIN_SIZE + self.BOOT_SIZE
+        if self._app.is_efi():
+            size += self.BOOT_EFI_SIZE
+        else:
+            size += self.BIOS_BOOT_SIZE
+        return size
+
     def done(self, data: StorageViewData):
         needs_reset = False
         if self._selected_disk != data.selected_disk:

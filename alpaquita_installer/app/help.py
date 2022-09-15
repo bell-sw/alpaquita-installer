@@ -25,12 +25,12 @@ This program will guide you through all the steps to install Alpaquita Linux on 
 The procedure requires a disk minimum of {:.1f} GB size and an active network connection to the Internet or a private repository with APK packages.
 
 Additional shell sessions are available on other virtual terminals. You can switch to them using Ctrl+Alt+Fn or Alt+Left/Right key combinations.
-""".format(StorageController.ROOT_MIN_SIZE / StorageController.GB)
+"""
 
-    def __init__(self, app_ui: ApplicationUI):
+    def __init__(self, app_ui: ApplicationUI, min_disk_size: float):
         self._app_ui = app_ui
         _ok_btn = ok_btn('Close', on_press=self._close)
-        super().__init__('Help', [urwid.Text(self.MSG),
+        super().__init__('Help', [urwid.Text(self.MSG.format(min_disk_size / StorageController.GB)),
                                   urwid.Text(''),
                                   button_pile([_ok_btn])], 0, 2)
 

@@ -48,8 +48,9 @@ MIN_SHOW_PROGRESS_TIME = 1.0
 class ApplicationUI(urwid.WidgetWrap):
     block_input = False
 
-    def __init__(self):
-        self._help_msg = HelpMsgStretchy(self)
+    def __init__(self, app: Application):
+        self._help_msg = HelpMsgStretchy(self,
+                                         min_disk_size=app.controller('StorageController').min_disk_size)
         self._shown_help_msg = None
 
         self._title = urwid.Text('Title', align='left')
@@ -170,7 +171,7 @@ class Application:
 
         self._ctrl_idx = 0
 
-        self.ui = self.make_ui()
+        self.ui = self.make_ui(self)
         self._palette = palette
 
         atexit.register(self.cleanup)
