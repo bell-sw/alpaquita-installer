@@ -7,7 +7,7 @@ import setuptools
 
 setuptools.setup(
     name='alpaquita_installer',
-    version="0.5.0",
+    version="0.5.1",
     description="Alpaquita Installer",
     long_description="",
     author='BellSoft',
