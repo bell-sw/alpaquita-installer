@@ -72,6 +72,7 @@ class StorageController(Controller):
         super().__init__(app)
 
         self._smanager: Optional[StorageManager] = None
+        self._smanager_needs_reset = False
 
         self._available_disks = scan_host_disks()
         self._selected_disk: Optional[Disk] = None
@@ -153,20 +154,20 @@ class StorageController(Controller):
         return size
 
     def done(self, data: StorageViewData):
-        needs_reset = False
         if self._selected_disk != data.selected_disk:
             self._selected_disk = data.selected_disk
-            needs_reset = True
+            self._smanager_needs_reset = True
         if self._use_lvm != data.use_lvm:
             self._use_lvm = data.use_lvm
-            needs_reset = True
+            self._smanager_needs_reset = True
         if self._crypto_passphrase != data.crypto_passphrase:
             self._crypto_passphrase = data.crypto_passphrase
-            needs_reset = True
+            self._smanager_needs_reset = True
 
-        if needs_reset:
+        if self._smanager_needs_reset:
             try:
                 self._reset_smanager()
+                self._smanager_needs_reset = False
             except (TypeError, ValueError) as exc:
                 self._app.show_error_message(str(exc))
                 return
