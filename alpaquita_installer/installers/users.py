@@ -113,5 +113,5 @@ class UsersInstaller(Installer):
                 wheel_sudoers_needed = True
 
         if wheel_sudoers_needed:
-            write_file(self.abs_target_path('/etc/sudoers.d/wheel'), 'w',
+            write_file(self.abs_target_path('/etc/sudoers.d/00-wheel'), 'w',
                        data='%wheel ALL=(ALL) ALL\n')
