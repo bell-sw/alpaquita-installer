@@ -35,7 +35,7 @@ Passing `-h` will display the list of all supported command line arguments.
 The code is Python 3. All necessary dependencies are listed in
 the provided `requirements.txt`:
 ```
-python -m ven venv
+python -m venv venv
 . venv/bin/activate
 pip install -r requirements.txt
 alpaquita-installer [args] # or python -m alpaquita_installer [args]
