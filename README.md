@@ -13,7 +13,8 @@ Then build the package using the provided `setup.py` and install it as usual.
 For example:
 
 ```
-python setup.py build
+# Before doing this, make sure that the Python wheel package is installed
+python setup.py bdist_wheel
 pip install dist/<the generated wheel file>
 ```
 
@@ -32,8 +33,9 @@ of the current installation.
 Passing `-h` will display the list of all supported command line arguments.
 
 ## Development environment setup
-The code is Python 3. All necessary dependencies are listed in
-the provided `requirements.txt`:
+The code is Python 3, the minimum supported Python version is 3.9.
+
+All necessary dependencies are listed in the provided `requirements.txt`:
 ```
 python -m venv venv
 . venv/bin/activate
