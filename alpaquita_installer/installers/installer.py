@@ -5,7 +5,7 @@ import logging
 import abc
 import os
 import subprocess
-from typing import Collection, Iterable
+from typing import Collection, Iterable, Optional
 
 from alpaquita_installer.common.utils import run_cmd, run_cmd_live
 from alpaquita_installer.common.events import EventReceiver
@@ -63,9 +63,9 @@ class Installer(abc.ABC):
         return os.path.join(self.target_root,
                             rel_target_path.lstrip('/'))
 
-    def run_in_chroot(self, args: list[str]) -> subprocess.CompletedProcess:
+    def run_in_chroot(self, args: list[str], input: Optional[bytes] = None) -> subprocess.CompletedProcess:
         new_args = ['chroot', self.target_root] + args
-        return run_cmd(args=new_args, event_receiver=self._event_receiver)
+        return run_cmd(args=new_args, input=input, event_receiver=self._event_receiver)
 
     def enable_service(self, service: str, runlevel: str):
         self.run_in_chroot(args=['rc-update', 'add', service, runlevel])
