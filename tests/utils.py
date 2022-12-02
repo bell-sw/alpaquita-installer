@@ -7,14 +7,26 @@ from alpaquita_installer.common.events import EventReceiver
 
 
 class StubEventReceiver(EventReceiver):
+    def __init__(self):
+        self._event_lines = []
+        self._log_lines = []
+
+    @property
+    def event_lines(self):
+        return list(self._event_lines)
+
+    @property
+    def log_lines(self):
+        return list(self._log_lines)
+
     def start_event(self, msg):
-        pass
+        self._event_lines.append(msg)
 
     def stop_event(self):
         pass
 
     def add_log_line(self, msg):
-        pass
+        self._log_lines.append(msg)
 
 
 _InstallerType = TypeVar('_InstallerType')
