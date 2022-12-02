@@ -306,3 +306,26 @@ swap_file:
    path: /swapfile
    size: 512M
 ```
+
+### Post installation scripts
+
+```yaml
+post_scripts:
+  - interpreter: /bin/sh
+    chroot: true # Optional, true by default
+    script: cat /etc/passwd
+  - interpreter: /usr/bin/python3
+    chroot: false
+    script: |
+      import time
+      print(time.time())
+      print('Doing some work')
+```
+
+These scripts are executed after the installation is complete, but before the target file system is unmounted.
+
+`chroot` determines whether the corresponding script should be executed inside the target chroot environment, or
+in the environment the installer is running in. In the former case the target file system is available at `/`,
+in the latter - at `/mnt/target_root`.
+
+The `script` content wil be passed to the standard input of the `interpreter` program.

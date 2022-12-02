@@ -25,6 +25,7 @@ from alpaquita_installer.installers.network import NetworkInstaller
 from alpaquita_installer.installers.kernel import KernelInstaller
 from alpaquita_installer.installers.secureboot import SecureBootInstaller
 from alpaquita_installer.installers.bootloader import BootloaderInstaller
+from alpaquita_installer.installers.post_scripts import PostScriptsInstaller
 from alpaquita_installer.installers.installer import InstallerException
 from alpaquita_installer.common.events import EventReceiver
 from alpaquita_installer.common.utils import DEFAULT_CONFIG_FILE
@@ -102,6 +103,7 @@ class BaseInstallerController(Controller, EventReceiver):
             BootloaderInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self,
                                 efi_mount=efi_mount),
             SecureBootInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
+            PostScriptsInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
         ]
 
         for i in installers:
