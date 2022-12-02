@@ -50,7 +50,7 @@ class ApplicationUI(urwid.WidgetWrap):
 
     def __init__(self, app: Application):
         self._help_msg = HelpMsgStretchy(self,
-                                         min_disk_size=app.controller('StorageController').min_disk_size)
+                                         min_disk_size=app.min_disk_size)
         self._shown_help_msg = None
 
         self._title = urwid.Text('Title', align='left')
@@ -205,6 +205,15 @@ class Application:
     @property
     def copy_config(self) -> bool:
         return self._copy_config
+
+    @property
+    def min_disk_size(self) -> float:
+        size = StorageController.ROOT_MIN_SIZE + StorageController.BOOT_SIZE
+        if self.is_efi():
+            size += StorageController.BOOT_EFI_SIZE
+        else:
+            size += StorageController.BIOS_BOOT_SIZE
+        return size
 
     def is_efi(self) -> bool:
         return os.path.exists('/sys/firmware/efi')
