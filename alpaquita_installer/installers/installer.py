@@ -63,6 +63,9 @@ class Installer(abc.ABC):
         return os.path.join(self.target_root,
                             rel_target_path.lstrip('/'))
 
+    def run(self, args: list[str], input: Optional[bytes] = None) -> subprocess.CompletedProcess:
+        return run_cmd(args=args, input=input, event_receiver=self._event_receiver)
+
     def run_in_chroot(self, args: list[str], input: Optional[bytes] = None) -> subprocess.CompletedProcess:
         new_args = ['chroot', self.target_root] + args
         return run_cmd(args=new_args, input=input, event_receiver=self._event_receiver)
