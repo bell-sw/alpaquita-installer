@@ -28,6 +28,13 @@ def mock_host_ifaces(monkeypatch):
                         add_host_ifaces)
 
 
+@pytest.fixture
+def target_root(tmp_path):
+    res = tmp_path / 'target_root'
+    (res / 'etc/network').mkdir(parents=True)
+    return res
+
+
 def static_ipv4_config():
     return {'network': {
         'hostname': 'some-host-name',
@@ -75,6 +82,12 @@ def bond_config():
     return config
 
 
+def vlan_config():
+    config = dhcp_ipv4_config()
+    config['network']['interface']['name'] = 'eth0.99'
+    return config
+
+
 def wifi_config():
     config = dhcp_ipv4_config()
     config['network']['interface'] = {  # type: ignore
@@ -86,8 +99,8 @@ def wifi_config():
     return config
 
 
-def create_installer(config: dict) -> NetworkInstaller:
-    return new_installer(NetworkInstaller, config=config)
+def create_installer(config: dict, **kwargs) -> NetworkInstaller:
+    return new_installer(NetworkInstaller, config=config, **kwargs)
 
 
 def test_no_network():
@@ -277,6 +290,13 @@ def test_bond_interface_invalid_mode(mock_host_ifaces):
         create_installer(config)
 
 
+def test_bond_interface_invalid_members_format(mock_host_ifaces):
+    config = bond_config()
+    config['network']['interface']['bond_members'] = False
+    with pytest.raises(ValueError, match=r'(?i)Error while adding bond members'):
+        create_installer(config)
+
+
 def test_bond_interface_hash_policies(mock_host_ifaces):
     bond_modes = ('balance-rr', 'active-backup', 'balance-xor', 'broadcast',
                   '802.3ad', 'balance-tlb', 'balance-alb')
@@ -352,3 +372,123 @@ def test_wifi_invalid_psk(mock_host_ifaces):
     config['network']['interface']['wifi_psk'] = 'psk_with_symbol_#'
     with pytest.raises(ValueError, match=r'(?i)must not contain #'):
         create_installer(config)
+
+
+def test_static_ipv4_config_apply(target_root):
+    installer = create_installer(config=static_ipv4_config(), target_root=target_root)
+    installer.apply()
+
+    with open(target_root / 'etc/hostname') as file:
+        assert file.read() == 'some-host-name\n'
+    with open(target_root / 'etc/resolv.conf') as file:
+        assert file.read() == '''nameserver 1.2.3.4
+search domain1 domain2.com
+'''
+    with open(target_root / 'etc/network/interfaces') as file:
+        assert file.read() == '''auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0
+    use static
+    address 192.168.0.1/24
+    gateway 192.168.0.254
+'''
+
+
+def test_dhcp_ipv4_config_apply(target_root):
+    installer = create_installer(config=dhcp_ipv4_config(), target_root=target_root)
+    installer.apply()
+
+    with open(target_root / 'etc/hostname') as file:
+        assert file.read() == 'some-host-name\n'
+    with open(target_root / 'etc/resolv.conf') as file:
+        assert file.read() == ''
+    with open(target_root / 'etc/network/interfaces') as file:
+        assert file.read() == '''auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0
+    use dhcp
+'''
+
+
+def test_static_ipv6_config_apply(target_root):
+    installer = create_installer(config=static_ipv6_config(), target_root=target_root)
+    installer.apply()
+
+    with open(target_root / 'etc/hostname') as file:
+        assert file.read() == 'some-host-name\n'
+    with open(target_root / 'etc/resolv.conf') as file:
+        assert file.read() == '''nameserver 2001:db8:abcd:12::3
+search domain1 domain2.com
+'''
+    with open(target_root / 'etc/network/interfaces') as file:
+        assert file.read() == '''auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0
+    use static
+    address 2001:db8:abcd:12::1/64
+    gateway 2001:db8:abcd:12::2
+'''
+
+
+def test_vlan_config_apply(target_root):
+    installer = create_installer(config=vlan_config(), target_root=target_root)
+    installer.apply()
+
+    with open(target_root / 'etc/hostname') as file:
+        assert file.read() == 'some-host-name\n'
+    with open(target_root / 'etc/resolv.conf') as file:
+        assert file.read() == ''
+    with open(target_root / 'etc/network/interfaces') as file:
+        assert file.read() == '''auto lo
+iface lo inet loopback
+
+auto eth0.99
+iface eth0.99
+    use dhcp
+'''
+
+
+def test_bond_config_apply(target_root):
+    installer = create_installer(config=bond_config(), target_root=target_root)
+    installer.apply()
+
+    with open(target_root / 'etc/hostname') as file:
+        assert file.read() == 'some-host-name\n'
+    with open(target_root / 'etc/resolv.conf') as file:
+        assert file.read() == ''
+    with open(target_root / 'etc/network/interfaces') as file:
+        assert file.read() == '''auto lo
+iface lo inet loopback
+
+auto bond0
+iface bond0
+    bond-members eth0 eth1
+    bond-mode balance-rr
+    use dhcp
+'''
+
+
+def test_wifi_config_apply(target_root):
+    installer = create_installer(config=wifi_config(), target_root=target_root)
+    installer.apply()
+
+    with open(target_root / 'etc/hostname') as file:
+        assert file.read() == 'some-host-name\n'
+    with open(target_root / 'etc/resolv.conf') as file:
+        assert file.read() == ''
+    with open(target_root / 'etc/network/interfaces') as file:
+        assert file.read() == '''auto lo
+iface lo inet loopback
+
+auto wlan0
+iface wlan0
+    wifi-ssid wifi-ssid
+    wifi-psk wifi-psk
+    use dhcp
+'''

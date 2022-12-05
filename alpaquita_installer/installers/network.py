@@ -54,6 +54,10 @@ log = logging.getLogger('installers.network')
 
 
 class NetworkInstaller(Installer):
+    STUB_MAC_ADDRESS = '00:00:00:00:00:00'
+    STUB_VENDOR = 'No vendor'
+    STUB_MODEL = 'No model'
+
     def __init__(self, target_root: str, config: dict, event_receiver):
         self._yaml_tag = 'network'
         super().__init__(name=self._yaml_tag, config=config,
@@ -67,7 +71,6 @@ class NetworkInstaller(Installer):
         log.debug('Hostname: {}'.format(self._hostname))
 
         self._nmanager = NetworkManager()
-        self._nmanager.add_host_ifaces()
         self._parse_interface()
         self._parse_ip()
 
@@ -92,17 +95,28 @@ class NetworkInstaller(Installer):
         log.debug('Interface name: {}, type: {}, vlan_id: {}'.format(
             iface_name, iface_type, vlan_id))
         if iface_type == 'ethernet':
-            pass
+            self._nmanager.add_eth_iface(name=iface, mac_address=self.STUB_MAC_ADDRESS,
+                                         vendor=self.STUB_VENDOR, model=self.STUB_MODEL)
         elif iface_type == 'bond':
             members = data.get('bond_members', [])
             mode = data.get('bond_mode', '')
             hash_policy = data.get('bond_hash_policy', None)
             log.debug('Bond members: {}, mode: {}, hash_policy: {}'.format(
                 members, mode, hash_policy))
+
+            try:
+                for member in members:
+                    self._nmanager.add_eth_iface(name=member, mac_address=self.STUB_MAC_ADDRESS,
+                                                 vendor=self.STUB_VENDOR, model=self.STUB_MODEL)
+            except TypeError:
+                raise ValueError("Error while adding bond members")
+
             self._nmanager.add_bond_iface(name=iface, members=members, mode=mode,
                                           hash_policy=hash_policy)
             self.add_package('bonding')
         elif iface_type == 'wifi':
+            self._nmanager.add_wifi_iface(name=iface, mac_address=self.STUB_MAC_ADDRESS,
+                                          vendor=self.STUB_VENDOR, model=self.STUB_MODEL)
             self._nmanager.set_wifi_config(WIFIConfig(ssid=data.get('wifi_ssid', ''),
                                                       psk=data.get('wifi_psk', '')))
             log.debug('WIFI configuration: {}'.format(self._nmanager.get_wifi_config()))
