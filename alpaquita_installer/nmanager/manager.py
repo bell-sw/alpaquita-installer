@@ -260,10 +260,11 @@ class NetworkManager:
         lines = ['auto lo',
                  'iface lo inet loopback']
         if (self._ipv4_config.method != 'disabled') or (self._ipv6_config.method != 'disabled'):
+            lines.append('')
             lines.append('auto {}'.format(self._selected_iface.name))
             lines.append('iface {}'.format(self._selected_iface.name))
 
-            interface_lines = ['']
+            interface_lines = []
             interface_lines.extend(self._selected_iface.get_interface_lines())
             interface_lines.extend(self._ipv4_config.get_interface_lines())
             interface_lines.extend(self._ipv6_config.get_interface_lines())
