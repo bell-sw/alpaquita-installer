@@ -55,7 +55,7 @@ class ServicesInstaller(Installer):
                               ('swap', 'boot'),
                               ('sysctl', 'boot'),
                               ('syslog', 'boot'),
-                              ('urandom', 'boot'),
+                              ('seedrng', 'boot'),
                               # ---
                               ('acpid', 'default'),
                               ('crond', 'default'),
