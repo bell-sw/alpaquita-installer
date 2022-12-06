@@ -41,25 +41,28 @@ class ServicesInstaller(Installer):
 
     def post_apply(self):
         self._event_receiver.start_event('Enabling base services')
-        for svc, runlevel in [('agetty.tty1', 'boot'),
-                              ('acpid', 'default'),
-                              ('bootmisc', 'boot'),
-                              ('crond', 'default'),
-                              ('dmesg', 'sysinit'),
-                              ('hostname', 'boot'),
-                              ('hwclock', 'boot'),
-                              ('killprocs', 'shutdown'),
-                              ('modules', 'boot'),
-                              ('mount-ro', 'shutdown'),
-                              ('networking', 'boot'),
-                              ('savecache', 'shutdown'),
-                              ('swap', 'boot'),
-                              ('sysctl', 'boot'),
-                              ('syslog', 'boot'),
+        for svc, runlevel in [('dmesg', 'sysinit'),
                               ('udev', 'sysinit'),
                               ('udev-settle', 'sysinit'),
                               ('udev-trigger', 'sysinit'),
-                              ('urandom', 'boot')]:
+                              # ---
+                              ('agetty.tty1', 'boot'),
+                              ('bootmisc', 'boot'),
+                              ('hostname', 'boot'),
+                              ('hwclock', 'boot'),
+                              ('modules', 'boot'),
+                              ('networking', 'boot'),
+                              ('swap', 'boot'),
+                              ('sysctl', 'boot'),
+                              ('syslog', 'boot'),
+                              ('urandom', 'boot'),
+                              # ---
+                              ('acpid', 'default'),
+                              ('crond', 'default'),
+                              # ---
+                              ('killprocs', 'shutdown'),
+                              ('mount-ro', 'shutdown'),
+                              ('savecache', 'shutdown')]:
             self.enable_service(service=svc, runlevel=runlevel)
 
         if self._disabled:
