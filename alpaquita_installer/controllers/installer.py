@@ -113,7 +113,8 @@ class BaseInstallerController(Controller, EventReceiver):
         for i in installers:
             i.post_apply()
 
-        self._copy_yaml_config()
+        if self._app.copy_config:
+            self._copy_yaml_config()
 
         for i in reversed(installers):
             i.cleanup()

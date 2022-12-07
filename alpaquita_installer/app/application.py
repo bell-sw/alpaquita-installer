@@ -109,10 +109,12 @@ class Application:
         self._no_ui = False
         self._iso_mode = False
         self._debug_log_file = None
+        self._copy_config = True
 
         try:
             opts, args = getopt.getopt(sys.argv[1:], 'hf:ndi',
-                                       ['help', 'config-file=', 'no-ui', 'debug', 'iso-mode'])
+                                       ['help', 'config-file=', 'no-ui', 'debug', 'iso-mode',
+                                        'no-config-copy'])
         except getopt.GetoptError as err:
             print(f'Options parsing error: {err}')
             self.usage()
@@ -135,6 +137,8 @@ class Application:
                 logging.basicConfig(filename=self._debug_log_file, filemode='w', level=logging.DEBUG)
             elif opt in ("-i", "--iso-mode"):
                 self._iso_mode = True
+            elif opt in ("--no-config-copy"):
+                self._copy_config = False
 
         if self._no_ui and not self._config_file:
             self.usage()
@@ -187,6 +191,7 @@ class Application:
             -n --no-ui         Run the installation without a text-based UI. Requires config-file option
             -d --debug         Enable debug-level log
             -i --iso-mode      Run the installer in the ISO mode (no exit feature in the UI)
+            --no-config-copy   Do not copy config file to the installed system
         ''')
 
     @property
@@ -196,6 +201,10 @@ class Application:
     @property
     def iso_mode(self) -> bool:
         return self._iso_mode
+
+    @property
+    def copy_config(self) -> bool:
+        return self._copy_config
 
     def is_efi(self) -> bool:
         return os.path.exists('/sys/firmware/efi')
