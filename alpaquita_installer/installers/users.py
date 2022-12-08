@@ -102,6 +102,9 @@ class UsersInstaller(Installer):
             args = ['adduser', '-D']
             if user.gecos:
                 args.extend(['-g', user.gecos])
+            # don't let host's $SHELL affect the shell choice
+            # TODO: provide ui and yaml key for this
+            args.extend(['-s', '/bin/sh'])
             args.append(user.name)
             self.run_in_chroot(args=args)
 
