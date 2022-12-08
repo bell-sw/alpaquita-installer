@@ -326,6 +326,6 @@ These scripts are executed after the installation is complete, but before the ta
 
 `chroot` determines whether the corresponding script should be executed inside the target chroot environment, or
 in the environment the installer is running in. In the former case the target file system is available at `/`,
-in the latter - at `/mnt/target_root`.
+in the latter - at location pointed by the `TARGET_ROOT` environment variable.
 
 The `script` content wil be passed to the standard input of the `interpreter` program.

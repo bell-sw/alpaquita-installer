@@ -52,6 +52,8 @@ class BaseInstallerController(Controller, EventReceiver):
         self._config_file = config_file
         self._create_config = create_config
 
+        os.environ['TARGET_ROOT'] = self.TARGET_ROOT
+
     def _run(self):
         try:
             if self._create_config:
