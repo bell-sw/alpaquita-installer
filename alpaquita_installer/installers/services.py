@@ -52,10 +52,10 @@ class ServicesInstaller(Installer):
                               ('hwclock', 'boot'),
                               ('modules', 'boot'),
                               ('networking', 'boot'),
+                              ('seedrng', 'boot'),
                               ('swap', 'boot'),
                               ('sysctl', 'boot'),
                               ('syslog', 'boot'),
-                              ('seedrng', 'boot'),
                               # ---
                               ('acpid', 'default'),
                               ('crond', 'default'),
