@@ -30,19 +30,23 @@ def run_cmd(args, input: Optional[bytes] = None,
                              preexec_fn=os.setpgrp,
                              timeout=timeout, check=False)
     except subprocess.TimeoutExpired:
+        if event_receiver:
+            event_receiver.add_log_line('Command did not complete in {} seconds'.format(timeout))
         raise RuntimeError("'{}' did not complete in {} seconds".format(
             ' '.join(args), timeout
         )) from None
 
     stdout = res.stdout.decode().replace('\\n', '\n').replace('\\t', '\t')
 
+    if event_receiver:
+        if stdout:
+            event_receiver.add_log_line(f'Command output: {stdout}')
+        event_receiver.add_log_line('Command exit code: {}'.format(res.returncode))
+
     if (not ignore_status) and (res.returncode != 0):
         raise RuntimeError("'{}' exited with {}: {}".format(
             ' '.join(args), res.returncode, stdout
         ))
-
-    if event_receiver and stdout:
-        event_receiver.add_log_line(f'Command output: {stdout}')
 
     return res
 

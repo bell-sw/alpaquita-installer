@@ -11,25 +11,32 @@ from alpaquita_installer.common.events import EventReceiver
 from alpaquita_installer.common.utils import (
     run_cmd, run_cmd_live, write_file, button_width_for_label,
     validate_proxy_url, validate_apk_repo)
+from .utils import StubEventReceiver
 
 
 def test_run_cmd_timeout():
+    receiver = StubEventReceiver()
     with pytest.raises(RuntimeError, match=r'(?i)did not complete'):
-        run_cmd(args=['sleep', '1'], timeout=0.1)
+        run_cmd(args=['sleep', '1'], timeout=0.1, event_receiver=receiver)
+    assert receiver.log_lines[1] == 'Command did not complete in 0.1 seconds'
 
 
 def test_run_cmd_returncode():
+    receiver = StubEventReceiver()
     with pytest.raises(RuntimeError, match=r'(?i)exited with 1'):
-        run_cmd(args=['false'])
+        run_cmd(args=['false'], event_receiver=receiver)
+    assert receiver.log_lines[1] == 'Command exit code: 1'
 
     res = run_cmd(args=['false'], ignore_status=True)
     assert res.returncode == 1
 
 
 def test_run_cmd_output():
+    receiver = StubEventReceiver()
     data = 'some_data'
-    res = run_cmd(args=['cat'], input=bytes(data, encoding='utf-8'))
+    res = run_cmd(args=['cat'], input=bytes(data, encoding='utf-8'), event_receiver=receiver)
     assert data == res.stdout.decode()
+    assert receiver.log_lines[1] == f'Command output: {data}'
     assert res.returncode == 0
 
 
