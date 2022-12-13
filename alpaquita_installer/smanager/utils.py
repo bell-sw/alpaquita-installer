@@ -13,8 +13,8 @@ def get_block_device_size(device_path: str) -> int:
 
 
 def get_block_device_uuid(device_path: str) -> str:
-    # blkid from busybox does not report UUID for vfat...
-    res = run_cmd(['lsblk', '-n', '-o', 'UUID', device_path])
+    res = run_cmd(args=['blkid', '-c', '/dev/null', '-o', 'value',
+                        '--match-tag', 'UUID', device_path])
     uuid = res.stdout.decode().strip()
     if not uuid:
         raise RuntimeError('Unable to determine a file system UUID of {}'.format(device_path))
