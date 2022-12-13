@@ -12,7 +12,7 @@ def get_block_device_size(device_path: str) -> int:
     return int(res.stdout.decode())
 
 
-def get_block_device_uuid(device_path: str) -> str:
+def get_fs_uuid(device_path: str) -> str:
     res = run_cmd(args=['blkid', '-c', '/dev/null', '-o', 'value',
                         '--match-tag', 'UUID', device_path])
     uuid = res.stdout.decode().strip()

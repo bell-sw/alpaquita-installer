@@ -8,7 +8,7 @@ import enum
 import attrs
 
 from .file_system import FSType
-from .utils import get_block_device_uuid, get_block_device_size
+from .utils import get_fs_uuid, get_block_device_size
 from alpaquita_installer.common.utils import run_cmd
 
 if TYPE_CHECKING:
@@ -77,7 +77,7 @@ class StorageUnit:
         if self.fs_type == FSType.RAID_MEMBER:
             return
 
-        self.fs_uuid = get_block_device_uuid(self.block_device)
+        self.fs_uuid = get_fs_uuid(self.block_device)
 
 
 @attrs.define
@@ -108,7 +108,7 @@ class Partition(StorageUnit):
 
             run_cmd(['cryptsetup', 'luksFormat', self.block_device],
                     input=self.crypto_passphrase.encode())
-            self.fs_uuid = get_block_device_uuid(self.block_device)
+            self.fs_uuid = get_fs_uuid(self.block_device)
         else:
             super().make_fs()
 
