@@ -154,9 +154,16 @@ class StorageDeviceWithPartitions(StorageDeviceOfLimitedSize):
         log.debug('{}: creating partitions'.format(self))
         run_cmd(args=['wipefs', '-a', self.block_device])
 
+        # We use sfdisk, as it doesn't require to manually specify start and end
+        # partition offsets (with alignment and etc).
+        # Later we recreate the same partitions with parted, as parted knows
+        # some magic and properly informs the system of updates in block
+        # devices (especially loopback devices).
+        # TODO: it would be good to use only one partitioning tool
+
         script = ['label: gpt']
         for part in self.partitions:
-            line = 'type={}'.format(part.gpt_type_guid)
+            line = 'name={}'.format(part.id)
             if not part.use_all_available_space:
                 line = 'size={}KiB,{}'.format(part.size // 1024, line)
             script.append(line)
@@ -171,26 +178,46 @@ class StorageDeviceWithPartitions(StorageDeviceOfLimitedSize):
         ptable = json.loads(res.stdout)['partitiontable']
         items = ptable.get('partitions', [])
         if len(items) != len(self.partitions):
-            raise RuntimeError("{}: {} partitions created, {} expected".format(
+            raise RuntimeError("{}: {} elements defined in the partition table, {} expected".format(
                 self, len(items), len(self.partitions)))
 
-        block_devices = []
         for i, part in enumerate(self.partitions):
-            block_device = items[i]['node']
-            part.block_device = block_device
-            block_devices.append(block_device)
+            part.block_device = items[i]['node']
 
-        # It turns out that 'blockdev --rereadpt' + 'mdev -s' are not enough.
-        # We need to wait and periodically check that all block devices are created.
+        res = run_cmd(args=['parted', '-s', '-m', self.block_device, 'unit s', 'print'])
+        data = res.stdout.decode().splitlines()
+        data = data[2:]
+        if len(data) == 0:
+            raise RuntimeError('Less than 2 lines in parted output: {}'.format(res.stdout))
+        if len(data) != len(self.partitions):
+            raise RuntimeError("'parted print' reported only {} partitions, but {} expected".format(
+                len(data), len(self.partitions)))
+        run_cmd(args=['parted', '-s', self.block_device, 'mklabel gpt'])
+        for i, part in enumerate(self.partitions):
+            try:
+                (_, start, end, _, _, name, _) = data[i].rstrip(';').split(':')
+            except ValueError:
+                raise RuntimeError('Invalid line format in parted output: {}'.format(data[i]))
+
+            run_cmd(args=['parted', '-s', self.block_device,
+                          'mkpart {} {} {}'.format(name, start, end)])
+
+            flag = part.parted_flag
+            if flag:
+                run_cmd(args=['parted', '-s', self.block_device,
+                              'set {} {} on'.format(i + 1, flag)])
+
+        def device_exist(device_path: str) -> bool:
+            res = run_cmd(args=['blkid', '-c', '/dev/null', device_path], ignore_status=True)
+            return res.returncode == 0
+
         spent_time = 0.0
-        sleep_interval = 0.1
+        sleep_interval = 0.5
         created = False
         while spent_time < DEVICE_CREATION_TIMEOUT:
-            if all(os.path.exists(d) for d in block_devices):
+            if all(device_exist(p.block_device) for p in self.partitions):
                 created = True
                 break
-
-            run_cmd(args=['blockdev', '--rereadpt', self.block_device])
 
             time.sleep(sleep_interval)
             spent_time += sleep_interval

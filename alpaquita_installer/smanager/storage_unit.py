@@ -85,19 +85,19 @@ class Partition(StorageUnit):
     crypto_passphrase: Optional[str] = None
 
     @property
-    def gpt_type_guid(self) -> str:
+    def parted_flag(self) -> Optional[str]:
         if self.is_flag_set(StorageUnitFlag.ESP):
-            res = 'C12A7328-F81F-11D2-BA4B-00A0C93EC93B'
+            res = 'esp'
         elif self.is_flag_set(StorageUnitFlag.BIOS_BOOT):
-            res = '21686148-6449-6E6F-744E-656564454649'
+            res = 'bios_grub'
         elif self.fs_type == FSType.RAID_MEMBER:
-            res = 'A19D880F-05FC-4D3B-A006-743F0F84911E'
+            res = 'raid'
         elif self.fs_type == FSType.PHYSICAL_VOLUME:
-            res = 'E6D6D379-F507-44C2-A23C-238F2A3DF928'
+            res = 'lvm'
         elif self.fs_type == FSType.SWAP:
-            res = '0657FD6D-A4AB-43C4-84E5-0933C84B4F4F'
+            res = 'swap'
         else:
-            res = '0FC63DAF-8483-4772-8E79-3D69D8477DE4'
+            res = None
 
         return res
 
