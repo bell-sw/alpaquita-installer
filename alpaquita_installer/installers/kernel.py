@@ -49,8 +49,9 @@ class KernelInstaller(Installer):
             raise RuntimeError('Unable to determine the installed kernel version')
         self.run_in_chroot(args=['dracut', '-f', f'/boot/initramfs-{kver}', kver])
 
-        data = """
-GRUB_TIMEOUT=2
+        data = """\
+GRUB_TIMEOUT=0
+GRUB_TIMEOUT_STYLE=hidden
 GRUB_DISABLE_SUBMENU=y
 GRUB_DISABLE_RECOVERY=true
 GRUB_CMDLINE_LINUX_DEFAULT="{}"
