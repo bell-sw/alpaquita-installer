@@ -59,10 +59,8 @@ class BaseInstallerController(Controller, EventReceiver):
             if self._create_config:
                 self.create_config()
             self._install_config()
-        except yaml.YAMLError as err:
-            raise InstallerException(f'An error occured while parsing {self._config_file} file: {err}')
         except Exception as err:
-            raise InstallerException(f'An error occured: {err}')
+            raise InstallerException(f'An error occurred: {err}')
 
     def _copy_yaml_config(self):
         copied_config_rel = os.path.join('/root', os.path.basename(DEFAULT_CONFIG_FILE))
@@ -83,7 +81,11 @@ class BaseInstallerController(Controller, EventReceiver):
         if not config_str:
             raise InstallerException(f'Config is empty')
 
-        config = yaml.safe_load(config_str)
+        try:
+            config = yaml.safe_load(config_str)
+        except yaml.YAMLError as err:
+            raise InstallerException(f"Failed to parse '{self._config_file}' file: {err}")
+
         self.add_log_line(f'Using new root {self.TARGET_ROOT}')
         storage_installer = StorageInstaller(target_root=self.TARGET_ROOT,
                                              config=config, event_receiver=self)
