@@ -136,13 +136,14 @@ class ConsoleInstallerController(BaseInstallerController):
         try:
             self._run()
         except Exception as err:
+            self.add_log_line(f'{err}')
             print(err_msg_with_debug_log_file(f'{err}', app=self._app))
             return 1
         return 0
 
     def start_event(self, msg):
+        self.add_log_line(msg)
         print(msg)
-        log.debug(msg)
 
     def stop_event(self):
         pass
@@ -170,7 +171,8 @@ class InstallerController(BaseInstallerController):
         try:
             await run_in_thread(self._run)
         except Exception as err:
-            self._event_start(err_msg_with_debug_log_file(f'{err}', app=self._app))
+            self._add_log_line(f'{err}')
+            self._event_start_no_logs(err_msg_with_debug_log_file(f'{err}', app=self._app))
             self._event_finish()
             self._view.done()
             return
@@ -180,17 +182,18 @@ class InstallerController(BaseInstallerController):
 
     def add_log_line(self, msg):
         self._eloop.call_soon_threadsafe(self._add_log_line, msg)
-        log.debug(msg)
 
     def start_event(self, msg):
         self._eloop.call_soon_threadsafe(self._event_start, msg)
-        log.debug(msg)
 
     def stop_event(self):
         self._eloop.call_soon_threadsafe(self._event_finish)
 
     def _event_start(self, msg):
-        self._view.add_log_line(msg)
+        self._add_log_line(msg)
+        self._event_start_no_logs(msg)
+
+    def _event_start_no_logs(self, msg):
         self._event_finish()
         self._view.event_start('', '', msg)
 
@@ -198,6 +201,7 @@ class InstallerController(BaseInstallerController):
         self._view.event_finish('')
 
     def _add_log_line(self, msg):
+        log.debug(msg)
         self._view.add_log_line(msg)
 
     def click_cancel(self):
