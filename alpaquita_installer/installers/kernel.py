@@ -28,8 +28,6 @@ class KernelInstaller(Installer):
             yaml_key = 'cmdline'
             self._cmdline = read_list(self._data, key=yaml_key, item_type=str,
                                       error_label=f'{yaml_tag}/{yaml_key}')
-        else:
-            self._cmdline = ['quiet']
 
         self.add_package('linux-lts')
 
@@ -49,17 +47,13 @@ class KernelInstaller(Installer):
             raise RuntimeError('Unable to determine the installed kernel version')
         self.run_in_chroot(args=['dracut', '-f', f'/boot/initramfs-{kver}', kver])
 
-        data = """\
-GRUB_TIMEOUT=0
-GRUB_TIMEOUT_STYLE=hidden
-GRUB_DISABLE_SUBMENU=y
-GRUB_DISABLE_RECOVERY=true
-GRUB_CMDLINE_LINUX_DEFAULT="{}"
-GRUB_DEFAULT=saved
+        if self._cmdline:
+            grub_path = self.abs_target_path('/etc/default/grub')
+            data = ''
+            with open(grub_path, 'r') as f:
+                for line in f.readlines():
+                    if line.startswith("GRUB_CMDLINE_LINUX_DEFAULT="):
+                        line = 'GRUB_CMDLINE_LINUX_DEFAULT="{}"\n'.format(' '.join(self._cmdline))
+                    data += line
 
-# Note that Alpaquita doesn't have os-prober installed by default,
-# therefore /etc/grub.d/30_os-prober is no-op. In order to use it,
-# you need to install the os-prober package.
-GRUB_DISABLE_OS_PROBER=false
-""".format(' '.join(self._cmdline))
-        write_file(self.abs_target_path('/etc/default/grub'), 'w', data=data)
+            write_file(grub_path, 'w', data=data)
