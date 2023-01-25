@@ -76,6 +76,7 @@ class StorageController(Controller):
 
         self._available_disks = scan_host_disks()
         self._selected_disk: Optional[Disk] = None
+        self._file_system = 'xfs'
         self._use_lvm = False
         self._crypto_passphrase: Optional[str] = None
 
@@ -94,6 +95,8 @@ class StorageController(Controller):
             raise ValueError("Not enough space on '{}': its size is {}, but {} is required".format(
                 self._selected_disk.path, self._selected_disk.size, req_size))
 
+        root_fs_type = {'ext4': FSType.EXT4, 'xfs': FSType.XFS}[self._file_system]
+
         smanager = StorageManager()
 
         disk = smanager.add_disk(id=self._selected_disk.path)
@@ -109,7 +112,7 @@ class StorageController(Controller):
 
         if create_boot:
             disk.add_partition(id='boot', size=self.BOOT_SIZE,
-                               mount_point='/boot', fs_type=FSType.EXT4)
+                               mount_point='/boot', fs_type=root_fs_type)
 
         if self._use_lvm:
             if self._crypto_passphrase:
@@ -121,15 +124,15 @@ class StorageController(Controller):
                 pv = disk.add_partition(id='pv', fs_type=FSType.PHYSICAL_VOLUME)
 
             vg = smanager.add_vg(id='alpaquita_vg', physical_volumes=[pv])
-            vg.add_lv(id='root', fs_type=FSType.EXT4, mount_point='/')
+            vg.add_lv(id='root', fs_type=root_fs_type, mount_point='/')
         else:
             if self._crypto_passphrase:
                 crypto_part = disk.add_partition(id='crypto_part', fs_type=FSType.CRYPTO_PARTITION,
                                                  crypto_passphrase=self._crypto_passphrase)
-                smanager.cryptsetup.add_volume(id='root', fs_type=FSType.EXT4,
+                smanager.cryptsetup.add_volume(id='root', fs_type=root_fs_type,
                                                partition=crypto_part, mount_point='/')
             else:
-                disk.add_partition(id='root', fs_type=FSType.EXT4, mount_point='/')
+                disk.add_partition(id='root', fs_type=root_fs_type, mount_point='/')
 
         # If/when we enable user-defined storage configurations, this check
         # will go into a separate method
@@ -140,6 +143,7 @@ class StorageController(Controller):
 
     def make_ui(self):
         data = StorageViewData(selected_disk=self._selected_disk,
+                               file_system=self._file_system,
                                use_lvm=self._use_lvm,
                                crypto_passphrase=self._crypto_passphrase)
         return StorageView(self, self._available_disks[:], data)
@@ -147,6 +151,9 @@ class StorageController(Controller):
     def done(self, data: StorageViewData):
         if self._selected_disk != data.selected_disk:
             self._selected_disk = data.selected_disk
+            self._smanager_needs_reset = True
+        if self._file_system != data.file_system:
+            self._file_system = data.file_system
             self._smanager_needs_reset = True
         if self._use_lvm != data.use_lvm:
             self._use_lvm = data.use_lvm

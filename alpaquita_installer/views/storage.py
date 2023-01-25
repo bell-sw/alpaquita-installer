@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 @attrs.define
 class StorageViewData:
     use_lvm: bool
+    file_system: str
     selected_disk: Optional[Disk] = None
     crypto_passphrase: Optional[str] = None
 
@@ -32,6 +33,7 @@ class StorageForm(Form):
     cancel_label = 'Back'
 
     disk = ChoiceField('Disk:', choices=['dummy'])
+    file_system = ChoiceField('File system:', choices=['xfs', 'ext4'])
     use_lvm = BooleanField('Set up this disk as an LVM group')
     encrypt = BooleanField('Enable encryption with LUKS')
     encrypt_subform = SubFormField(PassphraseForm, '')
@@ -61,6 +63,8 @@ class StorageView(BaseView):
         self._form = StorageForm()
         self._form.use_lvm.value = data.use_lvm
         self._init_disks_list()
+
+        self._form.file_system.value = data.file_system
 
         urwid.connect_signal(self._form.encrypt.widget, 'change', self._encrypt_change)
         if data.crypto_passphrase:
@@ -112,6 +116,7 @@ class StorageView(BaseView):
         if self._form.encrypt.value:
             passphrase = self._form.encrypt_subform.value['passphrase']
         data = StorageViewData(selected_disk=self._form.disk.value,
+                               file_system=self._form.file_system.value,
                                use_lvm=self._form.use_lvm.value,
                                crypto_passphrase=passphrase)
         self._controller.done(data)
