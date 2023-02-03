@@ -1,5 +1,5 @@
-This location should contain APK public keys used to install the alpaquita-keys
-package. All other APK packages will be installed using the keys from alpaquita-keys.
+This location should contain APK public keys used to install the distro-keys
+package. All other APK packages will be installed using the keys from distro-keys.
 
 The keys must be organized in 2 subdirectories:
  * glibc - for glibc Alpaquita

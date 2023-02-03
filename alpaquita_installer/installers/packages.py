@@ -25,7 +25,7 @@ class PackagesInstaller(Installer):
             for pkg in extra_pkgs:
                 self.add_package(pkg)
 
-        self.add_package('alpaquita-base')
+        self.add_package('distro-base')
 
     def apply(self):
         self._event_receiver.start_event('Installing packages:')

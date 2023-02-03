@@ -65,7 +65,7 @@ class RepoInstaller(Installer):
         self.create_repo_file()
 
         self._event_receiver.start_event('Initializing APK database:')
-        self.apk_add(args=['--initdb', '--keys', self._keys_dir, 'alpaquita-keys'])
+        self.apk_add(args=['--initdb', '--keys', self._keys_dir, 'distro-keys'])
 
     def create_repo_file(self, media_disabled: bool = False):
         lines = []
