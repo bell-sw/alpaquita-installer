@@ -3,6 +3,7 @@
 
 import os
 
+from alpaquita_installer.app.distro import DISTRO
 from .installer import Installer
 from typing import Optional
 
@@ -38,10 +39,10 @@ class BootloaderInstaller(Installer):
         if self._efi_mount:
             self.run_in_chroot(args=['grub-install', '--target=x86_64-efi',
                                      '--efi-directory={}'.format(self._efi_mount),
-                                     '--boot-directory=/boot', '--bootloader-id=alpaquita',
+                                     '--boot-directory=/boot', f'--bootloader-id={DISTRO}',
                                      '--no-nvram'])
             self.run_in_chroot(args=['install', '-D',
-                                     os.path.join(self._efi_mount, 'EFI/alpaquita/grubx64.efi'),
+                                     os.path.join(self._efi_mount, f'EFI/{DISTRO}/grubx64.efi'),
                                      os.path.join(self._efi_mount, 'EFI/boot/bootx64.efi')])
         else:
             self.run_in_chroot(args=['grub-install', '--target=i386-pc',

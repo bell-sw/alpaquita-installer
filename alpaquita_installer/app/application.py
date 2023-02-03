@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Optional
 from subiquitycore.ui.utils import Color, LoadingDialog, Padding
 from subiquitycore.ui.buttons import header_btn
 
+from alpaquita_installer.app.distro import DISTRO_NAME
 from alpaquita_installer.common.utils import run_cmd
 from alpaquita_installer.controllers.eula import EULAController
 from alpaquita_installer.controllers.timezone import TimezoneController
@@ -70,7 +71,7 @@ class ApplicationUI(urwid.WidgetWrap):
         super().__init__(Color.body(self._pile))
 
     def set_title(self, title):
-        prefix = 'Alpaquita Linux Installation'
+        prefix = f'{DISTRO_NAME} Installation'
         if title:
             text = '{} - {}'.format(prefix, title)
         else:
@@ -116,7 +117,7 @@ class Application:
                                        ['help', 'config-file=', 'no-ui', 'debug', 'iso-mode',
                                         'no-config-copy'])
         except getopt.GetoptError as err:
-            print(f'Options parsing error: {err}')
+            print(f'Options parsing error: {err}\n')
             self.usage()
             sys.exit(1)
 
@@ -185,14 +186,15 @@ class Application:
                                           event_loop=urwid.AsyncioEventLoop(loop=self.aio_loop))
 
     def usage(self):
-        print(f'''Usage: alpaquita-installer [OPTIONS]
-        OPTIONS:
-            -f --config-file x Get setup configuration from yaml file x
-            -n --no-ui         Run the installation without a text-based UI. Requires config-file option
-            -d --debug         Enable debug-level log
-            -i --iso-mode      Run the installer in the ISO mode (no exit feature in the UI)
-            --no-config-copy   Do not copy config file to the installed system
-        ''')
+        print(f'''{DISTRO_NAME} Installer
+
+Available options:
+    -f --config-file x Get setup configuration from yaml file x
+    -n --no-ui         Run the installation without a text-based UI. Requires config-file option
+    -d --debug         Enable debug-level log
+    -i --iso-mode      Run the installer in the ISO mode (no exit feature in the UI)
+    --no-config-copy   Do not copy config file to the installed system
+''')
 
     @property
     def debug_log_file(self) -> Optional[str]:

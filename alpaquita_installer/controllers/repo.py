@@ -8,6 +8,7 @@ import os
 from typing import Tuple, Set
 from .controller import Controller
 import alpaquita_installer
+from alpaquita_installer.app.distro import DISTRO, DISTRO_REPO_BASE_URL
 from alpaquita_installer.views.repo import RepoView
 from alpaquita_installer.common.utils import MEDIA_PATH, validate_apk_repos
 
@@ -19,7 +20,7 @@ class RepoController(Controller):
 
     def __init__(self, app):
         super().__init__(app)
-        self._repo_base_url = 'https://packages.bell-sw.com'
+        self._repo_base_url = DISTRO_REPO_BASE_URL
         ver_id = self.get_os_release().get('VERSION_ID', '').split('.')
         self._release = ver_id[0] if len(ver_id) > 1 and ver_id[0] else 'stream'
         self._libc_type = 'musl' if os.path.exists('/lib/ld-musl-x86_64.so.1') else 'glibc'
@@ -69,7 +70,7 @@ class RepoController(Controller):
         repos = []
         for name in ['core', 'universe']:
             repos.append(urllib.parse.quote(
-                f'{url}/alpaquita/{libc}/{self._release}/{name}',
+                f'{url}/{DISTRO}/{libc}/{self._release}/{name}',
                 safe='/:'))
         return repos
 

@@ -11,6 +11,8 @@ from subiquitycore.ui.buttons import cancel_btn, done_btn
 from subiquitycore.ui.container import ListBox
 from subiquitycore.ui.utils import screen, Padding
 
+from alpaquita_installer.app.distro import DISTRO_NAME
+
 if TYPE_CHECKING:
     from alpaquita_installer.controllers.eula import EULAController
 
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
 class EULAView(BaseView):
     title = 'End User License Agreement'
     excerpt = ('info_minor', (
-        'To install and use Alpaquita Linux you must read and accept '
+        f'To install and use {DISTRO_NAME} you must read and accept '
         'the terms of the End User License Agreement (EULA).'))
 
     def __init__(self, controller: EULAController, content: str,

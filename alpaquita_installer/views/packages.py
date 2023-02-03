@@ -11,20 +11,23 @@ from subiquitycore.ui.form import (
     NO_HELP
 )
 
+from alpaquita_installer.app.distro import DISTRO_NAME, DISTRO_JDK8, DISTRO_JDK11, DISTRO_JDK17, DISTRO_NIK22_11, \
+    DISTRO_NIK22_17
+
 
 class KernelForm(SubForm):
     extramods = BooleanField('Install firmware and extra modules',
                              help=('info_minor', (
                                  'This option installs components which may be required for '
-                                 'operating Alpaquita Linux on bare-metal machines.')))
+                                 f'operating {DISTRO_NAME} on bare-metal machines.')))
 
 
 class JavaForm(SubForm):
-    jdk_8 = BooleanField('Liberica Standard JDK 8', help=NO_HELP)
-    jdk_11 = BooleanField('Liberica Standard JDK 11', help=NO_HELP)
-    jdk_17 = BooleanField('Liberica Standard JDK 17', help=NO_HELP)
-    nik_22_11 = BooleanField('Liberica Native Image Kit 22 (Java 11)', help=NO_HELP)
-    nik_22_17 = BooleanField('Liberica Native Image Kit 22 (Java 17)', help=NO_HELP)
+    jdk_8 = BooleanField(DISTRO_JDK8.description, help=NO_HELP)
+    jdk_11 = BooleanField(DISTRO_JDK11.description, help=NO_HELP)
+    jdk_17 = BooleanField(DISTRO_JDK17.description, help=NO_HELP)
+    nik_22_11 = BooleanField(DISTRO_NIK22_11.description, help=NO_HELP)
+    nik_22_17 = BooleanField(DISTRO_NIK22_17.description, help=NO_HELP)
 
 
 class LibcForm(SubForm):

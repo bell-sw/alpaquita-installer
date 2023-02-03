@@ -5,6 +5,8 @@ import yaml
 import glob
 import logging
 from .controller import Controller
+from alpaquita_installer.app.distro import DISTRO, DISTRO_JDK8, DISTRO_JDK11, DISTRO_JDK17, DISTRO_NIK22_11, \
+    DISTRO_NIK22_17
 from alpaquita_installer.views.packages import PackagesView
 
 log = logging.getLogger('controllers.packages')
@@ -14,7 +16,7 @@ class PackagesController(Controller):
     def __init__(self, app):
         super().__init__(app)
 
-        is_virt = len(glob.glob('/dev/disk/by-label/alpaquita-virt-*')) > 0
+        is_virt = len(glob.glob(f'/dev/disk/by-label/{DISTRO}-virt-*')) > 0
         self._data = {'kernel': {'extramods': not is_virt},
                       'other': {'ssh_server': True}}
 
@@ -48,11 +50,11 @@ class PackagesController(Controller):
 
         self._add_pkg(epkgs, 'kernel', 'extramods', 'linux-lts-extra-modules')
 
-        self._add_pkg(epkgs, 'jdk', 'jdk_8', 'liberica8')
-        self._add_pkg(epkgs, 'jdk', 'jdk_11', 'liberica11')
-        self._add_pkg(epkgs, 'jdk', 'jdk_17', 'liberica17')
-        self._add_pkg(epkgs, 'jdk', 'nik_22_11', 'liberica-nik-22-11')
-        self._add_pkg(epkgs, 'jdk', 'nik_22_17', 'liberica-nik-22-17')
+        self._add_pkg(epkgs, 'jdk', 'jdk_8', DISTRO_JDK8.package)
+        self._add_pkg(epkgs, 'jdk', 'jdk_11', DISTRO_JDK11.package)
+        self._add_pkg(epkgs, 'jdk', 'jdk_17', DISTRO_JDK17.package)
+        self._add_pkg(epkgs, 'jdk', 'nik_22_11', DISTRO_NIK22_11.package)
+        self._add_pkg(epkgs, 'jdk', 'nik_22_17', DISTRO_NIK22_17.package)
 
         self._add_pkg(epkgs, 'libc', 'perf', 'musl-perf')
 

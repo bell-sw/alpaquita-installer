@@ -9,6 +9,7 @@ import logging
 import attrs
 import yaml
 
+from alpaquita_installer.app.distro import DISTRO
 from alpaquita_installer.smanager.manager import StorageManager
 from alpaquita_installer.smanager.file_system import FSType
 from alpaquita_installer.smanager.storage_unit import Partition, StorageUnit, StorageUnitFlag, CryptoVolume
@@ -123,7 +124,7 @@ class StorageController(Controller):
             else:
                 pv = disk.add_partition(id='pv', fs_type=FSType.PHYSICAL_VOLUME)
 
-            vg = smanager.add_vg(id='alpaquita_vg', physical_volumes=[pv])
+            vg = smanager.add_vg(id=f'{DISTRO}_vg', physical_volumes=[pv])
             vg.add_lv(id='root', fs_type=root_fs_type, mount_point='/')
         else:
             if self._crypto_passphrase:

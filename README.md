@@ -1,11 +1,11 @@
 # Alpaquita Linux Installer
 
-The official installer of Alpaquita Linux.
+An installer for Alpaquita and Alpaquita-like Linux distributions.
 
 ## Usage
 
 The installer supports cross-libc installations, i.e. it's possible
-to install a musl Alpaquita Linux running on a glibc Alpaquita Linux.
+to install a musl Linux instance running on a glibc Linux instance.
 So the code expects that APK key files are shipped with the package.
 
 For that to work put the keys to the `alpaquita_installer/keys` directory.
@@ -17,6 +17,9 @@ For example:
 python setup.py bdist_wheel
 pip install dist/<the generated wheel file>
 ```
+
+To enable installations of Alpaquita-like Linux distributions you may need to update
+the `alpaquita_installer/app/distro.py` file.
 
 The installer operates in 2 modes:
  * interactive mode with a text-based UI (default mode)

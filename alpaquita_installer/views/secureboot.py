@@ -9,6 +9,8 @@ from subiquitycore.ui.form import (
     ReadOnlyField,
 )
 
+from alpaquita_installer.app.distro import DISTRO_NAME
+
 
 class SecureBootForm(Form):
     ok_label = 'Next'
@@ -19,7 +21,7 @@ class SecureBootForm(Form):
 class SecureBootView(BaseView):
     title = 'Secure Boot'
     excerpt = ('info_minor', (
-        'Alpaquita Linux provides pre-bootloader shim with a built-in certificate, '
+        f'{DISTRO_NAME} provides pre-bootloader shim with a built-in certificate, '
         'signed MOKManager utility, grub and kernel (automatically locked down if '
         'Secure Boot is enabled).\n\n'
         'The currently provided shim EFI image is not yet signed by Microsoft, so '
