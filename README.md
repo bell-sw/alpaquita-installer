@@ -1,6 +1,6 @@
 # Alpaquita Linux Installer
 
-An installer for Alpaquita and Alpaquita-like Linux distributions.
+An installer of Alpaquita and Alpaquita-like Linux distributions.
 
 ## Usage
 
