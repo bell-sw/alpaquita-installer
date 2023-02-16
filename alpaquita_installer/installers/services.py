@@ -55,6 +55,7 @@ class ServicesInstaller(Installer):
                               ('seedrng', 'boot'),
                               ('swap', 'boot'),
                               ('sysctl', 'boot'),
+                              ('sysfsconf', 'boot'),
                               ('syslog', 'boot'),
                               # ---
                               ('acpid', 'default'),
