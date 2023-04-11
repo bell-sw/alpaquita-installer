@@ -27,6 +27,7 @@ from alpaquita_installer.installers.secureboot import SecureBootInstaller
 from alpaquita_installer.installers.bootloader import BootloaderInstaller
 from alpaquita_installer.installers.post_scripts import PostScriptsInstaller
 from alpaquita_installer.installers.installer import InstallerException
+from alpaquita_installer.common.apk import APKManager
 from alpaquita_installer.common.events import EventReceiver
 from alpaquita_installer.common.utils import DEFAULT_CONFIG_FILE
 from .controller import Controller
@@ -90,12 +91,15 @@ class BaseInstallerController(Controller, EventReceiver):
         storage_installer = StorageInstaller(target_root=self.TARGET_ROOT,
                                              config=config, event_receiver=self)
         efi_mount = storage_installer.efi_mount_point
+        apk = APKManager(event_receiver=self)
+        apk.root_dir = self.TARGET_ROOT
         pkgs_installer = PackagesInstaller(target_root=self.TARGET_ROOT,
-                                           config=config, event_receiver=self)
+                                           config=config, event_receiver=self, apk=apk)
 
         installers = [
             storage_installer,
-            RepoInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
+            RepoInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self,
+                          apk=apk),
             ProxyInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
             pkgs_installer,
             ServicesInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
@@ -106,7 +110,8 @@ class BaseInstallerController(Controller, EventReceiver):
             KernelInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
             BootloaderInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self,
                                 efi_mount=efi_mount),
-            SecureBootInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
+            SecureBootInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self,
+                                apk=apk),
             PostScriptsInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
         ]
 

@@ -7,6 +7,7 @@ import urllib
 
 from .installer import Installer
 from alpaquita_installer.common.utils import MEDIA_PATH, write_file
+from alpaquita_installer.common.apk import APKManager
 from .utils import read_key_or_fail, read_list
 
 log = logging.getLogger('installer.repo')
@@ -32,13 +33,12 @@ def validate_repo_url(url: str):
 
 
 class RepoInstaller(Installer):
-    APK_KEYS_DIR = '/etc/apk/keys'
-
-    def __init__(self, target_root: str, config: dict, event_receiver):
+    def __init__(self, target_root: str, config: dict, event_receiver, apk: APKManager):
         yaml_tag = 'repositories'
         super().__init__(name=yaml_tag, target_root=target_root,
                          event_receiver=event_receiver,
                          data_type=dict, config=config)
+        self._apk = apk
         self._repo_file = ''
 
         self._urls = read_list(self._data, 'urls', item_type=str,
@@ -48,24 +48,18 @@ class RepoInstaller(Installer):
         for url in self._urls:
             validate_repo_url(url)
 
-        self._keys_dir = read_key_or_fail(self._data, 'keys', value_type=str,
-                                          error_label=f'{yaml_tag}/keys')
-        if not self._keys_dir:
-            self._keys_dir = self.APK_KEYS_DIR
-        if not os.path.isdir(self._keys_dir):
-            raise ValueError(f"'{self._keys_dir}' is not a directory")
+        val = read_key_or_fail(self._data, 'keys', value_type=str,
+                               error_label=f'{yaml_tag}/keys')
+        if val:
+            self._apk.keys_dir = val
 
     def apply(self):
         self._event_receiver.start_event('Saving repositories')
         self._event_receiver.add_log_line(f'{self._urls}')
-
-        apk_dir = self.abs_target_path('/etc/apk')
-        os.makedirs(apk_dir, exist_ok=True)
-        self._repo_file = os.path.join(apk_dir, 'repositories')
         self.create_repo_file()
 
         self._event_receiver.start_event('Initializing APK database:')
-        self.apk_add(args=['--initdb', '--keys', self._keys_dir, 'distro-keys'])
+        self._apk.add(args=['--initdb', 'distro-keys'])
 
     def create_repo_file(self, media_disabled: bool = False):
         lines = []
@@ -73,7 +67,7 @@ class RepoInstaller(Installer):
             if media_disabled and r == MEDIA_PATH:
                 r = '#' + r
             lines.append(r + '\n')
-        write_file(self._repo_file, 'w', data=''.join(lines))
+        self._apk.write_repo_file(data=''.join(lines))
 
     def cleanup(self):
         self.create_repo_file(media_disabled=True)

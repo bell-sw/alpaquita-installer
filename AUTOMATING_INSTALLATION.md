@@ -154,7 +154,7 @@ The repositories from `urls` will be used to install all packages from and also 
 in `/etc/apk/repositories` on the installed system.
 
 If access to these repositories requires keys other than those which are available on the host system,
-the path to the new keys may be specified with the `keys` paramater. For example, this may be required
+the path to the new keys directory must be specified with the `keys` paramater. For example, this may be required
 for cross-libc installations.
 
 ### Storage

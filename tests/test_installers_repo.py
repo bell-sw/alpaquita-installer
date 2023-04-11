@@ -5,13 +5,17 @@ import os
 
 import pytest
 
+from alpaquita_installer.common.apk import APKManager
 from alpaquita_installer.installers.installer import InstallerException
 from alpaquita_installer.installers.repo import RepoInstaller
-from .utils import new_installer
+from .utils import new_installer, StubEventReceiver
 
 
 def create_installer(config: dict) -> RepoInstaller:
-    return new_installer(RepoInstaller, config=config)
+    event_receiver = StubEventReceiver()
+    return new_installer(RepoInstaller, config=config,
+                         event_receiver=event_receiver,
+                         apk=APKManager(event_receiver=event_receiver))
 
 
 def test_no_repositories():

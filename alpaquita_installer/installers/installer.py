@@ -79,18 +79,3 @@ class Installer(abc.ABC):
                                                  runlevel, service))
         if is_enabled:
             self.run_in_chroot(args=['rc-update', 'del', service, runlevel])
-
-    @staticmethod
-    def transform_apk_add(txt: str):
-        if 'Installing' in txt:
-            return ' * ' + txt.replace('Installing ', '')
-        if txt.startswith('ERROR:'):
-            return '   ' + txt
-        return None
-
-    def apk_add(self, args: Iterable):
-        all_args = ['apk', 'add', '--root', self.target_root,
-                    '--no-progress', '--update-cache', '--clean-protected']
-        all_args.extend(args)
-        run_cmd_live(args=all_args, event_receiver=self._event_receiver,
-                     event_transform=self.transform_apk_add)

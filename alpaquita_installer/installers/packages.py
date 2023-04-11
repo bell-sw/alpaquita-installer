@@ -1,7 +1,7 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
-from alpaquita_installer.common.utils import run_cmd
+from alpaquita_installer.common.apk import APKManager
 from .installer import Installer
 from .utils import read_list
 
@@ -12,7 +12,7 @@ from .utils import read_list
 
 
 class PackagesInstaller(Installer):
-    def __init__(self, target_root: str, config: dict, event_receiver):
+    def __init__(self, target_root: str, config: dict, event_receiver, apk: APKManager):
         yaml_tag = 'extra_packages'
         super().__init__(name=yaml_tag, config=config,
                          event_receiver=event_receiver,
@@ -25,8 +25,9 @@ class PackagesInstaller(Installer):
             for pkg in extra_pkgs:
                 self.add_package(pkg)
 
+        self._apk = apk
         self.add_package('distro-base')
 
     def apply(self):
         self._event_receiver.start_event('Installing packages:')
-        self.apk_add(args=self.packages)
+        self._apk.add(args=self.packages)
