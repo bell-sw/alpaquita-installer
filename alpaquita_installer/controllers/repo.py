@@ -81,7 +81,7 @@ class RepoController(Controller):
     def to_yaml(self):
         res = []
 
-        if self._host_libc_type == self._libc_type:
+        if self._app.iso_mode and (self._host_libc_type == self._libc_type):
             res.append(MEDIA_PATH)
         res.extend(self.get_repos(self._repo_base_url, self._libc_type))
 
