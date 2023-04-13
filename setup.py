@@ -7,7 +7,7 @@ import setuptools
 
 setuptools.setup(
     name='alpaquita_installer',
-    version="0.7.2",
+    version="0.7.3",
     description="Installer of Alpaquita-like Linux distributions",
     long_description="",
     author='BellSoft',
