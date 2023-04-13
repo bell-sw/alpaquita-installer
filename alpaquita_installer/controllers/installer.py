@@ -87,7 +87,9 @@ class BaseInstallerController(Controller, EventReceiver):
         except yaml.YAMLError as err:
             raise InstallerException(f"Failed to parse '{self._config_file}' file: {err}")
 
-        self.add_log_line(f'Using new root {self.TARGET_ROOT}')
+        self.add_log_line(f'Creating a temporary root {self.TARGET_ROOT}')
+        os.makedirs(self.TARGET_ROOT, exist_ok=True)
+
         storage_installer = StorageInstaller(target_root=self.TARGET_ROOT,
                                              config=config, event_receiver=self)
         efi_mount = storage_installer.efi_mount_point
@@ -129,6 +131,9 @@ class BaseInstallerController(Controller, EventReceiver):
 
         for i in reversed(installers):
             i.cleanup()
+
+        self.add_log_line(f'Removing {self.TARGET_ROOT}')
+        os.rmdir(self.TARGET_ROOT)
 
         self.start_event('\nInstallation complete!')
 
