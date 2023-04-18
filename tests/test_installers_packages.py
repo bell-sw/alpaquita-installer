@@ -18,7 +18,7 @@ def create_installer(config: dict) -> PackagesInstaller:
 
 def test_no_extra_packages():
     installer = create_installer({})
-    assert 'distro-base' in installer.packages
+    assert len(installer.packages) == 0
 
 
 def test_invalid_extra_packages_type():
@@ -33,5 +33,5 @@ def test_invalid_extra_packages_list():
 
 def test_extra_packages():
     installer = create_installer({'extra_packages': ['pkg1', 'pkg2']})
-    for pkg in ('distro-base', 'pkg1', 'pkg2'):
+    for pkg in ('pkg1', 'pkg2'):
         assert pkg in installer.packages

@@ -26,8 +26,14 @@ class PackagesInstaller(Installer):
                 self.add_package(pkg)
 
         self._apk = apk
-        self.add_package('distro-base')
 
     def apply(self):
-        self._event_receiver.start_event('Installing packages:')
-        self._apk.add(args=self.packages)
+        self._event_receiver.start_event('Initializing APK database')
+        self._apk.add(args=['--initdb'])
+
+        self._event_receiver.start_event('Installing base packages:')
+        self._apk.add(args=['distro-base'])
+
+        if self.packages:
+            self._event_receiver.start_event('Installing packages:')
+            self._apk.add(args=self.packages)

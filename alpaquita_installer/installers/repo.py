@@ -59,9 +59,6 @@ class RepoInstaller(Installer):
         self._apk.write_repo_file(data=''.join(map(lambda r: r + '\n',
                                                    self._urls)))
 
-        self._event_receiver.start_event('Initializing APK database:')
-        self._apk.add(args=['--initdb', 'distro-keys'])
-
     def cleanup(self):
         # The repo file may have been updated outside the APKManager. For example,
         # with post install scripts. So we work with the existing file content
