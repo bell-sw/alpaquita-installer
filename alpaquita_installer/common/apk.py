@@ -28,6 +28,16 @@ class APKManager:
             return '   ' + txt
         return None
 
+    def _get_apk_dir(self):
+        if self._root_dir is None:
+            root_dir = '/'
+        else:
+            root_dir = self._root_dir
+        return os.path.join(root_dir, 'etc/apk')
+
+    def _get_repo_file_path(self):
+        return os.path.join(self._get_apk_dir(), 'repositories')
+
     @property
     def keys_dir(self) -> Optional[str]:
         return self._keys_dir
@@ -49,14 +59,13 @@ class APKManager:
         self._root_dir = val
 
     def write_repo_file(self, data):
-        if self._root_dir is None:
-            root_dir = '/'
-        else:
-            root_dir = self._root_dir
-        apk_dir = os.path.join(root_dir, 'etc/apk')
-        os.makedirs(apk_dir, exist_ok=True)
-        repo_file = os.path.join(apk_dir, 'repositories')
+        repo_file = self._get_repo_file_path()
+        os.makedirs(os.path.dirname(repo_file), exist_ok=True)
         write_file(repo_file, 'w', data=data)
+
+    def read_repo_file(self):
+        with open(self._get_repo_file_path(), 'r') as file:
+            return file.read()
 
     def add(self, args: Iterable):
         all_args = ['apk', 'add', '--no-progress', '--update-cache', '--clean-protected']

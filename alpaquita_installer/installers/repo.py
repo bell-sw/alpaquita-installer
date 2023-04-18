@@ -56,18 +56,19 @@ class RepoInstaller(Installer):
     def apply(self):
         self._event_receiver.start_event('Saving repositories')
         self._event_receiver.add_log_line(f'{self._urls}')
-        self.create_repo_file()
+        self._apk.write_repo_file(data=''.join(map(lambda r: r + '\n',
+                                                   self._urls)))
 
         self._event_receiver.start_event('Initializing APK database:')
         self._apk.add(args=['--initdb', 'distro-keys'])
 
-    def create_repo_file(self, media_disabled: bool = False):
+    def cleanup(self):
+        # The repo file may have been updated outside the APKManager. For example,
+        # with post install scripts. So we work with the existing file content
+        self._event_receiver.add_log_line(f"Commenting '{MEDIA_PATH}' in the repo file")
         lines = []
-        for r in self._urls:
-            if media_disabled and r == MEDIA_PATH:
+        for r in self._apk.read_repo_file().splitlines():
+            if r == MEDIA_PATH:
                 r = '#' + r
             lines.append(r + '\n')
         self._apk.write_repo_file(data=''.join(lines))
-
-    def cleanup(self):
-        self.create_repo_file(media_disabled=True)
