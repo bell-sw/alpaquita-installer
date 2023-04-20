@@ -251,7 +251,8 @@ users:
     is_admin: true
 ```
 
-The `root` user is disabled, so at least one user with admin privileges (`is_admin: true`) must be defined.
+The `root` user is always disabled, so it's recommended to define at least one user with admin
+privileges (`is_admin: true`).
 
 The password hash can be generated with Python's `crypt.crypt()` function.
 

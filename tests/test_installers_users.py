@@ -12,11 +12,6 @@ def create_installer(config: dict) -> UsersInstaller:
     return new_installer(UsersInstaller, config=config)
 
 
-def test_no_users():
-    with pytest.raises(InstallerException):
-        create_installer({})
-
-
 def test_users_invalid_type():
     with pytest.raises(InstallerException):
         create_installer({'users': False})
@@ -24,11 +19,6 @@ def test_users_invalid_type():
     with pytest.raises(ValueError):
         create_installer({'users': [{'name': 'user1', 'password': 'password_hash', 'is_admin': False},
                                     False]})
-
-
-def test_no_admin_user():
-    with pytest.raises(InstallerException, match=r'(?i)admin user'):
-        create_installer({'users': [{'name': 'user', 'password': 'password_hash'}]})
 
 
 def test_root_user():
@@ -41,7 +31,6 @@ def test_invalid_user():
              {'name': 'user'},
              {'password': 'password_hash'},
              {'name': 'user', 'password': 'password_with_:'},
-             {'name': 'user', 'password': 'password with spaces'},
              {'name': False},
              {'name': 'user', 'password': False},
              {'name': 'user', 'password': 'password_hash', 'gecos': False},

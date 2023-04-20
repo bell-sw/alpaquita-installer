@@ -8,9 +8,9 @@ from alpaquita_installer.models.user import UserModel
 from .installer import Installer, InstallerException
 from .utils import read_list
 
+# Optional
 #
-# The root user is always disabled, so at least one
-# user with admin privileges must be defined.
+# The root user is always disabled.
 #
 # users:
 #   - name: user1
@@ -69,11 +69,11 @@ class UsersInstaller(Installer):
         yaml_tag = 'users'
         super().__init__(name=yaml_tag, target_root=target_root,
                          event_receiver=event_receiver,
+                         data_is_optional=True,
                          data_type=list, config=config)
 
         self._users: list[UserModel] = []
 
-        admin_defined = False
         for item in read_list(config, key=yaml_tag, item_type=dict, error_label=yaml_tag):
             try:
                 user = read_user_from_dict(item)
@@ -81,22 +81,25 @@ class UsersInstaller(Installer):
                 raise InstallerException(str(exc)) from None
             if user.name == 'root':
                 raise InstallerException('No root user must be defined')
-            if user.is_admin:
-                admin_defined = True
-                self.add_package('sudo')
             self._users.append(user)
 
-        if not admin_defined:
-            raise InstallerException('At least one admin user must be defined')
+        # It would be strange to have a system without sudo
+        self.add_package('sudo')
 
     def apply(self):
-        self._event_receiver.start_event('Adding users')
-        wheel_sudoers_needed = False
+        write_file(self.abs_target_path('/etc/sudoers.d/00-wheel'), 'w',
+                   data='%wheel ALL=(ALL) ALL\n')
+
         etc_shadow = self.abs_target_path('/etc/shadow')
 
         # Disable the root user
         update_user_hash(etc_shadow=etc_shadow, user='root',
                          password_hash='!')
+
+        if not self._users:
+            return
+
+        self._event_receiver.start_event('Adding users')
 
         for user in self._users:
             args = ['adduser', '-D']
@@ -113,8 +116,3 @@ class UsersInstaller(Installer):
 
             if user.is_admin:
                 self.run_in_chroot(args=['addgroup', user.name, 'wheel'])
-                wheel_sudoers_needed = True
-
-        if wheel_sudoers_needed:
-            write_file(self.abs_target_path('/etc/sudoers.d/00-wheel'), 'w',
-                       data='%wheel ALL=(ALL) ALL\n')
