@@ -62,8 +62,8 @@ class StorageController(Controller):
     BOOT_EFI_SIZE = 512 * MB
     # Size of the bios_boot partition for non-EFI installations
     BIOS_BOOT_SIZE = MB
-    # Size of /boot if LVM or LUKS is enabled
-    BOOT_SIZE = GB
+    # Size of /boot
+    BOOT_SIZE = 512 * MB
     # A bare installation takes less than 100M.
     # All liberica{8,11,17} and liberica{8,11,17} lite take < 1.2G.
     # liberica{11,17}-nik both take ~ 1G.
@@ -82,7 +82,13 @@ class StorageController(Controller):
         self._crypto_passphrase: Optional[str] = None
 
     def _reset_smanager(self):
-        create_boot = self._crypto_passphrase or self._use_lvm
+        # There is a bug - if we don't have a separate /boot
+        # and / is on xfs, and we reboot after a musl and kernel apk updates,
+        # busybox init may fail to correctly umount -o ro /, thus leaving the fs corrupted.
+        # This, in turn, may leave files in /boot corrupted, so grub will be unable
+        # to load them on the next boot.
+        # So we create /boot to avoid this situation.
+        create_boot = True
         create_esp = self._app.is_efi()
 
         req_size = self.ROOT_MIN_SIZE
