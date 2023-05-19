@@ -140,6 +140,7 @@ def test_validate_apk_repo_no_packages(httpserver: pytest_httpserver.HTTPServer,
     run_cmd(args=['openssl', 'genrsa', '-out', str(privkey), '2048'])
     run_cmd(args=['openssl', 'rsa', '-in', str(privkey), '-pubout', '-out', str(pubkey)])
 
+    os.chdir(tmpdir)
     apkindex = 'APKINDEX.tar.gz'
     run_cmd(args=['apk', 'index', '-o', apkindex])
     run_cmd(args=['abuild-sign', '-k', str(privkey), apkindex])
