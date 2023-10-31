@@ -32,8 +32,9 @@ styles = {
 
 
 class Spinner(Text):
-    def __init__(self, aio_loop=None, style='spin', align='center'):
+    def __init__(self, aio_loop=None, urwid_loop=None, style='spin', align='center'):
         self.aio_loop = aio_loop
+        self.urwid_loop = urwid_loop
         self.spin_index = 0
         self.spin_text = styles[style]['texts']
         self.rate = styles[style]['rate']
@@ -43,6 +44,7 @@ class Spinner(Text):
     def spin(self):
         self.spin_index = (self.spin_index + 1) % len(self.spin_text)
         self.set_text(self.spin_text[self.spin_index])
+        self.aio_loop.call_soon(self.urwid_loop.draw_screen)
 
     def _advance(self):
         self.spin()
@@ -54,6 +56,7 @@ class Spinner(Text):
 
     def stop(self):
         self.set_text('')
+        self.aio_loop.call_soon(self.urwid_loop.draw_screen)
         if self.handle is not None:
             self.handle.cancel()
             self.handle = None

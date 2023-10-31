@@ -59,6 +59,7 @@ class RepoController(Controller):
             self._app.next_screen()
         except ValueError as exc:
             self._app.show_error_message(str(exc))
+            self._app.aio_loop.call_soon(self._app.urwid_loop.draw_screen)
 
     def done(self, repo_base_url: str, libc_type: str):
         self._app.aio_loop.create_task(self._update_url_libc(repo_base_url, libc_type))
