@@ -181,9 +181,9 @@ class Application:
 
         atexit.register(self.cleanup)
         self.aio_loop = asyncio.get_event_loop()
-        self._urwid_loop = urwid.MainLoop(widget=self.ui, palette=self._palette,
-                                          handle_mouse=False, pop_ups=True,
-                                          event_loop=urwid.AsyncioEventLoop(loop=self.aio_loop))
+        self.urwid_loop = urwid.MainLoop(widget=self.ui, palette=self._palette,
+                                         handle_mouse=False, pop_ups=True,
+                                         event_loop=urwid.AsyncioEventLoop(loop=self.aio_loop))
 
     def usage(self):
         print(f'''{DISTRO_NAME} Installer
@@ -232,7 +232,7 @@ Available options:
 
         if not self._display_screen():
             self.next_screen()
-        self._urwid_loop.run()
+        self.urwid_loop.run()
 
     def _move_screen(self, increment):
         prev_idx = self._ctrl_idx
@@ -319,8 +319,8 @@ Available options:
 
         def show_load():
             nonlocal ld
-            ld = LoadingDialog(
-                self.ui.body, self.aio_loop, message, task_to_cancel)
+            ld = LoadingDialog(parent=self.ui.body, aio_loop=self.aio_loop, urwid_loop=self.urwid_loop,
+                               msg=message, task_to_cancel=task_to_cancel)
             self.ui.body.show_overlay(ld, width=ld.width)
 
         def hide_load():

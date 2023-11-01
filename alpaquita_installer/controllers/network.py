@@ -52,6 +52,7 @@ class NetworkController(Controller):
             self._app.next_screen()
         except RuntimeError as exc:
             self._app.show_error_message(str(exc))
+            self._app.aio_loop.call_soon(self._app.urwid_loop.draw_screen)
 
     def done(self):
         self._nmanager.select_iface(self._iface_name)
