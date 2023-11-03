@@ -2,6 +2,7 @@
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
 import logging
+import os
 
 import yaml
 
@@ -12,6 +13,8 @@ log = logging.getLogger('controllers.proxy')
 
 
 class ProxyController(Controller):
+    ENV_VARS = ('http_proxy', 'https_proxy')
+
     def __init__(self, app):
         super().__init__(app)
         self.proxy = ''
@@ -21,6 +24,13 @@ class ProxyController(Controller):
 
     def done(self, proxy: str):
         self.proxy = proxy
+        # If other controllers try to access the network,
+        # they should pick up the proxy configuration
+        for v in self.ENV_VARS:
+            if self.proxy:
+                os.environ[v] = self.proxy
+            elif v in os.environ:
+                del os.environ[v]
         log.debug("Proxy: '{}'".format(self.proxy))
         self._app.next_screen()
 
