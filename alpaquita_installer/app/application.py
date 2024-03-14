@@ -111,11 +111,12 @@ class Application:
         self._iso_mode = False
         self._debug_log_file = None
         self._copy_config = True
+        self._shim_unsigned = False
 
         try:
             opts, args = getopt.getopt(sys.argv[1:], 'hf:ndi',
                                        ['help', 'config-file=', 'no-ui', 'debug', 'iso-mode',
-                                        'no-config-copy'])
+                                        'no-config-copy', 'shim-unsigned'])
         except getopt.GetoptError as err:
             print(f'Options parsing error: {err}\n')
             self.usage()
@@ -140,6 +141,8 @@ class Application:
                 self._iso_mode = True
             elif opt in ("--no-config-copy"):
                 self._copy_config = False
+            elif opt in ("--shim-unsigned"):
+                self._shim_unsigned = True
 
         if self._no_ui and not self._config_file:
             self.usage()
@@ -194,6 +197,7 @@ Available options:
     -d --debug         Enable debug-level log
     -i --iso-mode      Run the installer in the ISO mode (no exit feature in the UI)
     --no-config-copy   Do not copy config file to the installed system
+    --shim-unsigned    Display menu with shim installation option
 ''')
 
     @property
@@ -219,6 +223,9 @@ Available options:
 
     def is_efi(self) -> bool:
         return os.path.exists('/sys/firmware/efi')
+
+    def is_shim_unsigned(self) -> bool:
+        return self._shim_unsigned
 
     def controllers(self):
         return self._controllers

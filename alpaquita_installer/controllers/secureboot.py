@@ -14,11 +14,11 @@ class SecureBootController(Controller):
     def __init__(self, app):
         super().__init__(app)
 
-        self._install_shim = False
-        self._is_efi = self._app.is_efi()
+        self._install_shim = not app.is_shim_unsigned()
+        self._show_ui = app.is_shim_unsigned() and app.is_efi()
 
     def make_ui(self):
-        return SecureBootView(self, self._install_shim) if self._is_efi else None
+        return SecureBootView(self, self._install_shim) if self._show_ui else None
 
     def done(self, install_shim):
         self._install_shim = install_shim
