@@ -29,7 +29,7 @@ from alpaquita_installer.installers.post_scripts import PostScriptsInstaller
 from alpaquita_installer.installers.installer import InstallerException
 from alpaquita_installer.common.apk import APKManager
 from alpaquita_installer.common.events import EventReceiver
-from alpaquita_installer.common.utils import DEFAULT_CONFIG_FILE
+from alpaquita_installer.common.utils import DEFAULT_CONFIG_FILE, Arch
 from .controller import Controller
 
 if TYPE_CHECKING:
@@ -92,6 +92,7 @@ class BaseInstallerController(Controller, EventReceiver):
 
         storage_installer = StorageInstaller(target_root=self.TARGET_ROOT,
                                              config=config, event_receiver=self)
+        arch = Arch(os.uname().machine)
         efi_mount = storage_installer.efi_mount_point
         apk = APKManager(event_receiver=self)
         apk.root_dir = self.TARGET_ROOT
@@ -111,7 +112,7 @@ class BaseInstallerController(Controller, EventReceiver):
             NetworkInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
             KernelInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),
             BootloaderInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self,
-                                efi_mount=efi_mount),
+                                arch=arch, efi_mount=efi_mount),
             SecureBootInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self,
                                 apk=apk),
             PostScriptsInstaller(target_root=self.TARGET_ROOT, config=config, event_receiver=self),

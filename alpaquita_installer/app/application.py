@@ -17,7 +17,7 @@ from subiquitycore.ui.utils import Color, LoadingDialog, Padding
 from subiquitycore.ui.buttons import header_btn
 
 from alpaquita_installer.app.distro import DISTRO_NAME
-from alpaquita_installer.common.utils import run_cmd
+from alpaquita_installer.common.utils import run_cmd, Arch
 from alpaquita_installer.controllers.eula import EULAController
 from alpaquita_installer.controllers.timezone import TimezoneController
 from alpaquita_installer.controllers.proxy import ProxyController
@@ -112,6 +112,7 @@ class Application:
         self._debug_log_file = None
         self._copy_config = True
         self._shim_unsigned = False
+        self._arch = Arch(os.uname().machine)
 
         try:
             opts, args = getopt.getopt(sys.argv[1:], 'hf:ndi',
@@ -220,6 +221,10 @@ Available options:
         else:
             size += StorageController.BIOS_BOOT_SIZE
         return size
+
+    @property
+    def arch(self) -> Arch:
+        return self._arch
 
     def is_efi(self) -> bool:
         return os.path.exists('/sys/firmware/efi')
