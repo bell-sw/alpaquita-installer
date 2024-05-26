@@ -113,11 +113,14 @@ class Application:
         self._copy_config = True
         self._shim_unsigned = False
         self._arch = Arch(os.uname().machine)
+        # It is the default value in urwid.
+        # Setting it explicitly in case urwid changes it.
+        self._colors = 16
 
         try:
             opts, args = getopt.getopt(sys.argv[1:], 'hf:ndi',
                                        ['help', 'config-file=', 'no-ui', 'debug', 'iso-mode',
-                                        'no-config-copy', 'shim-unsigned'])
+                                        'no-config-copy', 'shim-unsigned', 'no-colors'])
         except getopt.GetoptError as err:
             print(f'Options parsing error: {err}\n')
             self.usage()
@@ -144,6 +147,8 @@ class Application:
                 self._copy_config = False
             elif opt in ("--shim-unsigned"):
                 self._shim_unsigned = True
+            elif opt in ("--no-colors"):
+                self._colors = 1
 
         if self._no_ui and not self._config_file:
             self.usage()
@@ -183,9 +188,13 @@ class Application:
         self.ui = self.make_ui(self)
         self._palette = palette
 
+        screen = urwid.raw_display.Screen()
+        screen.register_palette(self._palette)
+        screen.set_terminal_properties(colors=self._colors)
+
         atexit.register(self.cleanup)
         self.aio_loop = asyncio.get_event_loop()
-        self.urwid_loop = urwid.MainLoop(widget=self.ui, palette=self._palette,
+        self.urwid_loop = urwid.MainLoop(widget=self.ui, screen=screen,
                                          handle_mouse=False, pop_ups=True,
                                          event_loop=urwid.AsyncioEventLoop(loop=self.aio_loop))
 
@@ -199,6 +208,7 @@ Available options:
     -i --iso-mode      Run the installer in the ISO mode (no exit feature in the UI)
     --no-config-copy   Do not copy config file to the installed system
     --shim-unsigned    Display menu with shim installation option
+    --no-colors        Do not use colors
 ''')
 
     @property
