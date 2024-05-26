@@ -50,6 +50,7 @@ class ApplicationUI(urwid.WidgetWrap):
     block_input = False
 
     def __init__(self, app: Application):
+        self._app = app
         self._help_msg = HelpMsgStretchy(self,
                                          min_disk_size=app.min_disk_size)
         self._shown_help_msg = None
@@ -84,6 +85,10 @@ class ApplicationUI(urwid.WidgetWrap):
     @property
     def body(self) -> BaseView:
         return self._pile.contents[self._body_pos][0]
+
+    @property
+    def app(self) -> Application:
+        return self._app
 
     def _show_help(self, sender=None):
         if self._shown_help_msg is None:
