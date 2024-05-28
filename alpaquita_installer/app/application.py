@@ -131,8 +131,11 @@ class Application:
                             help="get setup configuration from yaml file")
         parser.add_argument("-n", "--no-ui", action="store_true",
                             help="run the installation without a text-based UI. Requires config-file option")
-        parser.add_argument("-d", "--debug", action="store_true",
-                            help=f"write debug logs to '{DEFAULT_LOG_FILE}'")
+        debug_group = parser.add_mutually_exclusive_group()
+        debug_group.add_argument("-d", "--debug", action="store_true",
+                                 help=f"write debug logs to '{DEFAULT_LOG_FILE}'")
+        debug_group.add_argument("--debug-log",
+                                 help="write debug logs to a file")
         parser.add_argument("-i", "--iso-mode", action="store_true",
                             help="run the installer in the ISO mode (no exit feature in the UI)")
         parser.add_argument("--no-config-copy", action="store_true",
@@ -148,6 +151,8 @@ class Application:
         self._no_ui = args.no_ui
         if args.debug:
             self._debug_log_file = os.path.abspath(DEFAULT_LOG_FILE)
+        elif args.debug_log:
+            self._debug_log_file = os.path.abspath(args.debug_log)
         self._iso_mode = args.iso_mode
         self._copy_config = not args.no_config_copy
         self._shim_unsigned = args.shim_unsigned
