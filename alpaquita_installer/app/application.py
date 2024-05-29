@@ -26,6 +26,7 @@ from alpaquita_installer.controllers.repo import RepoController
 from alpaquita_installer.controllers.user import UserController
 from alpaquita_installer.controllers.network import NetworkController
 from alpaquita_installer.controllers.storage import StorageController
+from alpaquita_installer.controllers.serial_console import SerialConsoleController
 from alpaquita_installer.controllers.secureboot import SecureBootController
 from alpaquita_installer.controllers.packages import PackagesController
 from alpaquita_installer.controllers.installer import (
@@ -185,6 +186,7 @@ class Application:
                 PackagesController(self),
                 TimezoneController(self),
                 UserController(self),
+                SerialConsoleController(self),
                 StorageController(self),
                 SecureBootController(self),
                 InstallerController(self)
