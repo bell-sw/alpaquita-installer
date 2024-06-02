@@ -7,35 +7,42 @@ import pytest
 
 from alpaquita_installer.installers.installer import InstallerException
 from alpaquita_installer.installers.bootloader import BootloaderInstaller
+from alpaquita_installer.common.utils import Arch
 from .utils import new_installer
 
 
-def create_installer(config: dict, efi_mount: Optional[str] = None) -> BootloaderInstaller:
-    return new_installer(BootloaderInstaller, config=config, efi_mount=efi_mount)
+def create_installer(config: dict, arch: Arch, efi_mount: Optional[str] = None) -> BootloaderInstaller:
+    return new_installer(BootloaderInstaller, config=config, arch=arch, efi_mount=efi_mount)
 
 
 def test_no_bootloader_device():
     with pytest.raises(ValueError, match="'bootloader_device'"):
-        create_installer(config={})
+        create_installer(config={}, arch=Arch.X86_64)
+
+
+def test_non_efi_not_x86_64():
+    with pytest.raises(ValueError, match="bootloader installation is not supported"):
+        create_installer(config={}, arch=Arch.AARCH64)
 
 
 def test_no_bootloader_device_with_efi():
-    create_installer(config={}, efi_mount='/boot/efi')
+    create_installer(config={}, arch=Arch.X86_64, efi_mount='/boot/efi')
 
 
 def test_invalid_bootloader_device_type():
     with pytest.raises(InstallerException):
-        create_installer(config={'bootloader_device': False})
+        create_installer(config={'bootloader_device': False}, arch=Arch.X86_64)
 
 
-def test_added_package_efi():
+@pytest.mark.parametrize('arch', [Arch.X86_64, Arch.AARCH64])
+def test_added_package_efi(arch):
     installer = create_installer(config={'bootloader_device': '/dev/vda'},
-                                 efi_mount='/boot/efi')
+                                 arch=arch, efi_mount='/boot/efi')
     for pkg in ('grub', 'grub-efi'):
         assert pkg in installer.packages
 
 
 def test_added_package_non_efi():
-    installer = create_installer(config={'bootloader_device': '/dev/vda'})
+    installer = create_installer(config={'bootloader_device': '/dev/vda'}, arch=Arch.X86_64)
     for pkg in ('grub', 'grub-bios'):
         assert pkg in installer.packages

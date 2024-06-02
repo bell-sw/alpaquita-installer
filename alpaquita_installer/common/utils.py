@@ -1,6 +1,7 @@
 #  SPDX-FileCopyrightText: 2022 BellSoft
 #  SPDX-License-Identifier:  AGPL-3.0-or-later
 
+import enum
 import subprocess
 import urllib
 from typing import Optional, Callable, Iterable
@@ -15,6 +16,10 @@ log = logging.getLogger('common.utils')
 VALID_PROXY_URL_TEMPLATE = 'http://[[user][:password]@]hostname[:port]'
 MEDIA_PATH = '/media/disk/apks'
 DEFAULT_CONFIG_FILE = 'setup.yaml'
+
+class Arch(enum.Enum):
+    X86_64 = "x86_64"
+    AARCH64 = "aarch64"
 
 
 def run_cmd(args, input: Optional[bytes] = None,

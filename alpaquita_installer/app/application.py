@@ -11,13 +11,14 @@ import os
 import atexit
 import logging
 import signal
+import argparse
 from typing import TYPE_CHECKING, Optional
 
 from subiquitycore.ui.utils import Color, LoadingDialog, Padding
 from subiquitycore.ui.buttons import header_btn
 
 from alpaquita_installer.app.distro import DISTRO_NAME
-from alpaquita_installer.common.utils import run_cmd
+from alpaquita_installer.common.utils import run_cmd, Arch
 from alpaquita_installer.controllers.eula import EULAController
 from alpaquita_installer.controllers.timezone import TimezoneController
 from alpaquita_installer.controllers.proxy import ProxyController
@@ -25,6 +26,7 @@ from alpaquita_installer.controllers.repo import RepoController
 from alpaquita_installer.controllers.user import UserController
 from alpaquita_installer.controllers.network import NetworkController
 from alpaquita_installer.controllers.storage import StorageController
+from alpaquita_installer.controllers.serial_console import SerialConsoleController
 from alpaquita_installer.controllers.secureboot import SecureBootController
 from alpaquita_installer.controllers.packages import PackagesController
 from alpaquita_installer.controllers.installer import (
@@ -45,11 +47,14 @@ MAX_BLOCK_TIME = 0.1
 # long to avoid excessive flicker in the UI.
 MIN_SHOW_PROGRESS_TIME = 1.0
 
+DEFAULT_LOG_FILE = "installer.log"
+
 
 class ApplicationUI(urwid.WidgetWrap):
     block_input = False
 
     def __init__(self, app: Application):
+        self._app = app
         self._help_msg = HelpMsgStretchy(self,
                                          min_disk_size=app.min_disk_size)
         self._shown_help_msg = None
@@ -85,6 +90,10 @@ class ApplicationUI(urwid.WidgetWrap):
     def body(self) -> BaseView:
         return self._pile.contents[self._body_pos][0]
 
+    @property
+    def app(self) -> Application:
+        return self._app
+
     def _show_help(self, sender=None):
         if self._shown_help_msg is None:
             def on_close():
@@ -112,41 +121,50 @@ class Application:
         self._debug_log_file = None
         self._copy_config = True
         self._shim_unsigned = False
+        self._arch = Arch(os.uname().machine)
+        # It is the default value in urwid.
+        # Setting it explicitly in case urwid changes it.
+        self._colors = 16
 
-        try:
-            opts, args = getopt.getopt(sys.argv[1:], 'hf:ndi',
-                                       ['help', 'config-file=', 'no-ui', 'debug', 'iso-mode',
-                                        'no-config-copy', 'shim-unsigned'])
-        except getopt.GetoptError as err:
-            print(f'Options parsing error: {err}\n')
-            self.usage()
-            sys.exit(1)
+        parser = argparse.ArgumentParser(prog="python -m alpaquita_installer",
+                                         description=f"{DISTRO_NAME} Installer")
+        parser.add_argument("-f", "--config-file",
+                            help="get setup configuration from yaml file")
+        parser.add_argument("-n", "--no-ui", action="store_true",
+                            help="run the installation without a text-based UI. Requires config-file option")
+        debug_group = parser.add_mutually_exclusive_group()
+        debug_group.add_argument("-d", "--debug", action="store_true",
+                                 help=f"write debug logs to '{DEFAULT_LOG_FILE}'")
+        debug_group.add_argument("--debug-log",
+                                 help="write debug logs to a file")
+        parser.add_argument("-i", "--iso-mode", action="store_true",
+                            help="run the installer in the ISO mode (no exit feature in the UI)")
+        parser.add_argument("--no-config-copy", action="store_true",
+                            help="do not copy config file to the installed system")
+        parser.add_argument("--shim-unsigned", action="store_true",
+                            help="display menu with shim installation option")
+        parser.add_argument("--no-colors", action="store_true",
+                            help="do not use colors")
 
-        self._config_file = ''
-        for opt, arg in opts:
-            if opt in ("-h", "--help"):
-                self.usage()
-                sys.exit(0)
-            elif opt in ("-f", "--config-file"):
-                if not os.path.exists(arg):
-                    print(f'Failed to find config file {arg}')
-                    sys.exit(1)
-                self._config_file = arg
-            elif opt in ("-n", "--no-ui"):
-                self._no_ui = True
-            elif opt in ("-d", "--debug"):
-                self._debug_log_file = os.path.abspath('installer.log')
-                logging.basicConfig(filename=self._debug_log_file, filemode='w', level=logging.DEBUG)
-            elif opt in ("-i", "--iso-mode"):
-                self._iso_mode = True
-            elif opt in ("--no-config-copy"):
-                self._copy_config = False
-            elif opt in ("--shim-unsigned"):
-                self._shim_unsigned = True
+        args = parser.parse_args()
+
+        self._config_file = args.config_file if args.config_file else ''
+        self._no_ui = args.no_ui
+        if args.debug:
+            self._debug_log_file = os.path.abspath(DEFAULT_LOG_FILE)
+        elif args.debug_log:
+            self._debug_log_file = os.path.abspath(args.debug_log)
+        self._iso_mode = args.iso_mode
+        self._copy_config = not args.no_config_copy
+        self._shim_unsigned = args.shim_unsigned
+        if args.no_colors:
+            self._colors = 1
 
         if self._no_ui and not self._config_file:
-            self.usage()
-            sys.exit(1)
+            parser.error("--no-ui must be set with --config-file")
+
+        if self._debug_log_file:
+            logging.basicConfig(filename=self._debug_log_file, filemode='w', level=logging.DEBUG)
 
         if self._iso_mode:
             signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -168,6 +186,7 @@ class Application:
                 PackagesController(self),
                 TimezoneController(self),
                 UserController(self),
+                SerialConsoleController(self),
                 StorageController(self),
                 SecureBootController(self),
                 InstallerController(self)
@@ -182,23 +201,15 @@ class Application:
         self.ui = self.make_ui(self)
         self._palette = palette
 
+        screen = urwid.raw_display.Screen()
+        screen.register_palette(self._palette)
+        screen.set_terminal_properties(colors=self._colors)
+
         atexit.register(self.cleanup)
         self.aio_loop = asyncio.get_event_loop()
-        self.urwid_loop = urwid.MainLoop(widget=self.ui, palette=self._palette,
+        self.urwid_loop = urwid.MainLoop(widget=self.ui, screen=screen,
                                          handle_mouse=False, pop_ups=True,
                                          event_loop=urwid.AsyncioEventLoop(loop=self.aio_loop))
-
-    def usage(self):
-        print(f'''{DISTRO_NAME} Installer
-
-Available options:
-    -f --config-file x Get setup configuration from yaml file x
-    -n --no-ui         Run the installation without a text-based UI. Requires config-file option
-    -d --debug         Enable debug-level log
-    -i --iso-mode      Run the installer in the ISO mode (no exit feature in the UI)
-    --no-config-copy   Do not copy config file to the installed system
-    --shim-unsigned    Display menu with shim installation option
-''')
 
     @property
     def debug_log_file(self) -> Optional[str]:
@@ -220,6 +231,10 @@ Available options:
         else:
             size += StorageController.BIOS_BOOT_SIZE
         return size
+
+    @property
+    def arch(self) -> Arch:
+        return self._arch
 
     def is_efi(self) -> bool:
         return os.path.exists('/sys/firmware/efi')

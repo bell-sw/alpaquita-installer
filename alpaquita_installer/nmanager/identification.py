@@ -9,6 +9,9 @@ import attrs
 HWDATA_PCI = '/usr/share/hwdata/pci.ids'
 HWDATA_USB = '/usr/share/hwdata/usb.ids'
 
+UNKNOWN_VENDOR = 'Unknown vendor'
+UNKNOWN_MODEL = 'Unknown model'
+
 
 @attrs.define
 class DeviceIdentification:
@@ -68,9 +71,9 @@ def lookup_hwdata(hwdata_path: str, vendor_id: int, device_id: int) -> DeviceIde
         pass
 
     if not vendor:
-        vendor = 'Unknown vendor'
+        vendor = UNKNOWN_VENDOR
     if not device:
-        device = 'Unknown model'
+        device = UNKNOWN_MODEL
 
     return DeviceIdentification(vendor=vendor, model=device)
 
@@ -110,4 +113,4 @@ def identify_device(device_path: str) -> DeviceIdentification:
     elif subsystem == 'usb':
         return identify_usb_device(device_path)
     else:
-        raise ValueError('Cannot identify device on subsystem: {}'.format(subsystem))
+        return DeviceIdentification(vendor=UNKNOWN_VENDOR, model=UNKNOWN_MODEL)
