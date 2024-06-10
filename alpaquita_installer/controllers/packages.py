@@ -5,8 +5,8 @@ import yaml
 import glob
 import logging
 from .controller import Controller
-from alpaquita_installer.app.distro import DISTRO, DISTRO_JDK8, DISTRO_JDK11, DISTRO_JDK17, DISTRO_NIK22_11, \
-    DISTRO_NIK22_17
+from alpaquita_installer.app.distro import DISTRO, DISTRO_JDK8, DISTRO_JDK11, DISTRO_JDK17, DISTRO_NIK23_17, \
+    DISTRO_NIK23_21
 from alpaquita_installer.views.packages import PackagesView
 
 log = logging.getLogger('controllers.packages')
@@ -53,8 +53,8 @@ class PackagesController(Controller):
         self._add_pkg(epkgs, 'jdk', 'jdk_8', DISTRO_JDK8.package)
         self._add_pkg(epkgs, 'jdk', 'jdk_11', DISTRO_JDK11.package)
         self._add_pkg(epkgs, 'jdk', 'jdk_17', DISTRO_JDK17.package)
-        self._add_pkg(epkgs, 'jdk', 'nik_22_11', DISTRO_NIK22_11.package)
-        self._add_pkg(epkgs, 'jdk', 'nik_22_17', DISTRO_NIK22_17.package)
+        self._add_pkg(epkgs, 'jdk', 'nik_23_17', DISTRO_NIK23_17.package)
+        self._add_pkg(epkgs, 'jdk', 'nik_23_21', DISTRO_NIK23_21.package)
 
         self._add_pkg(epkgs, 'libc', 'perf', 'musl-perf')
 

@@ -26,7 +26,7 @@ DISTRO_JDK11 = PackageDescription(description='Liberica Standard JDK 11',
                                   package='liberica11')
 DISTRO_JDK17 = PackageDescription(description='Liberica Standard JDK 17',
                                   package='liberica17')
-DISTRO_NIK22_11 = PackageDescription(description='Liberica Native Image Kit 22 (Java 11)',
-                                     package='liberica-nik-22-11')
-DISTRO_NIK22_17 = PackageDescription(description='Liberica Native Image Kit 22 (Java 17)',
-                                     package='liberica-nik-22-17')
+DISTRO_NIK23_17 = PackageDescription(description='Liberica Native Image Kit 23 (Java 17)',
+                                     package='liberica-nik-23-17')
+DISTRO_NIK23_21 = PackageDescription(description='Liberica Native Image Kit 23 (Java 21)',
+                                     package='liberica-nik-23-21')
