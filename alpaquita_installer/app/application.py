@@ -164,7 +164,9 @@ class Application:
             parser.error("--no-ui must be set with --config-file")
 
         if self._debug_log_file:
-            logging.basicConfig(filename=self._debug_log_file, filemode='w', level=logging.DEBUG)
+            logging.basicConfig(filename=self._debug_log_file, filemode='w',
+                                format=f"%(asctime)s:{logging.BASIC_FORMAT}",
+                                level=logging.DEBUG)
 
         if self._iso_mode:
             signal.signal(signal.SIGINT, signal.SIG_IGN)
