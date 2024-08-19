@@ -12,7 +12,7 @@ from subiquitycore.ui.form import (
 )
 
 from alpaquita_installer.app.distro import DISTRO_NAME, DISTRO_JDK8, DISTRO_JDK11, DISTRO_JDK17, \
-    DISTRO_JDK21, DISTRO_NIK23_17, DISTRO_NIK23_21
+    DISTRO_JDK21, DISTRO_NIK23_17, DISTRO_NIK23_21, DISTRO_NIK24_22
 
 
 class KernelForm(SubForm):
@@ -29,6 +29,7 @@ class JavaForm(SubForm):
     jdk_21 = BooleanField(DISTRO_JDK21.description, help=NO_HELP)
     nik_23_17 = BooleanField(DISTRO_NIK23_17.description, help=NO_HELP)
     nik_23_21 = BooleanField(DISTRO_NIK23_21.description, help=NO_HELP)
+    nik_24_22 = BooleanField(DISTRO_NIK24_22.description, help=NO_HELP)
 
 
 class LibcForm(SubForm):
