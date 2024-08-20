@@ -32,3 +32,5 @@ DISTRO_NIK23_17 = PackageDescription(description='Liberica Native Image Kit 23 (
                                      package='liberica-nik-23-17')
 DISTRO_NIK23_21 = PackageDescription(description='Liberica Native Image Kit 23 (Java 21)',
                                      package='liberica-nik-23-21')
+DISTRO_NIK24_22 = PackageDescription(description='Liberica Native Image Kit 24 (Java 22)',
+                                     package='liberica-nik-24-22')
