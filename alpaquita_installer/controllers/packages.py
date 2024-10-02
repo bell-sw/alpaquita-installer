@@ -16,7 +16,16 @@ class PackagesController(Controller):
     def __init__(self, app):
         super().__init__(app)
 
-        is_virt = len(glob.glob(f'/dev/disk/by-label/{DISTRO}-virt-*')) > 0
+        #Determine if the ISO is of type "virt" or not
+        is_virt = False
+        try:
+            #.alpaquita-release file is in the format of ${image_name}-${RELEASE} ${build_date}
+            #and ${image_name} is formatted like image_name="alpaquita-${PROFILE}"
+            #.alpaquita-release should be smth like: alpaquita-virt-240901 240901 if virt type
+            with open("/media/disk/.alpaquita-release", "r") as f:
+                is_virt = '-virt-' in f.readline()
+        except FileNotFoundError:
+            pass
         self._data = {'kernel': {'extramods': not is_virt},
                       'other': {'ssh_server': True}}
 
